@@ -7,13 +7,14 @@ from aiogram.filters import Command, CommandObject
 
 from decorators import message_logging, check_time_limits
 from filters import ChatTypeFilter
+from filters import IsAdmin
 from loader import db, bot
 from utils.misc.neural_networks import bing_chat, chat_gpt_3, chat_gpt_4
 
 handle_chat_router = Router()
 
 
-@handle_chat_router.message(Command(commands=["switch"]), ChatTypeFilter(is_group=False))
+@handle_chat_router.message(Command(commands=["switch"]), ChatTypeFilter(is_group=False), IsAdmin())
 async def switch_chat_type(message: types.Message, command: CommandObject):
     args = command.args
     if args:
