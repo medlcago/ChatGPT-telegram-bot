@@ -1,3 +1,4 @@
+import logging
 import os
 
 import poe
@@ -12,6 +13,9 @@ import poe
 from dotenv import load_dotenv
 
 load_dotenv()
+
+poe.logger.setLevel(logging.INFO)
+
 
 OpenAI_API_KEY = os.getenv("OpenAI_API_KEY")
 REPLICATE_API_TOKEN = os.getenv("REPLICATE_API_TOKEN")
