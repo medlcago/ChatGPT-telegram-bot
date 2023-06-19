@@ -8,7 +8,7 @@ EDGES = {}
 my_conversation_style = ConversationStyle.precise
 
 
-async def bing_chat(message_text, user_id):
+async def chat_bing(message_text, user_id):
     if user_id not in EDGES:
         EDGES[user_id] = Chatbot(cookie_path=COOKIE_PATH)
     response_dict = await EDGES[user_id].ask(prompt=message_text, conversation_style=my_conversation_style)

@@ -215,7 +215,7 @@ class Database:
                 await cursor.execute("SELECT chat_type FROM users WHERE user_id = %s", (user_id,))
                 result = await cursor.fetchone()
             connection.close()
-            return 'gpt-3' if result[0] == 1 else 'gpt-4' if result[0] == 2 else 'bing'
+            return 'gpt-3' if result[0] == 1 else 'gpt-4' if result[0] == 2 else 'bing' if result[0] == 3 else 'claude'
         except Exception as e:
             print(e)
 
@@ -226,6 +226,6 @@ class Database:
                 await cursor.execute("UPDATE users SET chat_type = %s WHERE user_id = %s", (chat_type, user_id))
                 await connection.commit()
             connection.close()
-            return 'gpt-3' if chat_type == 1 else 'gpt-4' if chat_type == 2 else 'bing'
+            return 'gpt-3' if chat_type == 1 else 'gpt-4' if chat_type == 2 else 'bing' if chat_type == 3 else 'claude'
         except Exception as e:
             print(e)

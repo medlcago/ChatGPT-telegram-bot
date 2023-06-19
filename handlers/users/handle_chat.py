@@ -9,7 +9,7 @@ from decorators import message_logging, check_time_limits
 from filters import ChatTypeFilter
 from filters import IsAdmin
 from loader import db, bot
-from utils.misc.neural_networks import bing_chat, chat_gpt_3, chat_gpt_4
+from utils.misc.neural_networks import chat_bing, chat_gpt_3, chat_gpt_4, chat_claude
 
 handle_chat_router = Router()
 
@@ -18,8 +18,8 @@ handle_chat_router = Router()
 async def switch_chat_type(message: types.Message, command: CommandObject):
     args = command.args
     if args:
-        if args in ("gpt-3", "gpt-4", "bing"):
-            chat_type = 1 if args == "gpt-3" else 2 if args == "gpt-4" else 3
+        if args in ("gpt-3", "gpt-4", "bing", "claude"):
+            chat_type = 1 if args == "gpt-3" else 2 if args == "gpt-4" else 3 if args == "bing" else 4
             await message.reply(
                 html.quote(
                     f"Текущий тип чата: {await db.switch_chat_type(user_id=message.from_user.id, chat_type=chat_type)}"))
@@ -38,7 +38,7 @@ async def switch_chat_type(message: types.Message, command: CommandObject):
 async def command_bing(message: types.Message):
     sent_message = await message.reply("Обработка запроса, ожидайте")
     try:
-        bot_response = await bing_chat(message.text, message.from_user.id)
+        bot_response = await chat_bing(message.text, message.from_user.id)
     except Exception as error:
         await bot.edit_message_text(text=f"Ошибка: {error}", chat_id=sent_message.chat.id,
                                     message_id=sent_message.message_id)
@@ -80,6 +80,20 @@ async def command_gpt_4(message: types.Message):
                                     text=error.message)
 
 
+@message_logging
+@check_time_limits
+async def command_claude(message: types.Message):
+    loop = asyncio.get_event_loop()
+    sent_message = await message.reply("Обработка запроса, ожидайте")
+    bot_response = await loop.run_in_executor(None, chat_claude, message.text)
+    try:
+        await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id, text=bot_response,
+                                    parse_mode="markdown", disable_web_page_preview=True)
+    except TelegramBadRequest as error:
+        await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id,
+                                    text=error.message)
+
+
 @handle_chat_router.message(ChatTypeFilter(is_group=False), F.content_type.in_({'text'}))
 @message_logging
 async def handle_chat(message: types.Message):
@@ -91,6 +105,8 @@ async def handle_chat(message: types.Message):
         await command_gpt_4(message)
     elif chat_type == "bing":
         await command_bing(message)
+    elif chat_type == "claude":
+        await command_claude(message)
     else:
         await message.reply("Ошибка: тип чата не найден")
 
