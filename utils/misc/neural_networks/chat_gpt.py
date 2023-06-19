@@ -1,11 +1,8 @@
-import logging
-import os
-
 import openai
-from loader import client_poe
 
 from data import config
 from data.templates import PROMPT_MESSAGE
+from loader import client_poe
 
 
 def get_response(content):
