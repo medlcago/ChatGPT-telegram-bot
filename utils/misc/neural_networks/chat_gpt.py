@@ -1,4 +1,8 @@
+import logging
+import os
+
 import openai
+from loader import client_poe
 
 from data import config
 from data.templates import PROMPT_MESSAGE
@@ -32,7 +36,7 @@ def chat_gpt_3(prompt):
 
 def chat_gpt_4(prompt):
     try:
-        for chunk in config.client_poe.send_message("beaver", prompt, with_chat_break=True):
+        for chunk in client_poe.send_message("beaver", prompt, with_chat_break=True):
             pass
         return chunk["text"]
     except Exception as e:

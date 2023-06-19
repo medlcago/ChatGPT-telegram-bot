@@ -60,7 +60,7 @@ async def command_gpt_3(message: types.Message):
     bot_response = await loop.run_in_executor(None, chat_gpt_3, message.text)
     try:
         await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id, text=bot_response,
-                                    parse_mode="markdown")
+                                    parse_mode="markdown", disable_web_page_preview=True)
     except TelegramBadRequest as error:
         await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id,
                                     text=error.message)
@@ -74,7 +74,7 @@ async def command_gpt_4(message: types.Message):
     bot_response = await loop.run_in_executor(None, chat_gpt_4, message.text)
     try:
         await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id, text=bot_response,
-                                    parse_mode="markdown")
+                                    parse_mode="markdown", disable_web_page_preview=True)
     except TelegramBadRequest as error:
         await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id,
                                     text=error.message)

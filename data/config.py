@@ -1,7 +1,4 @@
-import logging
 import os
-
-import poe
 
 """
 -1001620211812 учебка
@@ -14,18 +11,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-poe.logger.setLevel(logging.INFO)
-
-
 OpenAI_API_KEY = os.getenv("OpenAI_API_KEY")
 REPLICATE_API_TOKEN = os.getenv("REPLICATE_API_TOKEN")
 model = "gpt-3.5-turbo"
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-
-client_poe = poe.Client(token=os.getenv("POE_TOKEN"))
-
-current_dir = os.path.abspath(os.path.dirname(__file__))
-COOKIE_PATH = os.path.join(current_dir, 'cookie.json')
+POE_TOKEN = os.getenv("POE_TOKEN")
+COOKIE_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'cookie.json')
 
 host = os.getenv("host")
 port = int(os.getenv("port"))
