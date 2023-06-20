@@ -1,7 +1,8 @@
-import aiomysql
-import pytz
 from dataclasses import dataclass
 from datetime import datetime
+
+import aiomysql
+import pytz
 
 from data import config
 
@@ -188,7 +189,8 @@ class Database:
         try:
             connection = await self._connect_db()
             async with connection.cursor() as cursor:
-                await cursor.execute("UPDATE users SET last_gpt4_command_time = (%s) WHERE user_id = (%s)", (time, user_id))
+                await cursor.execute("UPDATE users SET last_gpt4_command_time = (%s) WHERE user_id = (%s)",
+                                     (time, user_id))
                 await connection.commit()
             connection.close()
         except Exception as e:
@@ -209,23 +211,29 @@ class Database:
             print(e)
 
     async def get_chat_type(self, user_id):
+        """
+        Fetch the chat type associated with a given user ID from the database.
+        """
         try:
             connection = await self._connect_db()
             async with connection.cursor() as cursor:
                 await cursor.execute("SELECT chat_type FROM users WHERE user_id = %s", (user_id,))
                 result = await cursor.fetchone()
             connection.close()
-            return 'gpt-3' if result[0] == 1 else 'gpt-4' if result[0] == 2 else 'bing' if result[0] == 3 else 'claude'
+            return config.reverse_chat_type_mapping.get(result[0], 'gpt-3')
         except Exception as e:
             print(e)
 
     async def switch_chat_type(self, user_id, chat_type):
+        """
+        Update the chat type associated with a given user ID in the database.
+        """
         try:
             connection = await self._connect_db()
             async with connection.cursor() as cursor:
                 await cursor.execute("UPDATE users SET chat_type = %s WHERE user_id = %s", (chat_type, user_id))
                 await connection.commit()
             connection.close()
-            return 'gpt-3' if chat_type == 1 else 'gpt-4' if chat_type == 2 else 'bing' if chat_type == 3 else 'claude'
+            return config.reverse_chat_type_mapping.get(chat_type, 'gpt-3')
         except Exception as e:
             print(e)

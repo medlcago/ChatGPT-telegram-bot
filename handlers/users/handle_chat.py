@@ -5,6 +5,7 @@ from aiogram import types, Router, F
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command, CommandObject
 
+from data import config
 from decorators import message_logging, check_time_limits
 from filters import ChatTypeFilter
 from filters import IsAdmin
@@ -14,12 +15,13 @@ from utils.misc.neural_networks import chat_bing, chat_gpt_3, chat_gpt_4, chat_c
 handle_chat_router = Router()
 
 
+@message_logging
 @handle_chat_router.message(Command(commands=["switch"]), ChatTypeFilter(is_group=False), IsAdmin())
 async def switch_chat_type(message: types.Message, command: CommandObject):
     args = command.args
     if args:
-        if args in ("gpt-3", "gpt-4", "bing", "claude"):
-            chat_type = 1 if args == "gpt-3" else 2 if args == "gpt-4" else 3 if args == "bing" else 4
+        if args in config.models.keys():
+            chat_type = config.chat_type_mapping.get(args, 1)
             await message.reply(
                 html.quote(
                     f"Текущий тип чата: {await db.switch_chat_type(user_id=message.from_user.id, chat_type=chat_type)}"))
@@ -35,6 +37,7 @@ async def switch_chat_type(message: types.Message, command: CommandObject):
 
 
 @message_logging
+@check_time_limits
 async def command_bing(message: types.Message):
     sent_message = await message.reply("Обработка запроса, ожидайте")
     try:
@@ -99,19 +102,22 @@ async def command_claude(message: types.Message):
 async def handle_chat(message: types.Message):
     chat_type = await db.get_chat_type(user_id=message.from_user.id)
 
-    if chat_type == "gpt-3":
-        await command_gpt_3(message)
-    elif chat_type == "gpt-4":
-        await command_gpt_4(message)
-    elif chat_type == "bing":
-        await command_bing(message)
-    elif chat_type == "claude":
-        await command_claude(message)
+    chat_handlers = {
+        "gpt-3": command_gpt_3,
+        "gpt-4": command_gpt_4,
+        "bing": command_bing,
+        "claude": command_claude,
+    }
+
+    chat_handler = chat_handlers.get(chat_type)
+
+    if chat_handler:
+        await chat_handler(message)
     else:
-        await message.reply("Ошибка: тип чата не найден")
+        await message.reply("Ошибка: тип чата не найден.")
 
 
 @handle_chat_router.message(ChatTypeFilter(is_group=False))
 @message_logging
-async def not_command_gpt(message: types.Message):
+async def handle_non_text_message(message: types.Message):
     await message.reply("Oops, something went wrong. Please, try again.")
