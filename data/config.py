@@ -27,6 +27,6 @@ db = os.getenv("db")
 response_chance = 0
 response_delay = 5
 
-request_limit = 15
+request_limit = 60
 
 DEBUG = False
