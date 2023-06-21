@@ -3,6 +3,7 @@ import asyncio
 
 async def main():
     import logging
+    import poe
     from loader import dp, bot
     from utils import set_commands
 
@@ -10,6 +11,7 @@ async def main():
     from handlers import groups
     from handlers import admins
 
+    poe.logger.setLevel(logging.INFO)
     logging.basicConfig(level=logging.INFO)
 
     await set_commands(bot)

@@ -1,8 +1,8 @@
 import openai
+import poe
 
 from data import config
 from data.templates import PROMPT_MESSAGE
-from loader import client_poe
 
 
 def get_response(content, model):
@@ -20,8 +20,10 @@ def get_response(content, model):
             )
             return response.choices[0].message.content.strip()
         elif model == "gpt-4":
+            client_poe = poe.Client(token=config.POE_TOKEN)
             for response in client_poe.send_message(config.models[model], content, with_chat_break=True):
                 pass
+            client_poe.disconnect_ws()
             return response["text"]
     except Exception as e:
         print(e)
