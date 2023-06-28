@@ -3,7 +3,7 @@ from aiogram.filters.command import Command, CommandObject
 from aiogram.filters.text import Text
 from aiogram.fsm.context import FSMContext
 
-from decorators import message_logging
+from decorators import MessageLogging
 from filters import IsAdmin
 from loader import db
 from states.admins import Administrators
@@ -30,7 +30,7 @@ async def remove_admin(user_id: str, from_user_id):
 
 
 @command_remove_admin_router.message(Command(commands=["remove_admin"], prefix="/"), IsAdmin())
-@message_logging
+@MessageLogging
 async def command_remove_admin(message: types.Message, command: CommandObject):
     user_id = command.args
     from_user_id = message.from_user.id
@@ -39,7 +39,7 @@ async def command_remove_admin(message: types.Message, command: CommandObject):
 
 
 @command_remove_admin_router.callback_query(Text(text="remove_admin"), IsAdmin())
-@message_logging
+@MessageLogging
 async def command_remove_admin(call: types.CallbackQuery, state: FSMContext):
     sent_message = await call.message.reply("Введите user_id администратора, которого хотите удалить")
     await state.set_state(Administrators.RemoveAdmin.user_id)
@@ -48,7 +48,7 @@ async def command_remove_admin(call: types.CallbackQuery, state: FSMContext):
 
 
 @command_remove_admin_router.message(Administrators.RemoveAdmin.user_id, IsAdmin())
-@message_logging
+@MessageLogging
 async def command_remove_admin(message: types.Message, state: FSMContext):
     user_id = message.text
     from_user_id = message.from_user.id

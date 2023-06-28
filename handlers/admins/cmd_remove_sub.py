@@ -3,7 +3,7 @@ from aiogram.filters.command import Command, CommandObject
 from aiogram.filters.text import Text
 from aiogram.fsm.context import FSMContext
 
-from decorators import message_logging
+from decorators import MessageLogging
 from filters import IsAdmin
 from loader import db
 from states.admins import Administrators
@@ -28,7 +28,7 @@ async def remove_subscription(user_id: str):
 
 
 @command_remove_sub_router.message(Command(commands=["remove_sub"], prefix="/"), IsAdmin())
-@message_logging
+@MessageLogging
 async def command_remove_subscription(message: types.Message, command: CommandObject):
     user_id = command.args
     result = await remove_subscription(user_id)
@@ -36,7 +36,7 @@ async def command_remove_subscription(message: types.Message, command: CommandOb
 
 
 @command_remove_sub_router.callback_query(Text(text="remove_sub"), IsAdmin())
-@message_logging
+@MessageLogging
 async def command_remove_subscription(call: types.CallbackQuery, state: FSMContext):
     sent_message = await call.message.reply("Введите user_id подписчика, которого хотите удалить")
     await state.set_state(Administrators.RemoveSubscription.user_id)
@@ -45,7 +45,7 @@ async def command_remove_subscription(call: types.CallbackQuery, state: FSMConte
 
 
 @command_remove_sub_router.message(Administrators.RemoveSubscription.user_id, IsAdmin())
-@message_logging
+@MessageLogging
 async def command_remove_subscription(message: types.Message, state: FSMContext):
     user_id = message.text
     sent_message = (await state.get_data()).get("sent_message")

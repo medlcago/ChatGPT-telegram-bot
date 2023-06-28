@@ -3,7 +3,7 @@ from aiogram import html
 from aiogram.filters.command import Command
 
 from data.templates import START_MESSAGE
-from decorators import message_logging
+from decorators import MessageLogging
 from filters import ChatTypeFilter
 from loader import db
 
@@ -16,7 +16,7 @@ def cmd_start(username, language="ru"):
 
 
 @command_start_router.message(Command(commands=["start"], prefix="/"), ChatTypeFilter(is_group=False))
-@message_logging
+@MessageLogging
 async def command_start(message: types.Message):
     if not (await db.user_exists(message.from_user.id)):
         await db.add_user(message.from_user.id, message.from_user.full_name)

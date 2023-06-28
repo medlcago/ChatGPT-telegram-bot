@@ -3,7 +3,7 @@ from aiogram.filters.command import Command
 from aiogram.filters.text import Text
 from aiogram.fsm.context import FSMContext
 
-from decorators import message_logging
+from decorators import MessageLogging
 from filters import IsAdmin
 from keyboards.inline import btn_send_message
 from loader import bot
@@ -14,14 +14,14 @@ command_send_message_router = Router()
 
 
 @command_send_message_router.message(Command(commands=["send_message"], prefix="/"), IsAdmin())
-@message_logging
+@MessageLogging
 async def command_send_message(message: types.Message, state: FSMContext):
     await message.reply("Введите сообщение, которое хотите отправить")
     await state.set_state(Administrators.SendMessage.message)
 
 
 @command_send_message_router.callback_query(Text(text="send_message"), IsAdmin())
-@message_logging
+@MessageLogging
 async def command_send_message(call: types.callback_query, state: FSMContext):
     await call.answer()
     await call.message.reply("Введите сообщение, которое хотите отправить")
@@ -29,7 +29,7 @@ async def command_send_message(call: types.callback_query, state: FSMContext):
 
 
 @command_send_message_router.message(Administrators.SendMessage.message, IsAdmin())
-@message_logging
+@MessageLogging
 async def get_recipient_user_id(message: types.Message, state: FSMContext):
     await state.update_data(message=message)
     await message.reply("Введите user_id пользователя, который получит данное сообщение")
@@ -37,7 +37,7 @@ async def get_recipient_user_id(message: types.Message, state: FSMContext):
 
 
 @command_send_message_router.message(Administrators.SendMessage.user_id, IsAdmin())
-@message_logging
+@MessageLogging
 async def message_to_send(message: types.Message, state: FSMContext):
     await state.update_data(user_id=message.text)
 
@@ -59,9 +59,8 @@ async def message_to_send(message: types.Message, state: FSMContext):
         await state.clear()
 
 
-@command_send_message_router.callback_query(Administrators.SendMessage.confirmation,
-                                            Text(text="confirmation_send_message"), IsAdmin())
-@message_logging
+@command_send_message_router.callback_query(Administrators.SendMessage.confirmation, Text(text="confirmation_send_message"), IsAdmin())
+@MessageLogging
 async def confirmation_send_message(call: types.CallbackQuery, state: FSMContext):
     message_to_user = ((await state.get_data()).get("message")).text
     user_id = (await state.get_data()).get("user_id")
@@ -81,9 +80,8 @@ async def confirmation_send_message(call: types.CallbackQuery, state: FSMContext
     await call.answer()
 
 
-@command_send_message_router.callback_query(Administrators.SendMessage.confirmation, Text(text="cancel_send_message"),
-                                            IsAdmin())
-@message_logging
+@command_send_message_router.callback_query(Administrators.SendMessage.confirmation, Text(text="cancel_send_message"), IsAdmin())
+@MessageLogging
 async def cancel_send_message(call: types.CallbackQuery, state: FSMContext):
     await state.clear()
     await call.message.edit_text("Действие было отменено.")

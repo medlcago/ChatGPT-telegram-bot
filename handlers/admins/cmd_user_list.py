@@ -2,7 +2,7 @@ from aiogram import Router, types
 from aiogram.filters.command import Command
 from aiogram.filters.text import Text
 
-from decorators import message_logging
+from decorators import MessageLogging
 from filters import IsAdmin
 from loader import db
 
@@ -19,13 +19,13 @@ async def user_list():
 
 
 @command_user_list_router.message(Command(commands=["user_list"], prefix="/"), IsAdmin())
-@message_logging
+@MessageLogging
 async def command_user_list(message: types.Message):
     await message.reply(await user_list())
 
 
 @command_user_list_router.callback_query(Text(text="user_list"), IsAdmin())
-@message_logging
+@MessageLogging
 async def command_user_list(call: types.CallbackQuery):
     await call.message.reply(await user_list())
     await call.answer()

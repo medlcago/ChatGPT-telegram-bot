@@ -3,7 +3,7 @@ from aiogram import html
 from aiogram.filters.command import Command
 
 from data.templates import HELP_MESSAGE
-from decorators import message_logging
+from decorators import MessageLogging
 from filters import ChatTypeFilter
 
 command_help_users_router = Router()
@@ -16,6 +16,6 @@ def cmd_help(language="ru"):
 
 
 @command_help_users_router.message(Command(commands=["help"], prefix="/"), ChatTypeFilter(is_group=False))
-@message_logging
+@MessageLogging
 async def command_help(message: types.Message):
     await message.answer(cmd_help(message.from_user.language_code))

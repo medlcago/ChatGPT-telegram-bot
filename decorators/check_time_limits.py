@@ -1,21 +1,25 @@
-import pytz
-from aiogram import types
 from datetime import datetime, timedelta
 from functools import wraps
+
+import pytz
+from aiogram import types
 
 from data import config
 from loader import db
 
 
-def check_time_limits(handler):
-    @wraps(handler)
-    async def wrapper(message: types.Message, *args, **kwargs):
+class CheckTimeLimits:
+    def __init__(self, handler):
+        self.handler = handler
+        wraps(handler)(self)
+
+    async def __call__(self, message: types.Message, *args, **kwargs):
         moscow_tz = pytz.timezone('Europe/Moscow')
         now = datetime.now(moscow_tz)
         user_id = message.from_user.id
 
         if user_id in (item.user_id for item in await db.get_admins()):
-            return await handler(message, *args, **kwargs)
+            return await self.handler(message, *args, **kwargs)
 
         date_format = '%Y-%m-%d %H:%M:%S'
         command_count = await db.get_gpt4_command_count(user_id)
@@ -35,12 +39,10 @@ def check_time_limits(handler):
         if command_count < config.request_limit:
             await db.increment_gpt4_command_count(user_id)
             await db.update_last_gpt4_command_time(user_id, now.strftime(date_format))
-            return await handler(message, *args, **kwargs)
+            return await self.handler(message, *args, **kwargs)
 
         date_format = '%d.%m.%Y %H:%M:%S'
         await message.reply(
             f"Превышен часовой лимит запросов.\nПопробуйте снова <code>{(last_command_time + timedelta(hours=1)).strftime(date_format)}</code>"
             f"\n\nПодробнее /limits")
         return
-
-    return wrapper

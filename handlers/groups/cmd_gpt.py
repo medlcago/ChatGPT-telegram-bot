@@ -1,10 +1,11 @@
 import asyncio
+
 from aiogram import Router, types
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command, CommandObject
 
-from decorators import check_time_limits
-from decorators import message_logging
+from decorators import CheckTimeLimits
+from decorators import MessageLogging
 from filters import ChatTypeFilter
 from loader import bot
 from utils.misc.neural_networks import chat_gpt_3
@@ -13,8 +14,8 @@ command_gpt_groups_router = Router()
 
 
 @command_gpt_groups_router.message(Command(commands=["gpt"], prefix="!"), ChatTypeFilter(is_group=True))
-@message_logging
-@check_time_limits
+@MessageLogging
+@CheckTimeLimits
 async def command_gpt(message: types.Message, command: CommandObject):
     args = command.args
     if args:

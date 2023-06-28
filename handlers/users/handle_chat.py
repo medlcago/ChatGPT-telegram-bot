@@ -6,8 +6,8 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command, CommandObject
 
 from data import config
-from decorators import check_time_limits
-from decorators import message_logging
+from decorators import CheckTimeLimits
+from decorators import MessageLogging
 from filters import ChatTypeFilter
 from filters import IsAdmin
 from filters import IsSubscription
@@ -19,7 +19,7 @@ handle_chat_router = Router()
 
 @handle_chat_router.message(Command(commands=["switch"]), ChatTypeFilter(is_group=False), IsSubscription())
 @handle_chat_router.message(Command(commands=["switch"]), ChatTypeFilter(is_group=False), IsAdmin())
-@message_logging
+@MessageLogging
 async def switch_chat_type(message: types.Message, command: CommandObject):
     args = command.args
     if args:
@@ -39,8 +39,8 @@ async def switch_chat_type(message: types.Message, command: CommandObject):
                 f"The command <b><i>{command.prefix + command.command}</i></b> was empty, the request could not be completed.")
 
 
-@message_logging
-@check_time_limits
+@MessageLogging
+@CheckTimeLimits
 async def command_bing(message: types.Message):
     sent_message = await message.reply("Обработка запроса, ожидайте")
     try:
@@ -58,8 +58,8 @@ async def command_bing(message: types.Message):
                                         text=error.message)
 
 
-@message_logging
-@check_time_limits
+@MessageLogging
+@CheckTimeLimits
 async def command_gpt_3(message: types.Message):
     loop = asyncio.get_event_loop()
     sent_message = await message.reply("Обработка запроса, ожидайте")
@@ -72,8 +72,8 @@ async def command_gpt_3(message: types.Message):
                                     text=error.message)
 
 
-@message_logging
-@check_time_limits
+@MessageLogging
+@CheckTimeLimits
 async def command_gpt_4(message: types.Message):
     loop = asyncio.get_event_loop()
     sent_message = await message.reply("Обработка запроса, ожидайте")
@@ -86,8 +86,8 @@ async def command_gpt_4(message: types.Message):
                                     text=error.message)
 
 
-@message_logging
-@check_time_limits
+@MessageLogging
+@CheckTimeLimits
 async def command_claude(message: types.Message):
     loop = asyncio.get_event_loop()
     sent_message = await message.reply("Обработка запроса, ожидайте")
@@ -101,7 +101,7 @@ async def command_claude(message: types.Message):
 
 
 @handle_chat_router.message(ChatTypeFilter(is_group=False), F.content_type.in_({'text'}))
-@message_logging
+@MessageLogging
 async def handle_chat(message: types.Message):
     chat_type = await db.get_chat_type(user_id=message.from_user.id)
 
@@ -121,6 +121,6 @@ async def handle_chat(message: types.Message):
 
 
 @handle_chat_router.message(ChatTypeFilter(is_group=False))
-@message_logging
+@MessageLogging
 async def handle_non_text_message(message: types.Message):
     await message.reply("Oops, something went wrong. Please, try again.")

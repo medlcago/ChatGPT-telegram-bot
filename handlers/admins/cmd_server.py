@@ -2,7 +2,7 @@ from aiogram import types, Router
 from aiogram.filters.command import Command
 from aiogram.filters.text import Text
 
-from decorators import message_logging
+from decorators import MessageLogging
 from filters import IsAdmin
 
 command_server_router = Router()
@@ -38,13 +38,13 @@ async def get_server_system_info():
 
 
 @command_server_router.message(Command(commands=["server"], prefix="!/"), IsAdmin())
-@message_logging
+@MessageLogging
 async def command_server(message: types.Message):
     await message.reply(await get_server_system_info())
 
 
 @command_server_router.callback_query(Text(text="server_info"), IsAdmin())
-@message_logging
+@MessageLogging
 async def command_server(call: types.CallbackQuery):
     await call.answer()
     await call.message.reply(await get_server_system_info())

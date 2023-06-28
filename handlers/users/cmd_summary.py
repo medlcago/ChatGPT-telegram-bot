@@ -1,11 +1,12 @@
 import asyncio
+
 from aiogram import Router
 from aiogram import html
 from aiogram import types
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters.command import Command, CommandObject
 
-from decorators import message_logging
+from decorators import MessageLogging
 from filters import ChatTypeFilter
 from loader import bot
 from utils.misc.neural_networks import summarize_youtube_video
@@ -14,7 +15,7 @@ command_summary_router = Router()
 
 
 @command_summary_router.message(Command(commands=["summary"], prefix="/"), ChatTypeFilter(is_group=False))
-@message_logging
+@MessageLogging
 async def command_summarize(message: types.Message, command: CommandObject):
     url = command.args
     if url:

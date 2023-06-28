@@ -1,11 +1,12 @@
 import asyncio
+
 from aiogram import Router
 from aiogram import html
 from aiogram import types
 from aiogram.filters import Command, CommandObject
 from aiogram.types import URLInputFile
 
-from decorators import message_logging
+from decorators import MessageLogging
 from filters import ChatTypeFilter
 from utils.misc.neural_networks import image_generator
 
@@ -13,7 +14,7 @@ command_image_groups_router = Router()
 
 
 @command_image_groups_router.message(Command(commands=["image"], prefix="!"), ChatTypeFilter(is_group=True))
-@message_logging
+@MessageLogging
 async def command_image(message: types.Message, command: CommandObject):
     user_request = command.args
     if user_request:
