@@ -34,6 +34,8 @@ async def main():
     dp.include_router(admins.command_server_router)
     dp.include_router(admins.command_add_admin_router)
     dp.include_router(admins.command_remove_admin_router)
+    dp.include_router(admins.command_grant_sub_router)
+    dp.include_router(admins.command_remove_sub_router)
 
     dp.include_router(users.handle_chat_router)
 
