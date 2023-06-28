@@ -17,6 +17,7 @@ class UserData:
     gpt4_command_count: int = None
     last_gpt4_command_time: datetime = None
     chat_type: int = None
+    is_subscriber: bool = None
 
 
 class Database:
@@ -237,3 +238,34 @@ class Database:
             return config.reverse_chat_type_mapping.get(chat_type, 'gpt-3')
         except Exception as e:
             print(e)
+
+    async def check_user_subscription(self, user_id):
+        """
+        Check if the user with the given user ID is a subscriber or not.
+        """
+        try:
+            connection = await self._connect_db()
+            async with connection.cursor() as cursor:
+                await cursor.execute("SELECT is_subscriber FROM users WHERE user_id = %s", (user_id,))
+                result = await cursor.fetchone()
+            connection.close()
+
+            if result is not None:
+                return result[0]
+        except Exception as e:
+            print(e)
+
+    async def grant_or_remove_subscription(self, user_id, is_subscriber):
+        """
+        Grant or un a subscription to the user with the given user ID.
+        """
+        try:
+            connection = await self._connect_db()
+            async with connection.cursor() as cursor:
+                await cursor.execute("UPDATE users SET is_subscriber = %s WHERE user_id = %s", (is_subscriber, user_id))
+                await connection.commit()
+            connection.close()
+            return True
+        except Exception as e:
+            print(e)
+            return False

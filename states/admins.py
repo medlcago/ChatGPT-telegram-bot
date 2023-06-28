@@ -32,6 +32,20 @@ class RemoveAdmin(StatesGroup):
     user_id = State()
 
 
+class GrantSubscription(StatesGroup):
+    """
+    Класс состояний для выдачи подписки.
+    """
+    user_id = State()
+
+
+class RemoveSubscription(StatesGroup):
+    """
+    Класс состояний для удаления подписки.
+    """
+    user_id = State()
+
+
 class Administrators:
     """
     Класс, объединяющий состояния для управления администраторами.
@@ -40,3 +54,5 @@ class Administrators:
     SendMessage = SendMessage
     AddAdmin = AddAdmin
     RemoveAdmin = RemoveAdmin
+    GrantSubscription = GrantSubscription
+    RemoveSubscription = RemoveSubscription

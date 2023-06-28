@@ -16,6 +16,10 @@ btn_cmd_admin = InlineKeyboardMarkup(inline_keyboard=[
         InlineKeyboardButton(text="Удалить администратора", callback_data="remove_admin")
     ],
     [
+        InlineKeyboardButton(text="Выдать подписку", callback_data="grant_sub"),
+        InlineKeyboardButton(text="Забрать подписку", callback_data="remove_sub")
+    ],
+    [
         InlineKeyboardButton(text="Информация о сервере", callback_data="server_info")
     ]
 ])

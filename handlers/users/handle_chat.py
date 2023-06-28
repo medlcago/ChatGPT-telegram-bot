@@ -6,9 +6,11 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command, CommandObject
 
 from data import config
-from decorators import message_logging, check_time_limits
+from decorators import check_time_limits
+from decorators import message_logging
 from filters import ChatTypeFilter
 from filters import IsAdmin
+from filters import IsSubscription
 from loader import db, bot
 from utils.misc.neural_networks import chat_bing, chat_gpt_3, chat_gpt_4, chat_claude
 
@@ -16,6 +18,7 @@ handle_chat_router = Router()
 
 
 @message_logging
+@handle_chat_router.message(Command(commands=["switch"]), ChatTypeFilter(is_group=False), IsSubscription())
 @handle_chat_router.message(Command(commands=["switch"]), ChatTypeFilter(is_group=False), IsAdmin())
 async def switch_chat_type(message: types.Message, command: CommandObject):
     args = command.args
