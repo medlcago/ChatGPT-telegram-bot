@@ -1,16 +1,12 @@
 import asyncio
 
-from aiogram import html
-from aiogram import types, Router, F
+from aiogram import types, Router, F, html
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command, CommandObject
 
 from data import config
-from decorators import CheckTimeLimits
-from decorators import MessageLogging
-from filters import ChatTypeFilter
-from filters import IsAdmin
-from filters import IsSubscription
+from decorators import CheckTimeLimits, MessageLogging
+from filters import ChatTypeFilter, IsAdmin, IsSubscription
 from loader import db, bot
 from utils.misc.neural_networks import chat_bing, chat_gpt_3, chat_gpt_4, chat_claude
 
@@ -37,6 +33,17 @@ async def switch_chat_type(message: types.Message, command: CommandObject):
         else:
             await message.reply(
                 f"The command <b><i>{command.prefix + command.command}</i></b> was empty, the request could not be completed.")
+
+
+@handle_chat_router.message(Command(commands=["switch"]), ChatTypeFilter(is_group=False))
+@MessageLogging
+async def switch_chat_type(message: types.Message, command: CommandObject):
+    if message.from_user.language_code == "ru":
+        await message.reply(
+            f"Команда <b><i>{command.prefix + command.command}</i></b> доступна только premium пользователям.")
+    else:
+        await message.reply(
+            f"The command <b><i>{command.prefix + command.command}</i></b> is only available to premium users.")
 
 
 @MessageLogging
@@ -123,4 +130,7 @@ async def handle_chat(message: types.Message):
 @handle_chat_router.message(ChatTypeFilter(is_group=False))
 @MessageLogging
 async def handle_non_text_message(message: types.Message):
-    await message.reply("Oops, something went wrong. Please, try again.")
+    if message.from_user.language_code == "ru":
+        await message.reply("К сожалению, бот умеет работать только с текстом. Пожалуйста, повторите свой запрос в текстовом виде.")
+    else:
+        await message.reply("Unfortunately, the bot can only work with text. Please, repeat your request in text form.")
