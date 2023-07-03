@@ -47,7 +47,9 @@ class Database:
         try:
             connection = await self._connect_db()
             async with connection.cursor() as cursor:
-                await cursor.execute("INSERT INTO users (user_id, fullname) VALUES (%s, %s)", (user_id, fullname))
+                query = 'INSERT INTO users (user_id, fullname) VALUES (%s, %s)'
+                params = (user_id, fullname)
+                await cursor.execute(query, params)
                 await connection.commit()
             connection.close()
         except Exception as e:
@@ -60,7 +62,9 @@ class Database:
         try:
             connection = await self._connect_db()
             async with connection.cursor() as cursor:
-                await cursor.execute("UPDATE users SET is_admin = (%s) WHERE user_id = (%s)", (is_admin, user_id))
+                query = 'UPDATE users SET is_admin = (%s) WHERE user_id = (%s)'
+                params = (is_admin, user_id)
+                await cursor.execute(query, params)
                 await connection.commit()
             connection.close()
         except Exception as e:
@@ -73,7 +77,9 @@ class Database:
         try:
             connection = await self._connect_db()
             async with connection.cursor(aiomysql.cursors.DictCursor) as cursor:
-                await cursor.execute("SELECT * FROM users WHERE user_id = (%s)", (user_id,))
+                query = 'SELECT * FROM users WHERE user_id = (%s)'
+                params = (user_id,)
+                await cursor.execute(query, params)
                 user_exists = await cursor.fetchone()
                 connection.close()
                 if user_exists:
@@ -89,7 +95,8 @@ class Database:
         try:
             connection = await self._connect_db()
             async with connection.cursor(aiomysql.cursors.DictCursor) as cursor:
-                await cursor.execute("SELECT * FROM users")
+                query = 'SELECT * FROM users'
+                await cursor.execute(query)
                 all_users = (UserData(*user.values()) for user in await cursor.fetchall())
                 connection.close()
                 return all_users
@@ -103,7 +110,9 @@ class Database:
         try:
             connection = await self._connect_db()
             async with connection.cursor() as cursor:
-                await cursor.execute("UPDATE users SET is_blocked = (%s) WHERE user_id = (%s)", (is_blocked, user_id))
+                query = 'UPDATE users SET is_blocked = (%s) WHERE user_id = (%s)'
+                params = (is_blocked, user_id)
+                await cursor.execute(query, params)
                 await connection.commit()
             connection.close()
         except Exception as e:
@@ -116,7 +125,9 @@ class Database:
         try:
             connection = await self._connect_db()
             async with connection.cursor(aiomysql.cursors.DictCursor) as cursor:
-                await cursor.execute("SELECT * FROM users WHERE is_admin = (%s)", (1,))
+                query = 'SELECT * FROM users WHERE is_admin = (%s)'
+                params = (1,)
+                await cursor.execute(query, params)
                 admins = (UserData(*admin.values()) for admin in await cursor.fetchall())
                 connection.close()
                 return admins
@@ -130,7 +141,9 @@ class Database:
         try:
             connection = await self._connect_db()
             async with connection.cursor(aiomysql.cursors.DictCursor) as cursor:
-                await cursor.execute("SELECT gpt4_command_count FROM users WHERE user_id = (%s)", (user_id,))
+                query = 'SELECT gpt4_command_count FROM users WHERE user_id = (%s)'
+                params = (user_id,)
+                await cursor.execute(query, params)
                 gpt4_command_count = (await cursor.fetchone())["gpt4_command_count"]
                 connection.close()
                 return gpt4_command_count
@@ -144,7 +157,9 @@ class Database:
         try:
             connection = await self._connect_db()
             async with connection.cursor(aiomysql.cursors.DictCursor) as cursor:
-                await cursor.execute("SELECT last_gpt4_command_time FROM users WHERE user_id = (%s)", (user_id,))
+                query = 'SELECT last_gpt4_command_time FROM users WHERE user_id = (%s)'
+                params = (user_id,)
+                await cursor.execute(query, params)
                 last_gpt4_command_time = (await cursor.fetchone())["last_gpt4_command_time"]
                 connection.close()
                 if last_gpt4_command_time:
@@ -163,7 +178,9 @@ class Database:
         try:
             connection = await self._connect_db()
             async with connection.cursor() as cursor:
-                await cursor.execute("UPDATE users SET gpt4_command_count = (%s) WHERE user_id = (%s)", (0, user_id))
+                query = 'UPDATE users SET gpt4_command_count = (%s) WHERE user_id = (%s)'
+                params = (0, user_id)
+                await cursor.execute(query, params)
                 await connection.commit()
             connection.close()
         except Exception as e:
@@ -176,8 +193,9 @@ class Database:
         try:
             connection = await self._connect_db()
             async with connection.cursor() as cursor:
-                await cursor.execute(
-                    "UPDATE users SET gpt4_command_count = gpt4_command_count + 1 WHERE user_id = (%s)", (user_id,))
+                query = 'UPDATE users SET gpt4_command_count = gpt4_command_count + 1 WHERE user_id = (%s)'
+                params = (user_id,)
+                await cursor.execute(query, params)
                 await connection.commit()
             connection.close()
         except Exception as e:
@@ -190,8 +208,9 @@ class Database:
         try:
             connection = await self._connect_db()
             async with connection.cursor() as cursor:
-                await cursor.execute("UPDATE users SET last_gpt4_command_time = (%s) WHERE user_id = (%s)",
-                                     (time, user_id))
+                query = 'UPDATE users SET last_gpt4_command_time = (%s) WHERE user_id = (%s)'
+                params = (time, user_id)
+                await cursor.execute(query, params)
                 await connection.commit()
             connection.close()
         except Exception as e:
@@ -204,7 +223,8 @@ class Database:
         try:
             connection = await self._connect_db()
             async with connection.cursor(aiomysql.cursors.DictCursor) as cursor:
-                await cursor.execute("SELECT * FROM members")
+                query = 'SELECT * FROM members'
+                await cursor.execute(query)
                 members = await cursor.fetchall()
                 connection.close()
                 return members
@@ -218,7 +238,9 @@ class Database:
         try:
             connection = await self._connect_db()
             async with connection.cursor() as cursor:
-                await cursor.execute("SELECT chat_type FROM users WHERE user_id = %s", (user_id,))
+                query = 'SELECT chat_type FROM users WHERE user_id = %s'
+                params = (user_id,)
+                await cursor.execute(query, params)
                 result = await cursor.fetchone()
             connection.close()
             return config.reverse_chat_type_mapping.get(result[0], 'gpt-3')
@@ -232,7 +254,9 @@ class Database:
         try:
             connection = await self._connect_db()
             async with connection.cursor() as cursor:
-                await cursor.execute("UPDATE users SET chat_type = %s WHERE user_id = %s", (chat_type, user_id))
+                query = 'UPDATE users SET chat_type = %s WHERE user_id = %s'
+                params = (chat_type, user_id)
+                await cursor.execute(query, params)
                 await connection.commit()
             connection.close()
             return config.reverse_chat_type_mapping.get(chat_type, 'gpt-3')
@@ -246,10 +270,11 @@ class Database:
         try:
             connection = await self._connect_db()
             async with connection.cursor() as cursor:
-                await cursor.execute("SELECT is_subscriber FROM users WHERE user_id = %s", (user_id,))
+                query = 'SELECT is_subscriber FROM users WHERE user_id = %s'
+                params = (user_id,)
+                await cursor.execute(query, params)
                 result = await cursor.fetchone()
             connection.close()
-
             if result is not None:
                 return result[0]
         except Exception as e:
@@ -257,12 +282,14 @@ class Database:
 
     async def grant_or_remove_subscription(self, user_id, is_subscriber):
         """
-        Grant or un a subscription to the user with the given user ID.
+        Grant or remove a subscription to the user with the given user ID.
         """
         try:
             connection = await self._connect_db()
             async with connection.cursor() as cursor:
-                await cursor.execute("UPDATE users SET is_subscriber = %s WHERE user_id = %s", (is_subscriber, user_id))
+                query = 'UPDATE users SET is_subscriber = %s WHERE user_id = %s'
+                params = (is_subscriber, user_id)
+                await cursor.execute(query, params)
                 await connection.commit()
             connection.close()
             return True
