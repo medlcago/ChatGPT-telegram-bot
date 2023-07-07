@@ -30,12 +30,8 @@ def get_video_transcript(video_id: str) -> Optional[str]:
     return text
 
 
-def configure_openai_api():
-    openai.api_key = config.OpenAI_API_KEY
-
-
 def generate_summary(text: str, language: str = "ru") -> str:
-    configure_openai_api()
+    openai.api_key = config.OpenAI_API_KEY
 
     instructions_map = {
         "ru": "Пожалуйста, резюмируйте предоставленный текст на русском языке",
