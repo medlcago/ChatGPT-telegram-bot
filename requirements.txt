@@ -6,6 +6,6 @@ pytz==2023.3
 aiogram==3.0.0b7
 asyncio==3.4.3
 youtube-transcript-api==0.6.0
-poe-api==0.4.8
+poe-api==0.4.10
 cryptography==41.0.1
 psutil==5.9.5
