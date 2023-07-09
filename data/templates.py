@@ -45,23 +45,6 @@ You can communicate with the bot, as with a live interlocutor, asking questions 
 🎬 To make a summary of a YouTube video, use the /summary command, followed by a link to the video separated by a space."""
 }
 
-HELP_MESSAGE = {
-    "ru": ('<u>Пример работы с ботом</u>:\n'
-           '<b>· Объясни сложным языком, что такое импульс</b>\n'
-           '<b>· Напиши текст про образование в Англии</b>\n'
-           '<b>· Сократи предыдущий ответ</b>\n\n'
-           'Генерация рандомного изображения по запросу: \n<b>· /image {request}</b>\n\n'
-           'Cаммари из YouTube-видео: \n<b>· /summary {request}</b>\n\n'
-           ),
-    "en": ('<u>An example of working with a bot</u>:\n'
-           '<b>Explain in complex language what momentum is</b>\n'
-           '<b>Write a text about education in England</b>\n'
-           '<b>Shorten previous answer</b>\n\n'
-           'Random image generation on request: \n<b>· /image {request}</b>\n\n'
-           'Summary from YouTube video: \n<b>· /summary {request}</b>\n\n'
-           )
-}
-
 PROMPT_MESSAGE = """Ты полезный ассистент с ИИ, который готов помочь своему пользователю.
 Ты даешь короткие содержательные ответы, обычно не более 100 символов.
 Если я попрошу тебя написать код, пиши его на python, код присылай без объяснений.

@@ -16,8 +16,7 @@ async def main():
 
     await set_commands(bot)
 
-    dp.include_router(users.command_start_router)
-    dp.include_router(users.command_help_users_router)
+    dp.include_router(users.command_start_help_router)
     dp.include_router(users.command_image_users_router)
     dp.include_router(users.command_summary_router)
     dp.include_router(users.command_limits_router)
