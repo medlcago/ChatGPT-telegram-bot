@@ -21,6 +21,7 @@ def get_response(content, model):
             return response.choices[0].message.content.strip()
         elif model == "gpt-4":
             client_poe = poe.Client(token=config.POE_TOKEN)
+            client_poe.formkey_salt = "f09"
             for response in client_poe.send_message(config.models[model], content, with_chat_break=True):
                 pass
             client_poe.disconnect_ws()
