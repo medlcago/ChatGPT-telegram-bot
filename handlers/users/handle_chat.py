@@ -8,7 +8,7 @@ from data import config
 from decorators import CheckTimeLimits, MessageLogging
 from filters import ChatTypeFilter, IsAdmin, IsSubscription
 from loader import db, bot
-from utils.misc.neural_networks import chat_bing, chat_gpt_3, chat_gpt_4, chat_claude
+from utils.misc.neural_networks import chat_bing, ChatBot
 
 handle_chat_router = Router()
 
@@ -69,8 +69,9 @@ async def command_bing(message: types.Message):
 @CheckTimeLimits
 async def command_gpt_3(message: types.Message):
     loop = asyncio.get_event_loop()
+    gpt_3_bot = ChatBot(api_key=config.OpenAI_API_KEY, model="gpt-3")
     sent_message = await message.reply("Обработка запроса, ожидайте")
-    bot_response = await loop.run_in_executor(None, chat_gpt_3, message.text)
+    bot_response = await loop.run_in_executor(None, gpt_3_bot.chat, message.text)
     try:
         await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id, text=bot_response,
                                     parse_mode="markdown", disable_web_page_preview=True)
@@ -83,8 +84,9 @@ async def command_gpt_3(message: types.Message):
 @CheckTimeLimits
 async def command_gpt_4(message: types.Message):
     loop = asyncio.get_event_loop()
+    gpt_4_bot = ChatBot(poe_token=config.POE_TOKEN, model="gpt-4")
     sent_message = await message.reply("Обработка запроса, ожидайте")
-    bot_response = await loop.run_in_executor(None, chat_gpt_4, message.text)
+    bot_response = await loop.run_in_executor(None, gpt_4_bot.chat, message.text)
     try:
         await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id, text=bot_response,
                                     parse_mode="markdown", disable_web_page_preview=True)
@@ -97,8 +99,9 @@ async def command_gpt_4(message: types.Message):
 @CheckTimeLimits
 async def command_claude(message: types.Message):
     loop = asyncio.get_event_loop()
+    claude_bot = ChatBot(poe_token=config.POE_TOKEN, model="claude")
     sent_message = await message.reply("Обработка запроса, ожидайте")
-    bot_response = await loop.run_in_executor(None, chat_claude, message.text)
+    bot_response = await loop.run_in_executor(None, claude_bot.chat, message.text)
     try:
         await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id, text=bot_response,
                                     parse_mode="markdown", disable_web_page_preview=True)
@@ -131,6 +134,7 @@ async def handle_chat(message: types.Message):
 @MessageLogging
 async def handle_non_text_message(message: types.Message):
     if message.from_user.language_code == "ru":
-        await message.reply("К сожалению, бот умеет работать только с текстом. Пожалуйста, повторите свой запрос в текстовом виде.")
+        await message.reply(
+            "К сожалению, бот умеет работать только с текстом. Пожалуйста, повторите свой запрос в текстовом виде.")
     else:
         await message.reply("Unfortunately, the bot can only work with text. Please, repeat your request in text form.")
