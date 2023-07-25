@@ -20,6 +20,7 @@ async def main():
     dp.include_router(users.command_image_users_router)
     dp.include_router(users.command_summary_router)
     dp.include_router(users.command_limits_router)
+    dp.include_router(users.command_models_router)
 
     dp.include_router(groups.command_gpt_groups_router)
     dp.include_router(groups.command_image_groups_router)

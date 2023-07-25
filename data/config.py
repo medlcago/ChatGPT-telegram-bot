@@ -14,12 +14,12 @@ load_dotenv()
 models = {
     "gpt-4": "beaver",
     "claude": "a2_2",
-    "gpt-3": "gpt-3.5-turbo",
+    "gpt-3.5-turbo": "gpt-3.5-turbo",
     "bing": "bing"
 }
 
 chat_type_mapping = {
-    "gpt-3": 1,
+    "gpt-3.5-turbo": 1,
     "gpt-4": 2,
     "bing": 3,
     "claude": 4
