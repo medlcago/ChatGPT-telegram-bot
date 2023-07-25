@@ -4,7 +4,7 @@ from aiogram import types, Router, F, html
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command, CommandObject
 
-from data import config
+from data import config, templates
 from decorators import CheckTimeLimits, MessageLogging
 from filters import ChatTypeFilter, IsAdmin, IsSubscription
 from loader import db, bot
@@ -23,9 +23,9 @@ async def switch_chat_type(message: types.Message, command: CommandObject):
             chat_type = config.chat_type_mapping.get(args, 1)
             await message.reply(
                 html.quote(
-                    f"Текущий тип чата: {await db.switch_chat_type(user_id=message.from_user.id, chat_type=chat_type)}"))
+                    f"Текущая модель: {await db.switch_chat_type(user_id=message.from_user.id, chat_type=chat_type)}"))
         else:
-            await message.reply("Ошибка смены типа чата. Повторите попытку.")
+            await message.reply(f"Ошибка смены модели. Повторите попытку.\n\n{templates.MODELS}")
     else:
         if message.from_user.language_code == "ru":
             await message.reply(
@@ -69,7 +69,7 @@ async def command_bing(message: types.Message):
 @CheckTimeLimits
 async def command_gpt_3(message: types.Message):
     loop = asyncio.get_event_loop()
-    gpt_3_bot = ChatBot(api_key=config.OpenAI_API_KEY, model="gpt-3")
+    gpt_3_bot = ChatBot(api_key=config.OpenAI_API_KEY, model="gpt-3.5-turbo")
     sent_message = await message.reply("Обработка запроса, ожидайте")
     bot_response = await loop.run_in_executor(None, gpt_3_bot.chat, message.text)
     try:
@@ -116,7 +116,7 @@ async def handle_chat(message: types.Message):
     chat_type = await db.get_chat_type(user_id=message.from_user.id)
 
     chat_handlers = {
-        "gpt-3": command_gpt_3,
+        "gpt-3.5-turbo": command_gpt_3,
         "gpt-4": command_gpt_4,
         "bing": command_bing,
         "claude": command_claude,
@@ -127,7 +127,7 @@ async def handle_chat(message: types.Message):
     if chat_handler:
         await chat_handler(message)
     else:
-        await message.reply("Ошибка: тип чата не найден.")
+        await message.reply("Ошибка: модель не найдена.")
 
 
 @handle_chat_router.message(ChatTypeFilter(is_group=False))

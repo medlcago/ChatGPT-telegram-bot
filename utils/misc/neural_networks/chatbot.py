@@ -21,7 +21,7 @@ class ChatBot:
             raise ValueError("Model is not specified.")
 
         try:
-            if self.model == "gpt-3":
+            if self.model == "gpt-3.5-turbo":
                 return self.get_response_gpt3(content)
             elif self.model == "gpt-4" or self.model == "claude":
                 return self.get_response_poe(content)

@@ -134,9 +134,9 @@ class Database:
         except Exception as e:
             print(e)
 
-    async def get_gpt4_command_count(self, user_id):
+    async def get_command_count(self, user_id):
         """
-        Retrieve the GPT-4 command count for a specific user in the database.
+        Retrieve the command count for a specific user in the database.
         """
         try:
             connection = await self._connect_db()
@@ -150,7 +150,7 @@ class Database:
         except Exception as e:
             print(e)
 
-    async def get_last_gpt4_command_time(self, user_id):
+    async def get_last_command_time(self, user_id):
         """
         Retrieve the last GPT-4 command time for a specific user in the database.
         """
@@ -171,9 +171,9 @@ class Database:
         except Exception as e:
             print(e)
 
-    async def reset_gpt4_command_count(self, user_id):
+    async def reset_command_count(self, user_id):
         """
-        Reset the GPT-4 command count for a specific user in the database.
+        Reset the command count for a specific user in the database.
         """
         try:
             connection = await self._connect_db()
@@ -186,9 +186,9 @@ class Database:
         except Exception as e:
             print(e)
 
-    async def increment_gpt4_command_count(self, user_id):
+    async def increment_command_count(self, user_id):
         """
-        Increment the GPT-4 command count for a user in the database.
+        Increment the command count for a user in the database.
         """
         try:
             connection = await self._connect_db()
@@ -201,9 +201,9 @@ class Database:
         except Exception as e:
             print(e)
 
-    async def update_last_gpt4_command_time(self, user_id, time):
+    async def update_last_command_time(self, user_id, time):
         """
-        Update the last GPT-4 command time for a user in the database.
+        Update the last command time for a user in the database.
         """
         try:
             connection = await self._connect_db()
@@ -243,7 +243,7 @@ class Database:
                 await cursor.execute(query, params)
                 result = await cursor.fetchone()
             connection.close()
-            return config.reverse_chat_type_mapping.get(result[0], 'gpt-3')
+            return config.reverse_chat_type_mapping.get(result[0], 'gpt-3.5-turbo')
         except Exception as e:
             print(e)
 
@@ -259,7 +259,7 @@ class Database:
                 await cursor.execute(query, params)
                 await connection.commit()
             connection.close()
-            return config.reverse_chat_type_mapping.get(chat_type, 'gpt-3')
+            return config.reverse_chat_type_mapping.get(chat_type, 'gpt-3.5-turbo')
         except Exception as e:
             print(e)
 

@@ -21,7 +21,7 @@ async def command_gpt(message: types.Message, command: CommandObject):
     args = command.args
     if args:
         loop = asyncio.get_event_loop()
-        gpt_3_bot = ChatBot(api_key=config.OpenAI_API_KEY, model="gpt-3")
+        gpt_3_bot = ChatBot(api_key=config.OpenAI_API_KEY, model="gpt-3.5-turbo")
         sent_message = await message.reply("Обработка запроса, ожидайте")
         bot_response = await loop.run_in_executor(None, gpt_3_bot.chat, args)
         try:

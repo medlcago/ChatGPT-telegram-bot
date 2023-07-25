@@ -22,8 +22,8 @@ class CheckTimeLimits:
             return await self.handler(message, *args, **kwargs)
 
         date_format = '%Y-%m-%d %H:%M:%S'
-        command_count = await db.get_gpt4_command_count(user_id)
-        last_command_time = await db.get_last_gpt4_command_time(user_id)
+        command_count = await db.get_command_count(user_id)
+        last_command_time = await db.get_last_command_time(user_id)
 
         if last_command_time is not None:
             time_since_last_command = now - last_command_time
@@ -34,11 +34,11 @@ class CheckTimeLimits:
 
             if time_since_last_command > timedelta(hours=1):
                 command_count = 0
-                await db.reset_gpt4_command_count(user_id)
+                await db.reset_command_count(user_id)
 
         if command_count < config.request_limit:
-            await db.increment_gpt4_command_count(user_id)
-            await db.update_last_gpt4_command_time(user_id, now.strftime(date_format))
+            await db.increment_command_count(user_id)
+            await db.update_last_command_time(user_id, now.strftime(date_format))
             return await self.handler(message, *args, **kwargs)
 
         date_format = '%d.%m.%Y %H:%M:%S'
