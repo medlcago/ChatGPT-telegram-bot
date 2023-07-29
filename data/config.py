@@ -41,6 +41,8 @@ user = os.getenv("user")
 password = os.getenv("password")
 db = os.getenv("db")
 
+main_chat_ids = (-1001633082765, -1001525007729)
+
 response_chance = 0
 response_delay = 5
 
