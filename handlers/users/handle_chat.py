@@ -4,11 +4,11 @@ from aiogram import types, Router, F, html
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command, CommandObject
 
-from data import config, templates
+from data import config
 from decorators import CheckTimeLimits, MessageLogging
 from filters import ChatTypeFilter, IsAdmin, IsSubscription
 from loader import db, bot
-from utils.misc.neural_networks import chat_bing, ChatBot
+from utils.misc.neural_networks import ChatBot
 
 handle_chat_router = Router()
 
@@ -17,15 +17,14 @@ handle_chat_router = Router()
 @handle_chat_router.message(Command(commands=["switch"]), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
 async def switch_chat_type(message: types.Message, command: CommandObject):
-    args = command.args
-    if args:
-        if args in config.models.keys():
-            chat_type = config.chat_type_mapping.get(args, 1)
+    chat_type = command.args
+    if chat_type:
+        if chat_type in config.models:
             await message.reply(
                 html.quote(
                     f"Текущая модель: {await db.switch_chat_type(user_id=message.from_user.id, chat_type=chat_type)}"))
         else:
-            await message.reply(f"Ошибка смены модели. Повторите попытку.\n\n{templates.MODELS}")
+            await message.reply(f"Ошибка смены модели. Повторите попытку.\n\n{config.models}")
     else:
         if message.from_user.language_code == "ru":
             await message.reply(
@@ -48,60 +47,11 @@ async def switch_chat_type(message: types.Message, command: CommandObject):
 
 @MessageLogging
 @CheckTimeLimits
-async def command_bing(message: types.Message):
-    sent_message = await message.reply("Обработка запроса, ожидайте")
-    try:
-        bot_response = await chat_bing(message.text, message.from_user.id)
-    except Exception as error:
-        await bot.edit_message_text(text=f"Ошибка: {error}", chat_id=sent_message.chat.id,
-                                    message_id=sent_message.message_id)
-    else:
-        text = bot_response[0:4095] if len(bot_response) > 4095 else bot_response
-        try:
-            await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id, text=text,
-                                        parse_mode='markdown', disable_web_page_preview=True)
-        except TelegramBadRequest as error:
-            await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id,
-                                        text=error.message)
-
-
-@MessageLogging
-@CheckTimeLimits
-async def command_gpt_3(message: types.Message):
+async def command_gpt(message: types.Message, model: str):
     loop = asyncio.get_event_loop()
-    gpt_3_bot = ChatBot(api_key=config.OpenAI_API_KEY, model="gpt-3.5-turbo")
+    gpt_bot = ChatBot(api_key=config.OpenAI_API_KEY, model=model)
     sent_message = await message.reply("Обработка запроса, ожидайте")
-    bot_response = await loop.run_in_executor(None, gpt_3_bot.chat, message.text)
-    try:
-        await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id, text=bot_response,
-                                    parse_mode="markdown", disable_web_page_preview=True)
-    except TelegramBadRequest as error:
-        await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id,
-                                    text=error.message)
-
-
-@MessageLogging
-@CheckTimeLimits
-async def command_gpt_4(message: types.Message):
-    loop = asyncio.get_event_loop()
-    gpt_4_bot = ChatBot(poe_token=config.POE_TOKEN, model="gpt-4")
-    sent_message = await message.reply("Обработка запроса, ожидайте")
-    bot_response = await loop.run_in_executor(None, gpt_4_bot.chat, message.text)
-    try:
-        await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id, text=bot_response,
-                                    parse_mode="markdown", disable_web_page_preview=True)
-    except TelegramBadRequest as error:
-        await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id,
-                                    text=error.message)
-
-
-@MessageLogging
-@CheckTimeLimits
-async def command_claude(message: types.Message):
-    loop = asyncio.get_event_loop()
-    claude_bot = ChatBot(poe_token=config.POE_TOKEN, model="claude")
-    sent_message = await message.reply("Обработка запроса, ожидайте")
-    bot_response = await loop.run_in_executor(None, claude_bot.chat, message.text)
+    bot_response = await loop.run_in_executor(None, gpt_bot.chat, message.text)
     try:
         await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id, text=bot_response,
                                     parse_mode="markdown", disable_web_page_preview=True)
@@ -113,19 +63,10 @@ async def command_claude(message: types.Message):
 @handle_chat_router.message(ChatTypeFilter(is_group=False), F.content_type.in_({'text'}))
 @MessageLogging
 async def handle_chat(message: types.Message):
-    chat_type = await db.get_chat_type(user_id=message.from_user.id)
+    model = await db.get_chat_type(user_id=message.from_user.id)
 
-    chat_handlers = {
-        "gpt-3.5-turbo": command_gpt_3,
-        "gpt-4": command_gpt_4,
-        "bing": command_bing,
-        "claude": command_claude,
-    }
-
-    chat_handler = chat_handlers.get(chat_type)
-
-    if chat_handler:
-        await chat_handler(message)
+    if model:
+        await command_gpt(message, model)
     else:
         await message.reply("Ошибка: модель не найдена.")
 

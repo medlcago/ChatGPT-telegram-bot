@@ -14,10 +14,10 @@ class UserData:
     fullname: str = None
     is_blocked: bool = None
     is_admin: bool = None
-    gpt4_command_count: int = None
-    last_gpt4_command_time: datetime = None
-    chat_type: int = None
+    command_count: int = None
+    last_command_time: datetime = None
     is_subscriber: bool = None
+    chat_type: str = None
 
 
 class Database:
@@ -141,33 +141,32 @@ class Database:
         try:
             connection = await self._connect_db()
             async with connection.cursor(aiomysql.cursors.DictCursor) as cursor:
-                query = 'SELECT gpt4_command_count FROM users WHERE user_id = (%s)'
+                query = 'SELECT command_count FROM users WHERE user_id = (%s)'
                 params = (user_id,)
                 await cursor.execute(query, params)
-                gpt4_command_count = (await cursor.fetchone())["gpt4_command_count"]
+                command_count = (await cursor.fetchone())["command_count"]
                 connection.close()
-                return gpt4_command_count
+                return command_count
         except Exception as e:
             print(e)
 
     async def get_last_command_time(self, user_id):
         """
-        Retrieve the last GPT-4 command time for a specific user in the database.
+        Retrieve the last command time for a specific user in the database.
         """
         try:
             connection = await self._connect_db()
             async with connection.cursor(aiomysql.cursors.DictCursor) as cursor:
-                query = 'SELECT last_gpt4_command_time FROM users WHERE user_id = (%s)'
+                query = 'SELECT last_command_time FROM users WHERE user_id = (%s)'
                 params = (user_id,)
                 await cursor.execute(query, params)
-                last_gpt4_command_time = (await cursor.fetchone())["last_gpt4_command_time"]
+                last_command_time = (await cursor.fetchone())["last_command_time"]
                 connection.close()
-                if last_gpt4_command_time:
+                if last_command_time:
                     date_format = '%Y-%m-%d %H:%M:%S'
                     moscow_tz = pytz.timezone('Europe/Moscow')
-                    last_gpt4_command_time = datetime.strptime(last_gpt4_command_time, date_format)
-                    return moscow_tz.localize(last_gpt4_command_time)
-                return None
+                    last_command_time = datetime.strptime(last_command_time, date_format)
+                    return moscow_tz.localize(last_command_time)
         except Exception as e:
             print(e)
 
@@ -178,7 +177,7 @@ class Database:
         try:
             connection = await self._connect_db()
             async with connection.cursor() as cursor:
-                query = 'UPDATE users SET gpt4_command_count = (%s) WHERE user_id = (%s)'
+                query = 'UPDATE users SET command_count = (%s) WHERE user_id = (%s)'
                 params = (0, user_id)
                 await cursor.execute(query, params)
                 await connection.commit()
@@ -193,7 +192,7 @@ class Database:
         try:
             connection = await self._connect_db()
             async with connection.cursor() as cursor:
-                query = 'UPDATE users SET gpt4_command_count = gpt4_command_count + 1 WHERE user_id = (%s)'
+                query = 'UPDATE users SET command_count = command_count + 1 WHERE user_id = (%s)'
                 params = (user_id,)
                 await cursor.execute(query, params)
                 await connection.commit()
@@ -208,7 +207,7 @@ class Database:
         try:
             connection = await self._connect_db()
             async with connection.cursor() as cursor:
-                query = 'UPDATE users SET last_gpt4_command_time = (%s) WHERE user_id = (%s)'
+                query = 'UPDATE users SET last_command_time = (%s) WHERE user_id = (%s)'
                 params = (time, user_id)
                 await cursor.execute(query, params)
                 await connection.commit()
@@ -243,7 +242,7 @@ class Database:
                 await cursor.execute(query, params)
                 result = await cursor.fetchone()
             connection.close()
-            return config.reverse_chat_type_mapping.get(result[0], 'gpt-3.5-turbo')
+            return result[0]
         except Exception as e:
             print(e)
 
@@ -259,7 +258,7 @@ class Database:
                 await cursor.execute(query, params)
                 await connection.commit()
             connection.close()
-            return config.reverse_chat_type_mapping.get(chat_type, 'gpt-3.5-turbo')
+            return chat_type
         except Exception as e:
             print(e)
 

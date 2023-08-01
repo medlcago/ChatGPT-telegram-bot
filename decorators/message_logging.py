@@ -10,7 +10,7 @@ class MessageLogging:
         self.func = func
         wraps(func)(self)
 
-    async def __call__(self, event, **kwargs):
+    async def __call__(self, event, *args, **kwargs):
         logging.info(f"Function {self.func.__name__} called")
 
         full_name = event.from_user.full_name
@@ -27,7 +27,7 @@ class MessageLogging:
         )
         print(log_message)
 
-        return await self.func(event, **kwargs)
+        return await self.func(event, *args, **kwargs)
 
     @staticmethod
     def _extract_text_and_chat_id(event):

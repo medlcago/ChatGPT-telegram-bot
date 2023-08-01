@@ -1,8 +1,10 @@
-import openai
 import re
+from typing import Optional
+
+import openai
 from openai import InvalidRequestError
 from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled
-from typing import Optional
+
 from data import config
 
 
@@ -31,7 +33,9 @@ def get_video_transcript(video_id: str) -> Optional[str]:
 
 
 def generate_summary(text: str, language: str = "ru") -> str:
+    from data.config import OpenAI_API_BASE
     openai.api_key = config.OpenAI_API_KEY
+    openai.api_base = OpenAI_API_BASE
 
     instructions_map = {
         "ru": "Пожалуйста, резюмируйте предоставленный текст на русском языке",
@@ -42,7 +46,7 @@ def generate_summary(text: str, language: str = "ru") -> str:
 
     try:
         response = openai.ChatCompletion.create(
-            model=config.models["gpt-3"],
+            model="gpt-3.5-turbo-16k",
             messages=[
                 {"role": "system", "content": instructions},
                 {"role": "user", "content": text}
