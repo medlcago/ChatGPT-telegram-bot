@@ -27,7 +27,7 @@ async def command_image(message: types.Message, command: CommandObject):
         )
         if image:
             await message.reply_photo(photo=image,
-                                      caption=f"👨 <b>Запрос отправлен пользователем</b>: <code>{message.from_user.full_name}</code>\n\n"
+                                      caption=f"👨 <b>Запрос отправлен пользователем</b>: {message.from_user.mention_html()}\n\n"
                                               f"🎈 <b>Айди сообщения</b>: <code>{message.message_id}</code>\n\n"
                                               f"🤔 <b>Запрос</b>: <code>{user_request}</code>")
             await sent_message.delete()

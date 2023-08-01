@@ -22,9 +22,8 @@ models = [
 
 OpenAI_API_KEY = os.getenv("OpenAI_API_KEY")
 OpenAI_API_BASE = "https://chimeragpt.adventblocks.cc/api/v1"
-REPLICATE_API_TOKEN = os.getenv("REPLICATE_API_TOKEN")
+
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-POE_TOKEN = os.getenv("POE_TOKEN")
 COOKIE_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'cookie.json')
 
 host = os.getenv("host")
