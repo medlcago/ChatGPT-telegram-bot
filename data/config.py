@@ -20,6 +20,8 @@ models = [
     "gpt-3.5-turbo-16k",
 ]
 
+default_model = "gpt-3.5-turbo"
+
 OpenAI_API_KEY = os.getenv("OpenAI_API_KEY")
 OpenAI_API_BASE = "https://chimeragpt.adventblocks.cc/api/v1"
 
@@ -31,6 +33,8 @@ port = int(os.getenv("port"))
 user = os.getenv("user")
 password = os.getenv("password")
 db = os.getenv("db")
+
+connection_db_string = f'mysql+aiomysql://{user}:{password}@{host}:{port}/{db}'
 
 main_chat_ids = (-1001633082765, -1001525007729)
 
