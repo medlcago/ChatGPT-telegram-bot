@@ -1,3 +1,4 @@
+import logging
 import re
 from typing import Optional
 
@@ -8,7 +9,7 @@ from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled
 from data import config
 
 
-def extract_youtube_video_id(url: str) -> Optional[str]:
+async def extract_youtube_video_id(url: str) -> Optional[str]:
     """
     Links example:
     1. 'https://www.youtube.com/watch?v=video_id',
@@ -22,7 +23,7 @@ def extract_youtube_video_id(url: str) -> Optional[str]:
         return video_id
 
 
-def get_video_transcript(video_id: str) -> Optional[str]:
+async def get_video_transcript(video_id: str) -> Optional[str]:
     try:
         transcript = YouTubeTranscriptApi.get_transcript(video_id=video_id, languages=["ru", "en", "de", "es"])
     except TranscriptsDisabled:
@@ -32,7 +33,7 @@ def get_video_transcript(video_id: str) -> Optional[str]:
     return text
 
 
-def generate_summary(text: str, language: str = "ru") -> str:
+async def generate_summary(text: str, language: str = "ru") -> str:
     from data.config import OpenAI_API_BASE
     openai.api_key = config.OpenAI_API_KEY
     openai.api_base = OpenAI_API_BASE
@@ -59,22 +60,22 @@ def generate_summary(text: str, language: str = "ru") -> str:
         )
 
         return response.choices[0].message.content.strip()
-    except InvalidRequestError as error:
-        print(error)
-        return "К сожалению, превышена максимальная длина сообщения :(" if language == "ru" else "Unfortunately, the maximum message length has been exceeded :("
+    except InvalidRequestError as e:
+        logging.error(f'Error processing request: {e}')
+        return "Unfortunately, the maximum message length has been exceeded."
 
 
-def summarize_youtube_video(video_url: str, language: str = "ru") -> str:
-    video_id = extract_youtube_video_id(video_url)
+async def summarize_youtube_video(video_url: str, language: str = "ru") -> str:
+    video_id = await extract_youtube_video_id(video_url)
 
     if not video_id:
         return "Ссылка не является ссылкой на видео с YouTube"
 
-    transcript = get_video_transcript(video_id)
+    transcript = await get_video_transcript(video_id)
 
     if not transcript:
         return f"Для данного видео нет транскрипта на английском или русском языке: {video_url}"
 
-    summary = generate_summary(transcript, language=language)
+    summary = await generate_summary(transcript, language=language)
 
     return summary

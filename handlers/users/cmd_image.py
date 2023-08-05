@@ -1,5 +1,3 @@
-import asyncio
-
 from aiogram import Router
 from aiogram import html
 from aiogram import types
@@ -16,23 +14,22 @@ command_image_users_router = Router()
 @command_image_users_router.message(Command(commands="image", prefix="/"), ChatTypeFilter(is_group=False))
 @MessageLogging
 async def command_image(message: types.Message, command: CommandObject):
-    user_request = command.args
-    if user_request:
-        loop = asyncio.get_event_loop()
-        user_request = html.quote(user_request)
+    prompt = command.args
+    if prompt:
+        prompt = html.quote(prompt)
         sent_message = await message.reply("Обработка запроса, ожидайте")
         image = URLInputFile(
-            await loop.run_in_executor(None, image_generator, user_request),
-            filename=user_request
+            await image_generator(prompt),
+            filename=prompt
         )
         if image:
             await message.reply_photo(photo=image,
                                       caption=f"👨 <b>Запрос отправлен пользователем</b>: <code>{message.from_user.full_name}</code>\n\n"
                                               f"🎈 <b>Айди сообщения</b>: <code>{message.message_id}</code>\n\n"
-                                              f"🤔 <b>Запрос</b>: <code>{user_request}</code>")
+                                              f"🤔 <b>Запрос</b>: <code>{prompt}</code>")
             await sent_message.delete()
         else:
-            await message.reply(f"❌ <b>OpenAI API не смог обработать запрос</b>: {user_request}")
+            await message.reply(f"❌ <b>OpenAI API не смог обработать запрос</b>: {prompt}")
     else:
         if message.from_user.language_code == "ru":
             await message.reply(

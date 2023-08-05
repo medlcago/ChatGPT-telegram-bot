@@ -1,6 +1,7 @@
 import logging
 
 import openai
+
 from data.config import OpenAI_API_BASE
 
 
@@ -13,16 +14,16 @@ class ChatBot:
         # Setup logging
         logging.basicConfig(filename='chatbot.log', level=logging.INFO)
 
-    def get_response(self, content):
+    async def get_response(self, content):
         if not self.model:
             raise ValueError("Model is not specified.")
         try:
-            return self._get_response(content)
+            return await self._get_response(content)
         except Exception as e:
             logging.error(f'Error processing request: {e}')
             return "Ошибка обработки запроса. Пожалуйста, повторите попытку."
 
-    def _get_response(self, content):
+    async def _get_response(self, content):
         if not self.api_key:
             raise ValueError("API Key is not specified.")
 
@@ -37,5 +38,5 @@ class ChatBot:
         )
         return response.choices[0].message.content.strip()
 
-    def chat(self, prompt):
-        return self.get_response(prompt)
+    async def chat(self, prompt):
+        return await self.get_response(prompt)
