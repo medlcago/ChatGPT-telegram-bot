@@ -30,6 +30,7 @@ btn_cmd_admin = InlineKeyboardMarkup(inline_keyboard=[
         InlineKeyboardButton(text="Информация о сервере", callback_data="server_info")
     ],
     [
+
         InlineKeyboardButton(text="❌ Закрыть панель", callback_data="close_admin_panel")
     ]
 ])

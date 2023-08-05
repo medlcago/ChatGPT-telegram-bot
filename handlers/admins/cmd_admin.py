@@ -1,5 +1,7 @@
 from aiogram import types, Router
+
 from aiogram.filters.command import Command, CommandObject
+from aiogram.filters.command import Command
 from aiogram.filters.text import Text
 
 from decorators import MessageLogging
