@@ -14,5 +14,5 @@ command_all_mention_router.message.filter(F.chat.id.in_(main_chat_ids))
 @MessageLogging
 async def command_all_mention(message: types.Message):
     members = await db.get_members()
-    usernames = (f'@{member.get("username")}' for member in members)
+    usernames = (f'@{member.username}' for member in members)
     await message.reply("<b>Уебища, общий сбор:</b>\n" + "\n".join(usernames), disable_web_page_preview=True)
