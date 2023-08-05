@@ -1,8 +1,15 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
+btn_my_profile = InlineKeyboardMarkup(inline_keyboard=[
+    [
+        InlineKeyboardButton(text="Мой профиль", callback_data="my_profile")
+    ]
+])
+
 btn_cmd_admin = InlineKeyboardMarkup(inline_keyboard=[
     [
-        InlineKeyboardButton(text="Рассылка", callback_data="send_all")
+        InlineKeyboardButton(text="Рассылка", callback_data="send_all"),
+        InlineKeyboardButton(text="Статистика", callback_data="statistics")
     ],
     [
         InlineKeyboardButton(text="Сообщение пользователю", callback_data="send_message")

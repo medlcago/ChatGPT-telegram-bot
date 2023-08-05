@@ -17,6 +17,7 @@ async def main():
     await set_commands(bot)
 
     dp.include_router(users.command_start_help_router)
+    dp.include_router(users.command_profile_router)
     dp.include_router(users.command_image_users_router)
     dp.include_router(users.command_summary_router)
     dp.include_router(users.command_limits_router)
@@ -38,6 +39,7 @@ async def main():
     dp.include_router(admins.command_remove_admin_router)
     dp.include_router(admins.command_grant_sub_router)
     dp.include_router(admins.command_remove_sub_router)
+    dp.include_router(admins.command_statistics_router)
 
     dp.include_router(users.handle_chat_router)
 
