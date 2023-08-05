@@ -1,5 +1,6 @@
 from aiogram import types, Router
 from aiogram.filters.command import Command
+from aiogram.filters.text import Text
 
 from decorators import MessageLogging
 from filters import IsAdmin
@@ -12,3 +13,10 @@ command_admin_router = Router()
 @MessageLogging
 async def command_admin(message: types.Message):
     await message.answer("Панель администратора", reply_markup=btn_cmd_admin)
+
+
+@command_admin_router.callback_query(Text(text="close_panel"), IsAdmin())
+@MessageLogging
+async def close_admin_panel(call: types.CallbackQuery):
+    await call.answer("Панель успешно удалена")
+    await call.message.delete()
