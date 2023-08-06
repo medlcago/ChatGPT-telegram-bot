@@ -63,14 +63,13 @@ class Database:
             await session.close()
 
     async def get_all_users(self):
-        from itertools import chain
         """
         Retrieve all users from the database and return them as a generator of User objects.
         """
         try:
             session = await self.get_session()
-            users = await session.execute(select(User))
-            return chain.from_iterable(users.fetchall())
+            users = (await session.scalars(select(User))).all()
+            return users
         except Exception as e:
             logging.error(f"Database error: {e}")
         finally:
@@ -96,9 +95,9 @@ class Database:
         """
         try:
             session = await self.get_session()
-            admins = await session.execute(select(User).filter_by(is_admin=1))
+            admins = (await session.scalars(select(User).filter_by(is_admin=1))).all()
             if admins:
-                return chain.from_iterable(admins.fetchall())
+                return admins
         except Exception as e:
             logging.error(f"Database error: {e}")
         finally:
@@ -124,7 +123,6 @@ class Database:
         try:
             session = await self.get_session()
             command_count = await session.scalar(select(User.command_count).filter_by(user_id=user_id))
-            await session.close()
             return command_count
         except Exception as e:
             logging.error(f"Database error: {e}")
@@ -188,14 +186,13 @@ class Database:
             await session.close()
 
     async def get_members(self):
-        from itertools import chain
         """
         Get all members from members table.
         """
         try:
             session = await self.get_session()
-            members = await session.execute(select(Member))
-            return chain.from_iterable(members.fetchall())
+            members = await session.scalars(select(Member))
+            return members.all()
         except Exception as e:
             logging.error(f"Database error: {e}")
         finally:
