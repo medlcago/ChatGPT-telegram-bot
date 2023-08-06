@@ -22,7 +22,7 @@ class Database:
 
     async def add_user(self, user_id, fullname):
         """
-        Add a new user to the database.
+        Adds a new user to the database.
         """
         try:
             session = await self.get_session()
@@ -36,7 +36,7 @@ class Database:
 
     async def add_or_remove_admin(self, user_id, is_admin):
         """
-        Update the admin status of a user in the database.
+        Grants or removes administrative rights to the user with the given user ID.
         """
         try:
             session = await self.get_session()
@@ -49,7 +49,7 @@ class Database:
 
     async def user_exists(self, user_id):
         """
-        Check if a user exists in the database and return their data as a User object.
+        Checks if a user exists in the database and return their data as a User object.
         """
         try:
             session = await self.get_session()
@@ -64,7 +64,7 @@ class Database:
 
     async def get_all_users(self):
         """
-        Retrieve all users from the database and return them as a generator of User objects.
+        Retrieves all users from the database and return them as a generator of User objects.
         """
         try:
             session = await self.get_session()
@@ -77,7 +77,7 @@ class Database:
 
     async def block_or_unblock_user(self, user_id, is_blocked):
         """
-        Update the block status of a user in the database.
+        Updates the user's lock status in the database.
         """
         try:
             session = await self.get_session()
@@ -88,10 +88,22 @@ class Database:
         finally:
             await session.close()
 
-    async def get_admins(self):
-        from itertools import chain
+    async def check_user_blocked(self, user_id):
         """
-        Retrieve all admins from the database and return them as a generator of User objects.
+        Checks the user's lockout status
+        """
+        try:
+            session = await self.get_session()
+            is_blocked = await session.scalar(select(User.is_blocked).filter_by(user_id=user_id))
+            return is_blocked
+        except Exception as e:
+            logging.error(f"Database error: {e}")
+        finally:
+            await session.close()
+
+    async def get_admins(self):
+        """
+        Retrieves all admins from the database and return them as a generator of User objects.
         """
         try:
             session = await self.get_session()
@@ -118,7 +130,7 @@ class Database:
 
     async def get_command_count(self, user_id):
         """
-        Retrieve the command count for a specific user in the database.
+        Retrieves the command count for a specific user in the database.
         """
         try:
             session = await self.get_session()
@@ -131,7 +143,7 @@ class Database:
 
     async def get_last_command_time(self, user_id):
         """
-        Retrieve the last command time for a specific user in the database.
+        Retrieves the last command time for a specific user in the database.
         """
         try:
             session = await self.get_session()
@@ -148,7 +160,7 @@ class Database:
 
     async def reset_command_count(self, user_id):
         """
-        Reset the command count for a specific user in the database.
+        Resets the command count for a specific user in the database.
         """
         try:
             session = await self.get_session()
@@ -161,7 +173,7 @@ class Database:
 
     async def increment_command_count(self, user_id):
         """
-        Increment the command count for a user in the database.
+        Increments the command count for a user in the database.
         """
         try:
             session = await self.get_session()
@@ -174,7 +186,7 @@ class Database:
 
     async def update_last_command_time(self, user_id, time):
         """
-        Update the last command time for a user in the database.
+        Updates the last command time for a user in the database.
         """
         try:
             session = await self.get_session()
@@ -187,7 +199,7 @@ class Database:
 
     async def get_members(self):
         """
-        Get all members from members table.
+        Gets all members from members table.
         """
         try:
             session = await self.get_session()
@@ -200,7 +212,7 @@ class Database:
 
     async def get_chat_type(self, user_id):
         """
-        Get user's chat type by its user id.
+        Gets user's chat type by its user id.
         """
         try:
             session = await self.get_session()
@@ -213,7 +225,7 @@ class Database:
 
     async def switch_chat_type(self, user_id, chat_type):
         """
-        Update the chat type associated with a given user ID in the database.
+        Updates the chat type associated with a given user ID in the database.
         """
         try:
             session = await self.get_session()
@@ -227,7 +239,7 @@ class Database:
 
     async def check_user_subscription(self, user_id):
         """
-        Check if the user with the given user ID is a subscriber or not.
+        Check if the user with the given user ID is a subscriber.
         """
         try:
             session = await self.get_session()
@@ -240,7 +252,7 @@ class Database:
 
     async def grant_or_remove_subscription(self, user_id, is_subscriber):
         """
-        Grant or remove a subscription to the user with the given user ID.
+        Grants or removes a subscription to the user with the given user ID.
         """
         try:
             session = await self.get_session()
