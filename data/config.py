@@ -26,7 +26,6 @@ OpenAI_API_KEY = os.getenv("OpenAI_API_KEY")
 OpenAI_API_BASE = "https://chimeragpt.adventblocks.cc/api/v1"
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-COOKIE_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'cookie.json')
 
 host = os.getenv("host")
 port = int(os.getenv("port"))
