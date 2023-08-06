@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 from aiogram import types, Router
 from aiogram.filters.command import Command, CommandObject
@@ -15,7 +16,7 @@ from states.admins import Administrators
 command_send_all_router = Router()
 
 
-async def send_all(message_to_user: str, command: CommandObject = None):
+async def send_all(message_to_user: str, command: CommandObject):
     if message_to_user:
         count = 0
         users = await db.get_all_users()
@@ -24,7 +25,7 @@ async def send_all(message_to_user: str, command: CommandObject = None):
                 await bot.send_message(chat_id=user.user_id, text=message_to_user)
                 count += 1
             except Exception as e:
-                print(e)
+                logging.error(e)
             finally:
                 await asyncio.sleep(2)
             return f"Рассылка завершена. Сообщение получили {count}/{len(users)}"
@@ -46,7 +47,7 @@ async def command_send_all(call: types.CallbackQuery, state: FSMContext):
     await call.answer()
 
 
-@command_send_all_router.message(Administrators.Mailing.message, IsAdmin())
+@command_send_all_router.message(Administrators.Mailing.message)
 @MessageLogging
 async def message_send_all(message: types.Message, state: FSMContext):
     await state.update_data(message=message.text)
@@ -54,7 +55,8 @@ async def message_send_all(message: types.Message, state: FSMContext):
     await state.set_state(Administrators.Mailing.confirmation)
 
 
-@command_send_all_router.callback_query(Administrators.Mailing.confirmation, Text(text="confirmation_send_all"), IsAdmin())
+@command_send_all_router.callback_query(Administrators.Mailing.confirmation, Text(text="confirmation_send_all"),
+                                        IsAdmin())
 @MessageLogging
 async def confirmation_send_all(call: types.CallbackQuery, state: FSMContext):
     message_to_user = (await state.get_data()).get("message")
@@ -63,9 +65,9 @@ async def confirmation_send_all(call: types.CallbackQuery, state: FSMContext):
     await state.clear()
 
 
-@command_send_all_router.callback_query(Administrators.Mailing.confirmation, Text(text="cancel_send_all"), IsAdmin())
+@command_send_all_router.callback_query(Administrators.Mailing.confirmation, Text(text="cancel_send_all"))
 @MessageLogging
 async def cancel_send_all(call: types.CallbackQuery, state: FSMContext):
     await state.clear()
     await call.message.edit_text("Действие было отменено.")
-    await call.answer()
+    await call.answer("Отменено")

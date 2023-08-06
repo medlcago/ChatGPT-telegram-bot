@@ -1,7 +1,6 @@
 from datetime import timedelta
 
 from aiogram import Router, types
-from aiogram import html
 from aiogram.filters.command import Command
 
 from data import config

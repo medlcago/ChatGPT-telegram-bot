@@ -1,18 +1,18 @@
+import datetime
+import platform
+
+import psutil
 from aiogram import types, Router
 from aiogram.filters.command import Command
 from aiogram.filters.text import Text
 
 from decorators import MessageLogging
-from filters import IsAdmin
+from filters import IsAdmin, ChatTypeFilter
 
 command_server_router = Router()
 
 
 async def get_server_system_info():
-    import psutil
-    import datetime
-    import platform
-
     delimiter = "-" * 55 + "\n"
 
     date_info = f'<b>Дата и время:</b> {datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")}\n'
@@ -37,7 +37,7 @@ async def get_server_system_info():
         delimiter + (cpu_load + memory_load) + delimiter + disk_information + delimiter
 
 
-@command_server_router.message(Command(commands=["server"], prefix="!/"), IsAdmin())
+@command_server_router.message(Command(commands=["server"], prefix="!/"), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
 async def command_server(message: types.Message):
     await message.reply(await get_server_system_info())
@@ -46,5 +46,5 @@ async def command_server(message: types.Message):
 @command_server_router.callback_query(Text(text="server_info"), IsAdmin())
 @MessageLogging
 async def command_server(call: types.CallbackQuery):
-    await call.answer()
+    await call.answer("Успех!")
     await call.message.reply(await get_server_system_info())

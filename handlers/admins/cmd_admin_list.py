@@ -3,7 +3,7 @@ from aiogram.filters.command import Command
 from aiogram.filters.text import Text
 
 from decorators import MessageLogging
-from filters import IsAdmin
+from filters import IsAdmin, ChatTypeFilter
 from loader import db
 
 command_admin_list_router = Router()
@@ -18,7 +18,8 @@ async def admin_list():
         return "Администраторы отсутствуют."
 
 
-@command_admin_list_router.message(Command(commands=["admin_list"], prefix="/"), IsAdmin())
+@command_admin_list_router.message(Command(commands=["admin_list"], prefix="/"), ChatTypeFilter(is_group=False),
+                                   IsAdmin())
 @MessageLogging
 async def command_admin_list(message: types.Message):
     result = await admin_list()
