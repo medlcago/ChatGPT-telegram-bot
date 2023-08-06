@@ -5,5 +5,5 @@ from loader import db
 
 
 class IsAdmin(Filter):
-    async def __call__(self, event: types.Message | types.CallbackQuery) -> bool | None:
+    async def __call__(self, event: types.Message | types.CallbackQuery) -> bool:
         return await db.check_admin_permissions(user_id=event.from_user.id)
