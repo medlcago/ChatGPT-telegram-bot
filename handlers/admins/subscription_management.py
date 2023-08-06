@@ -11,7 +11,7 @@ from states.admins import Administrators
 subscription_management_router = Router()
 
 
-async def grant_subscription(user_id: str):
+async def grant_subscription_common(user_id: str):
     if user_id and user_id.isnumeric():
         user = await db.user_exists(user_id=user_id)
         if user:
@@ -27,7 +27,7 @@ async def grant_subscription(user_id: str):
         return "Аргумент не является идентификатором пользователя."
 
 
-async def remove_subscription(user_id: str):
+async def remove_subscription_common(user_id: str):
     if user_id and user_id.isnumeric():
         user = await db.user_exists(user_id=user_id)
         if user:
@@ -47,9 +47,9 @@ async def remove_subscription(user_id: str):
 @subscription_management_router.message(Command(commands=["grant_sub"], prefix="/"), ChatTypeFilter(is_group=False),
                                         IsAdmin())
 @MessageLogging
-async def grant_subscription(message: types.Message, command: CommandObject):
+async def command_grant_subscription(message: types.Message, command: CommandObject):
     user_id = command.args
-    result = await grant_subscription(user_id)
+    result = await grant_subscription_common(user_id)
     await message.reply(result)
 
 
@@ -67,7 +67,7 @@ async def grant_subscription(call: types.CallbackQuery, state: FSMContext):
 async def grant_subscription(message: types.Message, state: FSMContext):
     user_id = message.text
     sent_message = (await state.get_data()).get("sent_message")
-    result = await grant_subscription(user_id)
+    result = await grant_subscription_common(user_id)
     await message.reply(result)
 
     await sent_message.delete()
@@ -80,13 +80,13 @@ async def grant_subscription(message: types.Message, state: FSMContext):
 @MessageLogging
 async def command_remove_subscription(message: types.Message, command: CommandObject):
     user_id = command.args
-    result = await remove_subscription(user_id)
+    result = await remove_subscription_common(user_id)
     await message.reply(result)
 
 
 @subscription_management_router.callback_query(Text(text="remove_sub"), IsAdmin())
 @MessageLogging
-async def command_remove_subscription(call: types.CallbackQuery, state: FSMContext):
+async def remove_subscription(call: types.CallbackQuery, state: FSMContext):
     await call.answer("Удаление подписки")
     sent_message = await call.message.reply("Введите user_id подписчика, которого хотите удалить")
     await state.set_state(Administrators.RemoveSubscription.user_id)
@@ -95,10 +95,10 @@ async def command_remove_subscription(call: types.CallbackQuery, state: FSMConte
 
 @subscription_management_router.message(Administrators.RemoveSubscription.user_id)
 @MessageLogging
-async def command_remove_subscription(message: types.Message, state: FSMContext):
+async def remove_subscription(message: types.Message, state: FSMContext):
     user_id = message.text
     sent_message = (await state.get_data()).get("sent_message")
-    result = await remove_subscription(user_id)
+    result = await remove_subscription_common(user_id)
     await message.reply(result)
 
     await sent_message.delete()
