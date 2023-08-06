@@ -16,7 +16,7 @@ from states.admins import Administrators
 command_send_all_router = Router()
 
 
-async def send_all(message_to_user: str, command: CommandObject):
+async def send_all(message_to_user: str, command: CommandObject = None):
     if message_to_user:
         count = 0
         users = await db.get_all_users()
