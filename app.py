@@ -3,10 +3,14 @@ async def main():
     from loader import bot
     from utils import set_commands
     from data.config import DEBUG
+    from middlewares import BlockMiddleware
 
     from routers import dp
 
     logging.basicConfig(level=logging.INFO)
+
+    dp.message.middleware.register(BlockMiddleware())
+    dp.callback_query.middleware.register(BlockMiddleware())
 
     await set_commands(bot)
 
