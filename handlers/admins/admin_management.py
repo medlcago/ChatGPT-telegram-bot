@@ -47,7 +47,7 @@ async def remove_admin_common(user_id: str, from_user_id):
 # Добавление администратора
 @admin_management_router.message(Command(commands=["add_admin"], prefix="/"), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
-async def add_admin(message: types.Message, command: CommandObject):
+async def command_add_admin(message: types.Message, command: CommandObject):
     user_id = command.args
     result = await add_admin_common(user_id)
     await message.reply(result)
@@ -55,7 +55,7 @@ async def add_admin(message: types.Message, command: CommandObject):
 
 @admin_management_router.callback_query(Text(text="add_admin"), IsAdmin())
 @MessageLogging
-async def add_admin(call: types.CallbackQuery, state: FSMContext):
+async def command_add_admin(call: types.CallbackQuery, state: FSMContext):
     await call.answer("Добавление администратора")
     sent_message = await call.message.reply("Введите user_id пользователя, который получит права администратора")
     await state.set_state(Administrators.AddAdmin.user_id)
@@ -75,10 +75,9 @@ async def add_admin(message: types.Message, state: FSMContext):
 
 
 # Удаление администратора
-@admin_management_router.message(Command(commands=["remove_admin"], prefix="/"), ChatTypeFilter(is_group=False),
-                                 IsAdmin())
+@admin_management_router.message(Command(commands=["remove_admin"], prefix="/"), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
-async def remove_admin(message: types.Message, command: CommandObject):
+async def command_remove_admin(message: types.Message, command: CommandObject):
     user_id = command.args
     from_user_id = message.from_user.id
     result = await remove_admin_common(user_id, from_user_id)
@@ -87,7 +86,7 @@ async def remove_admin(message: types.Message, command: CommandObject):
 
 @admin_management_router.callback_query(Text(text="remove_admin"), IsAdmin())
 @MessageLogging
-async def remove_admin(call: types.CallbackQuery, state: FSMContext):
+async def command_remove_admin(call: types.CallbackQuery, state: FSMContext):
     await call.answer("Удаление администратора")
     sent_message = await call.message.reply("Введите user_id администратора, которого хотите удалить")
     await state.set_state(Administrators.RemoveAdmin.user_id)

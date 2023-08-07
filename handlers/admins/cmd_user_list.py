@@ -18,8 +18,7 @@ async def user_list():
         return "Пользователи отсутствуют."
 
 
-@command_user_list_router.message(Command(commands=["user_list"], prefix="/"), ChatTypeFilter(is_group=False),
-                                  IsAdmin())
+@command_user_list_router.message(Command(commands=["user_list"], prefix="/"), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
 async def command_user_list(message: types.Message):
     await message.reply(await user_list())

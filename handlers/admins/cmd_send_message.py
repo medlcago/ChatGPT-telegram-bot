@@ -15,8 +15,7 @@ from states.admins import Administrators
 command_send_message_router = Router()
 
 
-@command_send_message_router.message(Command(commands=["send_message"], prefix="/"), ChatTypeFilter(is_group=False),
-                                     IsAdmin())
+@command_send_message_router.message(Command(commands=["send_message"], prefix="/"), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
 async def command_send_message(message: types.Message, state: FSMContext):
     await message.reply("Введите сообщение, которое хотите отправить")
@@ -62,8 +61,7 @@ async def message_to_send(message: types.Message, state: FSMContext):
         await state.clear()
 
 
-@command_send_message_router.callback_query(Administrators.SendMessage.confirmation,
-                                            Text(text="confirmation_send_message"), IsAdmin())
+@command_send_message_router.callback_query(Administrators.SendMessage.confirmation, Text(text="confirmation_send_message"), IsAdmin())
 @MessageLogging
 async def confirmation_send_message(call: types.CallbackQuery, state: FSMContext):
     message_to_user = ((await state.get_data()).get("message")).text

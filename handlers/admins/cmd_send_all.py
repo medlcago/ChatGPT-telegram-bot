@@ -55,8 +55,7 @@ async def message_send_all(message: types.Message, state: FSMContext):
     await state.set_state(Administrators.Mailing.confirmation)
 
 
-@command_send_all_router.callback_query(Administrators.Mailing.confirmation, Text(text="confirmation_send_all"),
-                                        IsAdmin())
+@command_send_all_router.callback_query(Administrators.Mailing.confirmation, Text(text="confirmation_send_all"), IsAdmin())
 @MessageLogging
 async def confirmation_send_all(call: types.CallbackQuery, state: FSMContext):
     message_to_user = (await state.get_data()).get("message")

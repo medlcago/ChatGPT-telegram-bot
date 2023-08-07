@@ -34,7 +34,7 @@ async def remove_subscription_common(user_id: str):
             if user.is_subscriber:
                 if await db.grant_or_remove_subscription(user_id=user_id, is_subscriber=False):
                     return f"<b>{user.fullname}({user.user_id})</b> лишился подписки."
-                return "Произошла ошибка. <b>{user.fullname}({user.user_id})</b> не лишился подписки."
+                return f"Произошла ошибка. <b>{user.fullname}({user.user_id})</b> не лишился подписки."
             else:
                 return f"<b>{user.fullname}({user.user_id})</b> не является подписчиком."
         else:
@@ -44,8 +44,7 @@ async def remove_subscription_common(user_id: str):
 
 
 # Выдача подписки
-@subscription_management_router.message(Command(commands=["grant_sub"], prefix="/"), ChatTypeFilter(is_group=False),
-                                        IsAdmin())
+@subscription_management_router.message(Command(commands=["grant_sub"], prefix="/"), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
 async def command_grant_subscription(message: types.Message, command: CommandObject):
     user_id = command.args
@@ -55,7 +54,7 @@ async def command_grant_subscription(message: types.Message, command: CommandObj
 
 @subscription_management_router.callback_query(Text(text="grant_sub"), IsAdmin())
 @MessageLogging
-async def grant_subscription(call: types.CallbackQuery, state: FSMContext):
+async def command_grant_subscription(call: types.CallbackQuery, state: FSMContext):
     await call.answer("Выдача подписки")
     sent_message = await call.message.reply("Введите user_id пользователя, который получит подписку")
     await state.set_state(Administrators.GrantSubscription.user_id)
@@ -75,8 +74,7 @@ async def grant_subscription(message: types.Message, state: FSMContext):
 
 
 # Удаление подписки
-@subscription_management_router.message(Command(commands=["remove_sub"], prefix="/"), ChatTypeFilter(is_group=False),
-                                        IsAdmin())
+@subscription_management_router.message(Command(commands=["remove_sub"], prefix="/"), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
 async def command_remove_subscription(message: types.Message, command: CommandObject):
     user_id = command.args
@@ -86,7 +84,7 @@ async def command_remove_subscription(message: types.Message, command: CommandOb
 
 @subscription_management_router.callback_query(Text(text="remove_sub"), IsAdmin())
 @MessageLogging
-async def remove_subscription(call: types.CallbackQuery, state: FSMContext):
+async def command_remove_subscription(call: types.CallbackQuery, state: FSMContext):
     await call.answer("Удаление подписки")
     sent_message = await call.message.reply("Введите user_id подписчика, которого хотите удалить")
     await state.set_state(Administrators.RemoveSubscription.user_id)
