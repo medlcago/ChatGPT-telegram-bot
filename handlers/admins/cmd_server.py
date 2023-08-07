@@ -8,6 +8,7 @@ from aiogram.filters.text import Text
 
 from decorators import MessageLogging
 from filters import IsAdmin, ChatTypeFilter
+from keyboards.inline import btn_back_admin_panel
 
 command_server_router = Router()
 
@@ -40,11 +41,13 @@ async def get_server_system_info():
 @command_server_router.message(Command(commands=["server"], prefix="!/"), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
 async def command_server(message: types.Message):
-    await message.reply(await get_server_system_info())
+    result = await get_server_system_info()
+    await message.edit_text(result, reply_markup=btn_back_admin_panel)
 
 
 @command_server_router.callback_query(Text(text="server_info"), IsAdmin())
 @MessageLogging
 async def command_server(call: types.CallbackQuery):
+    result = await get_server_system_info()
+    await call.message.edit_text(result, reply_markup=btn_back_admin_panel)
     await call.answer("Успех!")
-    await call.message.reply(await get_server_system_info())

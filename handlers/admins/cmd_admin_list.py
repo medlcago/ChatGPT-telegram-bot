@@ -4,6 +4,7 @@ from aiogram.filters.text import Text
 
 from decorators import MessageLogging
 from filters import IsAdmin, ChatTypeFilter
+from keyboards.inline import btn_back_admin_panel
 from loader import db
 
 command_admin_list_router = Router()
@@ -29,5 +30,5 @@ async def command_admin_list(message: types.Message):
 @MessageLogging
 async def command_admin_list(call: types.CallbackQuery):
     result = await admin_list()
-    await call.message.reply(result)
-    await call.answer()
+    await call.message.edit_text(result, reply_markup=btn_back_admin_panel)
+    await call.answer("Успех!")

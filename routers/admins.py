@@ -1,6 +1,7 @@
 from handlers import admins
 from loader import dp
 
+dp.include_router(admins.command_cancel_router)
 dp.include_router(admins.command_admin_router)
 dp.include_router(admins.command_send_all_router)
 dp.include_router(admins.command_send_message_router)

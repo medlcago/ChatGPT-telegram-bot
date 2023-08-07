@@ -39,6 +39,12 @@ btn_cmd_admin = InlineKeyboardMarkup(inline_keyboard=[
     ]
 ])
 
+btn_back_admin_panel = InlineKeyboardMarkup(inline_keyboard=[
+    [
+        InlineKeyboardButton(text="Назад", callback_data="back_admin_panel")
+    ]
+])
+
 btn_send_all = InlineKeyboardMarkup(inline_keyboard=[
     [
         InlineKeyboardButton(text="Подтвердить", callback_data="confirmation_send_all")
