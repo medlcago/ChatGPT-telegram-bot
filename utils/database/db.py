@@ -5,13 +5,15 @@ import pytz
 from sqlalchemy import update, select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
-from data.config import connection_db_string
 from .models import User, Member
 
 
 class Database:
-    def __init__(self):
-        self._engine = create_async_engine(url=connection_db_string)
+    __slots__ = ("_url", "_engine")
+
+    def __init__(self, url: str):
+        self._url = url
+        self._engine = create_async_engine(url=self._url)
 
     async def get_session(self):
         """
