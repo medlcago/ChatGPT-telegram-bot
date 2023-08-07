@@ -83,6 +83,7 @@ class Database:
             session = await self.get_session()
             await session.execute(update(User).filter_by(user_id=user_id).values(is_blocked=is_blocked))
             await session.commit()
+            return True
         except Exception as e:
             logging.error(f"Database error: {e}")
         finally:
@@ -101,6 +102,19 @@ class Database:
         finally:
             await session.close()
 
+    async def get_all_blocked(self):
+        """
+        Retrieves all blocked users from the database and returns them as a generator of User objects.
+        """
+        try:
+            session = await self.get_session()
+            blocked_users = (await session.scalars(select(User).filter_by(is_blocked=1))).all()
+            return blocked_users
+        except Exception as e:
+            logging.error(f"Database error: {e}")
+        finally:
+            await session.close()
+
     async def get_admins(self):
         """
         Retrieves all admins from the database and return them as a generator of User objects.
@@ -108,8 +122,7 @@ class Database:
         try:
             session = await self.get_session()
             admins = (await session.scalars(select(User).filter_by(is_admin=1))).all()
-            if admins:
-                return admins
+            return admins
         except Exception as e:
             logging.error(f"Database error: {e}")
         finally:

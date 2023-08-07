@@ -46,6 +46,20 @@ class RemoveSubscription(StatesGroup):
     user_id = State()
 
 
+class BlockUser(StatesGroup):
+    """
+    Класс состояний для блокировки пользователя.
+    """
+    user_id = State()
+
+
+class UnblockUser(StatesGroup):
+    """
+    Класс состояний для разблокировки пользователя.
+    """
+    user_id = State()
+
+
 class Administrators:
     """
     Класс, объединяющий состояния для управления администраторами.
@@ -56,3 +70,5 @@ class Administrators:
     RemoveAdmin = RemoveAdmin
     GrantSubscription = GrantSubscription
     RemoveSubscription = RemoveSubscription
+    BlockUser = BlockUser
+    UnblockUser = UnblockUser

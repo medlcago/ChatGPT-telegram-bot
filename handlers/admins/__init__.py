@@ -7,3 +7,4 @@ from .cmd_server import command_server_router
 from .cmd_statistics import command_statistics_router
 from .cmd_user_list import command_user_list_router
 from .subscription_management import subscription_management_router
+from .user_management import user_management_router
