@@ -23,7 +23,7 @@ async def user_list():
 @MessageLogging
 async def command_user_list(message: types.Message):
     result = await user_list()
-    await message.edit_text(result, reply_markup=btn_back_admin_panel)
+    await message.reply(result)
 
 
 @command_user_list_router.callback_query(Text(text="user_list"), IsAdmin())

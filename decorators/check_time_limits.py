@@ -18,7 +18,7 @@ class CheckTimeLimits:
         now = datetime.now(moscow_tz)
         user_id = message.from_user.id
 
-        if user_id in (item.user_id for item in await db.get_admins()):
+        if await db.check_admin_permissions(user_id=user_id):
             return await self.handler(message, *args, **kwargs)
 
         date_format = '%Y-%m-%d %H:%M:%S'

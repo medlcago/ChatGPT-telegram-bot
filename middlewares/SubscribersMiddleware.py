@@ -17,7 +17,6 @@ class SubscribersMiddleware(BaseMiddleware):
             data: Dict[str, Any]
     ) -> Any:
         user_id = event.from_user.id
-        # TODO button
         if (not SUBSCRIBERS_ONLY or
                 await db.check_user_subscription(user_id=user_id) or await db.check_admin_permissions(user_id=user_id)):
             return await handler(event, data)
