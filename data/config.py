@@ -42,4 +42,5 @@ response_delay = 5
 
 request_limit = 20
 
+SUBSCRIBERS_ONLY = False
 DEBUG = False

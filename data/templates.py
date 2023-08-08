@@ -1,4 +1,5 @@
 DEBUG_MESSAGE = "Technical work is underway. The bot is temporarily unavailable."
+SUBSCRIBERS_ONLY_MESSAGE = "To use the bot, you must purchase a subscription."
 
 START_MESSAGE = {
     "ru": """Привет, {username}!

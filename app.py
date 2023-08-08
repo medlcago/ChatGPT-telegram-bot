@@ -2,7 +2,10 @@ async def main():
     import logging
     from loader import bot
     from utils import set_commands
-    from middlewares import BlockMiddleware, DebugMiddleware
+    from middlewares import (
+        BlockMiddleware,
+        DebugMiddleware,
+        SubscribersMiddleware)
 
     from routers import dp
 
@@ -13,6 +16,9 @@ async def main():
 
     dp.message.middleware.register(DebugMiddleware())
     dp.callback_query.middleware.register(DebugMiddleware())
+
+    dp.message.middleware.register(SubscribersMiddleware())
+    dp.callback_query.middleware.register(SubscribersMiddleware())
 
     await set_commands(bot)
 
