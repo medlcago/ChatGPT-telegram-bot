@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
-from sqlalchemy import Column, BigInteger, Text
+from sqlalchemy import Column, Text
+from sqlalchemy.dialects.mysql import BIGINT
 from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
@@ -10,7 +11,7 @@ Base = declarative_base()
 class Member(Base):
     __tablename__ = 'members'
 
-    id: int = Column(BigInteger, primary_key=True, unique=True, nullable=False)
-    user_id: int = Column(BigInteger)
-    username: str = Column(Text)
+    id: int = Column(BIGINT(unsigned=True), primary_key=True)
+    user_id: int = Column(BIGINT(unsigned=True), unique=True)
+    username: str = Column(Text, unique=True)
     nickname: str = Column(Text)
