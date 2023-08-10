@@ -68,3 +68,9 @@ btn_contact_admin = InlineKeyboardMarkup(inline_keyboard=[
         InlineKeyboardButton(text="Contact the bot administrator", url="https://t.me/medlcago")
     ]
 ])
+
+btn_promocode_activation = InlineKeyboardMarkup(inline_keyboard=[
+    [
+        InlineKeyboardButton(text="Активировать промокод", callback_data="promocode")
+    ]
+])

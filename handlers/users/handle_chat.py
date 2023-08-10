@@ -5,7 +5,7 @@ from aiogram.filters import Command, CommandObject
 from data import config
 from decorators import CheckTimeLimits, MessageLogging
 from filters import ChatTypeFilter, IsAdmin, IsSubscription
-from keyboards.inline import btn_contact_admin
+from keyboards.inline import btn_promocode_activation
 from loader import db, bot
 from utils.misc.neural_networks import ChatBot
 
@@ -39,10 +39,12 @@ async def switch_chat_type(message: types.Message, command: CommandObject):
 async def switch_chat_type(message: types.Message, command: CommandObject):
     if message.from_user.language_code == "ru":
         await message.reply(
-            f"Команда <b><i>{command.prefix + command.command}</i></b> доступна только premium пользователям.", reply_markup=btn_contact_admin)
+            f"Команда <b><i>{command.prefix + command.command}</i></b> доступна только premium пользователям.",
+            reply_markup=btn_promocode_activation)
     else:
         await message.reply(
-            f"The command <b><i>{command.prefix + command.command}</i></b> is only available to premium users.", reply_markup=btn_contact_admin)
+            f"The command <b><i>{command.prefix + command.command}</i></b> is only available to premium users.",
+            reply_markup=btn_promocode_activation)
 
 
 @MessageLogging
