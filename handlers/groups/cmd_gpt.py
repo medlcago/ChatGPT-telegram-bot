@@ -1,3 +1,5 @@
+import asyncio
+
 from aiogram import Router, types
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command, CommandObject
@@ -18,9 +20,10 @@ command_gpt_groups_router = Router()
 async def command_gpt(message: types.Message, command: CommandObject):
     args = command.args
     if args:
+        loop = asyncio.get_event_loop()
         gpt_3_bot = ChatBot(api_key=config.OpenAI_API_KEY, model="gpt-3.5-turbo")
         sent_message = await message.reply("Обработка запроса, ожидайте")
-        bot_response = await gpt_3_bot.chat(args)
+        bot_response = await loop.run_in_executor(None, gpt_3_bot.chat, message.text)
         try:
             await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id,
                                         text=bot_response, parse_mode="markdown")

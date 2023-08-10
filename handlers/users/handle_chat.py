@@ -1,3 +1,4 @@
+import asyncio
 from aiogram import types, Router, F, html
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command, CommandObject
@@ -50,9 +51,10 @@ async def switch_chat_type(message: types.Message, command: CommandObject):
 @MessageLogging
 @CheckTimeLimits
 async def command_gpt(message: types.Message, model: str):
+    loop = asyncio.get_event_loop()
     gpt_bot = ChatBot(api_key=config.OpenAI_API_KEY, model=model)
     sent_message = await message.reply("Обработка запроса, ожидайте")
-    bot_response = await gpt_bot.chat(message.text)
+    bot_response = await loop.run_in_executor(None, gpt_bot.chat, message.text)
     try:
         await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id, text=bot_response,
                                     parse_mode="markdown", disable_web_page_preview=True)

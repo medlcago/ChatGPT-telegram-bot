@@ -1,3 +1,5 @@
+import asyncio
+
 from aiogram import Router
 from aiogram import html
 from aiogram import types
@@ -15,10 +17,11 @@ command_image_router = Router()
 async def command_image(message: types.Message, command: CommandObject):
     prompt = command.args
     if prompt:
+        loop = asyncio.get_event_loop()
         prompt = html.quote(prompt)
         sent_message = await message.reply("Обработка запроса, ожидайте")
         image = URLInputFile(
-            await image_generator(prompt),
+            await loop.run_in_executor(None, image_generator, prompt),
             filename=prompt
         )
         if image:

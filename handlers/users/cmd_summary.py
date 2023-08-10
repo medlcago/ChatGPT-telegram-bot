@@ -1,3 +1,5 @@
+import asyncio
+
 from aiogram import Router
 from aiogram import html
 from aiogram import types
@@ -17,9 +19,10 @@ command_summary_router = Router()
 async def command_summarize(message: types.Message, command: CommandObject):
     url = command.args
     if url:
+        loop = asyncio.get_event_loop()
         sent_message = await message.reply("Обработка запроса, ожидайте")
         summarize = html.quote(
-            await summarize_youtube_video(url, message.from_user.language_code))
+            await loop.run_in_executor(None, summarize_youtube_video, url, message.from_user.language_code))
         try:
             await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id,
                                         text=summarize, disable_web_page_preview=True)

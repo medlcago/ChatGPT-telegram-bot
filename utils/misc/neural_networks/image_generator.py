@@ -5,7 +5,7 @@ import openai
 from data.config import OpenAI_API_KEY, OpenAI_API_BASE
 
 
-async def image_generator(prompt):
+def image_generator(prompt):
     try:
         openai.api_key = OpenAI_API_KEY
         openai.api_base = OpenAI_API_BASE
