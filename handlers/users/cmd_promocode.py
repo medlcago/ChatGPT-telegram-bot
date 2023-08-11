@@ -1,4 +1,4 @@
-from aiogram import Router, types
+from aiogram import Router, types, F
 from aiogram.filters.command import Command
 from aiogram.filters.text import Text
 from aiogram.fsm.context import FSMContext
@@ -29,7 +29,7 @@ async def command_promocode(call: types.CallbackQuery, state: FSMContext):
     await state.set_state(Users.PromocodeActivation.promo_code)
 
 
-@command_promocode_router.message(Text(startswith="PROMO-"), Users.PromocodeActivation.promo_code)
+@command_promocode_router.message(F.text.regexp(r"^PROMO-[A-Z]{3}-\d{3}-[A-Z]{3}$"), Users.PromocodeActivation.promo_code)
 @MessageLogging
 async def promocode_activation(message: types.Message, state: FSMContext):
     promo_code = message.text

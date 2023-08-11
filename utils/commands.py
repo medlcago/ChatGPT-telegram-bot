@@ -11,6 +11,10 @@ async def set_commands(bot: Bot):
         BotCommand(
             command="help",
             description="Помощь"
+        ),
+        BotCommand(
+            command="models",
+            description="Список моделей"
         )
     ]
     await bot.set_my_commands(commands, scope=BotCommandScopeDefault())
