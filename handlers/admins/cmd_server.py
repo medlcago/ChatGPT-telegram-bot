@@ -42,7 +42,7 @@ async def get_server_system_info():
 @MessageLogging
 async def command_server(message: types.Message):
     result = await get_server_system_info()
-    await message.edit_text(result, reply_markup=btn_back_admin_panel)
+    await message.reply(result)
 
 
 @command_server_router.callback_query(Text(text="server_info"), IsAdmin())
