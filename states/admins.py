@@ -60,6 +60,14 @@ class UnblockUser(StatesGroup):
     user_id = State()
 
 
+class CreatePromocode(StatesGroup):
+    """
+    Класс состояний для создания промокода.
+    """
+    promocode = State()
+    activations_count = State()
+
+
 class Administrators:
     """
     Класс, объединяющий состояния для управления администраторами.
@@ -72,3 +80,4 @@ class Administrators:
     RemoveSubscription = RemoveSubscription
     BlockUser = BlockUser
     UnblockUser = UnblockUser
+    CreatePromocode = CreatePromocode

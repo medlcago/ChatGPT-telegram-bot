@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 
 import pytz
-from sqlalchemy import update, select
+from sqlalchemy import update, select, delete
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 from .models import User, Member, Promocode
@@ -282,7 +282,7 @@ class Database:
 
     async def check_promocode(self, promocode):
         """
-        Checks the promo code for validity
+        Checks the promo code for validity and increases the number of its activations
         """
         try:
             session = await self.get_session()
@@ -292,6 +292,51 @@ class Database:
                     is_valid_promo.individual_activations_count += 1
                     await session.commit()
                     return True
+        except Exception as e:
+            logging.error(f"Database error: {e}")
+            return False
+        finally:
+            await session.close()
+
+    async def promocode_exists(self, promocode):
+        """
+        Checks if a promo code exists
+        """
+        try:
+            session = await self.get_session()
+            promocode_exists = await session.scalar(select(Promocode).filter_by(promocode=promocode))
+            return promocode_exists
+        except Exception as e:
+            logging.error(f"Database error: {e}")
+            return False
+        finally:
+            await session.close()
+
+    async def add_promocode(self, promocode, activations_count=1):
+        """
+        Adds a new promo code to the database
+        """
+        try:
+            session = await self.get_session()
+            promocode = Promocode(promocode=promocode, activations_count=activations_count)
+            session.add(promocode)
+            await session.commit()
+            return True
+        except Exception as e:
+            logging.error(f"Database error: {e}")
+            return False
+        finally:
+            await session.close()
+
+    async def delete_promocode(self, promocode):
+        """
+        Deletes the promo code in the database
+        """
+        try:
+            session = await self.get_session()
+            await session.execute(delete(Promocode).filter_by(promocode=promocode))
+            await session.commit()
+            return True
         except Exception as e:
             logging.error(f"Database error: {e}")
             return False

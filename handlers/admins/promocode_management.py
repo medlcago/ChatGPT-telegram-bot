@@ -1,0 +1,90 @@
+import random
+import string
+
+from aiogram import Router, types
+from aiogram.filters.text import Text
+from aiogram.fsm.context import FSMContext
+
+from decorators import MessageLogging
+from filters import IsAdmin
+from loader import db
+from states.admins import Administrators
+
+promocode_management_router = Router()
+
+
+async def generate_promocode():
+    """
+    Генерирует промокод по шаблону r^PROMO-[A-Z]{3}-\d{3}-[A-Z]{3}$
+    """
+    letters = random.sample(string.ascii_uppercase, 3)
+    prefix = "".join(letters)
+
+    number = random.randint(100, 999)
+
+    letters = random.sample(string.ascii_uppercase, 3)
+    suffix = "".join(letters)
+
+    promocode = f"PROMO-{prefix}-{number}-{suffix}"
+    return promocode
+
+
+async def add_promocode_common(*, activations_count):
+    if activations_count.isnumeric() and int(activations_count) > 0:
+        promocode = await generate_promocode()
+        if await db.add_promocode(promocode=promocode, activations_count=activations_count):
+            return f"Сгенерированный промокод: <code>{promocode}</code>\nКол-во активаций: {activations_count}"
+        return "Произошла ошибка при создании промокода."
+    return "Аргумент не является целым числом > 0"
+
+
+async def delete_promocode_common(*, promocode):
+    if await db.promocode_exists(promocode=promocode):
+        if await db.delete_promocode(promocode=promocode):
+            return f"Промокод <code>{promocode}</code> был деактивирован."
+        return f"Промокод <code>{promocode}</code> не был деактивирован."
+    return f"Промокод <code>{promocode}</code> не существует."
+
+
+# Создание промокода
+@promocode_management_router.callback_query(Text(text="create_promocode"), IsAdmin())
+@MessageLogging
+async def command_add_promocode(call: types.CallbackQuery, state: FSMContext):
+    await call.answer("Создание промокода")
+    sent_message = await call.message.answer("Введите кол-во активаций промокода (целое число) > 0")
+    await state.set_state(Administrators.CreatePromocode.activations_count)
+    await state.update_data(sent_message=sent_message)
+
+
+@promocode_management_router.message(Administrators.CreatePromocode.activations_count, IsAdmin())
+@MessageLogging
+async def add_promocode(message: types.Message, state: FSMContext):
+    activations_count = message.text
+    sent_message = (await state.get_data()).get("sent_message")
+    result = await add_promocode_common(activations_count=activations_count)
+    await message.reply(result)
+
+    await sent_message.delete()
+    await state.clear()
+
+
+# Деактивация промокода
+@promocode_management_router.callback_query(Text(text="deactivate_promocode"), IsAdmin())
+@MessageLogging
+async def command_delete_promocode(call: types.CallbackQuery, state: FSMContext):
+    await call.answer("Деактивация промокода")
+    sent_message = await call.message.answer("Введите промокод, который необходимо деактивировать")
+    await state.set_state(Administrators.CreatePromocode.promocode)
+    await state.update_data(sent_message=sent_message)
+
+
+@promocode_management_router.message(Administrators.CreatePromocode.promocode, IsAdmin())
+@MessageLogging
+async def delete_promocode(message: types.Message, state: FSMContext):
+    promocode = message.text
+    sent_message = (await state.get_data()).get("sent_message")
+    result = await delete_promocode_common(promocode=promocode)
+    await message.reply(result)
+
+    await sent_message.delete()
+    await state.clear()

@@ -1,12 +1,10 @@
 python-dotenv==1.0.0
 openai==0.27.8
-EdgeGPT==0.2.1
 aiomysql==0.2.0
 pytz==2023.3
 aiogram==3.0.0b7
 asyncio==3.4.3
 youtube-transcript-api==0.6.0
-poe-api==0.4.17
 cryptography==41.0.1
 psutil==5.9.5
 urllib3==1.26.6

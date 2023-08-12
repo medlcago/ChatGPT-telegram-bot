@@ -5,7 +5,7 @@ class PromocodeActivation(StatesGroup):
     """
     Класс состояний для активации промокода.
     """
-    promo_code = State()
+    promocode = State()
 
 
 class Users:

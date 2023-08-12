@@ -31,6 +31,10 @@ btn_cmd_admin = InlineKeyboardMarkup(inline_keyboard=[
         InlineKeyboardButton(text="Разблокировать пользователя", callback_data="unblock_user")
     ],
     [
+        InlineKeyboardButton(text="Создать промокод", callback_data="create_promocode"),
+        InlineKeyboardButton(text="Деактивировать промокод", callback_data="deactivate_promocode")
+    ],
+    [
         InlineKeyboardButton(text="Информация о сервере", callback_data="server_info")
     ],
     [
@@ -71,6 +75,6 @@ btn_contact_admin = InlineKeyboardMarkup(inline_keyboard=[
 
 btn_promocode_activation = InlineKeyboardMarkup(inline_keyboard=[
     [
-        InlineKeyboardButton(text="Активировать промокод", callback_data="promocode")
+        InlineKeyboardButton(text="Активировать промокод", callback_data="activate_promocode")
     ]
 ])
