@@ -8,7 +8,7 @@ from decorators import CheckTimeLimits, MessageLogging
 from filters import ChatTypeFilter, IsAdmin, IsSubscription
 from keyboards.inline import btn_promocode_activation
 from loader import db, bot
-from utils.misc.neural_networks import ChatBot
+from utils.neural_networks import ChatBot
 
 handle_chat_router = Router()
 

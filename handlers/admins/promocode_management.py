@@ -1,6 +1,3 @@
-import random
-import string
-
 from aiogram import Router, types
 from aiogram.filters.text import Text
 from aiogram.fsm.context import FSMContext
@@ -9,24 +6,9 @@ from decorators import MessageLogging
 from filters import IsAdmin
 from loader import db
 from states.admins import Administrators
+from utils.misc import generate_promocode
 
 promocode_management_router = Router()
-
-
-async def generate_promocode():
-    """
-    Генерирует промокод по шаблону r^PROMO-[A-Z]{3}-\d{3}-[A-Z]{3}$
-    """
-    letters = random.sample(string.ascii_uppercase, 3)
-    prefix = "".join(letters)
-
-    number = random.randint(100, 999)
-
-    letters = random.sample(string.ascii_uppercase, 3)
-    suffix = "".join(letters)
-
-    promocode = f"PROMO-{prefix}-{number}-{suffix}"
-    return promocode
 
 
 async def add_promocode_common(*, activations_count):

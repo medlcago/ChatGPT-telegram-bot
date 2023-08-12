@@ -9,7 +9,7 @@ from aiogram.filters.command import Command, CommandObject
 from decorators import MessageLogging
 from filters import ChatTypeFilter
 from loader import bot
-from utils.misc.neural_networks import summarize_youtube_video
+from utils.neural_networks import summarize_youtube_video
 
 command_summary_router = Router()
 

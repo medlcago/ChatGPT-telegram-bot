@@ -7,7 +7,7 @@ from aiogram.filters import Command, CommandObject
 from aiogram.types import URLInputFile
 
 from decorators import MessageLogging
-from utils.misc.neural_networks import image_generator
+from utils.neural_networks import image_generator
 
 command_image_router = Router()
 

@@ -1,7 +1,7 @@
 async def main():
     import logging
     from loader import bot
-    from utils import set_commands
+    from utils.misc import set_commands
     from middlewares import (
         BlockMiddleware,
         DebugMiddleware,

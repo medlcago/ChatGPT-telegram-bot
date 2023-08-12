@@ -9,7 +9,7 @@ from decorators import CheckTimeLimits
 from decorators import MessageLogging
 from filters import ChatTypeFilter
 from loader import bot
-from utils.misc.neural_networks import ChatBot
+from utils.neural_networks import ChatBot
 
 command_gpt_groups_router = Router()
 
