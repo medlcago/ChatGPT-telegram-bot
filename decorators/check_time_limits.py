@@ -10,7 +10,7 @@ from loader import db
 
 class CheckTimeLimits:
     def __init__(self, handler):
-        self.handler = handler
+        self.func = handler
         wraps(handler)(self)
 
     async def __call__(self, message: types.Message, *args, **kwargs):
@@ -19,7 +19,7 @@ class CheckTimeLimits:
         user_id = message.from_user.id
 
         if await db.check_admin_permissions(user_id=user_id):
-            return await self.handler(message, *args, **kwargs)
+            return await self.func(message, *args, **kwargs)
 
         date_format = '%Y-%m-%d %H:%M:%S'
         command_count = await db.get_command_count(user_id)
@@ -27,9 +27,11 @@ class CheckTimeLimits:
 
         if last_command_time is not None:
             time_since_last_command = now - last_command_time
+            delta = timedelta(seconds=30)
 
-            if time_since_last_command < timedelta(seconds=30):
-                await message.reply("Пожалуйста, подождите 30 секунд между запросами.")
+            if time_since_last_command < delta:
+                time_period = (delta - time_since_last_command).seconds
+                await message.reply(f"⏳ Подождите еще {time_period} секунд перед тем, как отправить следующий запрос..")
                 return
 
             if time_since_last_command > timedelta(hours=1):
@@ -39,7 +41,7 @@ class CheckTimeLimits:
         if command_count < config.request_limit:
             await db.increment_command_count(user_id)
             await db.update_last_command_time(user_id, now.strftime(date_format))
-            return await self.handler(message, *args, **kwargs)
+            return await self.func(message, *args, **kwargs)
 
         date_format = '%d.%m.%Y %H:%M:%S'
         await message.reply(
