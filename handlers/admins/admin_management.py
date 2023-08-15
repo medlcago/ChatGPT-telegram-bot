@@ -11,37 +11,32 @@ from states.admins import Administrators
 admin_management_router = Router()
 
 
-async def add_admin_common(user_id: str):
+async def add_admin_common(*, user_id: str):
     if user_id and user_id.isnumeric():
         user = await db.user_exists(user_id=user_id)
         if user:
             if user.is_admin:
                 return f"<b>{user.fullname}({user.user_id})</b> уже является администратором."
-            else:
-                await db.add_or_remove_admin(user_id=user_id, is_admin=True)
+            if await db.add_or_remove_admin(user_id=user_id, is_admin=True):
                 return f"<b>{user.fullname}({user.user_id})</b> назначен администратором."
-        else:
-            return f"user_id <i>{user_id}</i> не найден в базе данных."
-    else:
-        return "Аргумент не является идентификатором пользователя."
+            return f"<b>{user.fullname}({user.user_id})</b> не назначен администратором."
+        return f"user_id <i>{user_id}</i> не найден в базе данных."
+    return "Аргумент не является идентификатором пользователя."
 
 
-async def remove_admin_common(user_id: str, from_user_id):
+async def remove_admin_common(*, user_id: str, from_user_id):
     if user_id and user_id.isnumeric():
         user = await db.user_exists(user_id=user_id)
         if user:
             if user.is_admin:
                 if user.user_id != from_user_id:
-                    await db.add_or_remove_admin(user_id=user_id, is_admin=False)
-                    return f"<b>{user.fullname}({user.user_id})</b> удален из администраторов."
-                else:
-                    return "Нельзя удалить самого себя!"
-            else:
-                return f"<b>{user.fullname}({user.user_id})</b> не является администратором."
-        else:
-            return f"user_id <i>{user_id}</i> не найден в базе данных."
-    else:
-        return "Аргумент не является идентификатором пользователя."
+                    if await db.add_or_remove_admin(user_id=user_id, is_admin=False):
+                        return f"<b>{user.fullname}({user.user_id})</b> удален из администраторов."
+                    return f"<b>{user.fullname}({user.user_id})</b> не удален из администраторов."
+                return "Нельзя удалить самого себя!"
+            return f"<b>{user.fullname}({user.user_id})</b> не является администратором."
+        return f"user_id <i>{user_id}</i> не найден в базе данных."
+    return "Аргумент не является идентификатором пользователя."
 
 
 # Добавление администратора
@@ -49,7 +44,7 @@ async def remove_admin_common(user_id: str, from_user_id):
 @MessageLogging
 async def command_add_admin(message: types.Message, command: CommandObject):
     user_id = command.args
-    result = await add_admin_common(user_id)
+    result = await add_admin_common(user_id=user_id)
     await message.reply(result)
 
 
@@ -67,7 +62,7 @@ async def command_add_admin(call: types.CallbackQuery, state: FSMContext):
 async def add_admin(message: types.Message, state: FSMContext):
     user_id = message.text
     sent_message = (await state.get_data()).get("sent_message")
-    result = await add_admin_common(user_id)
+    result = await add_admin_common(user_id=user_id)
     await message.reply(result)
 
     await sent_message.delete()
@@ -80,7 +75,7 @@ async def add_admin(message: types.Message, state: FSMContext):
 async def command_remove_admin(message: types.Message, command: CommandObject):
     user_id = command.args
     from_user_id = message.from_user.id
-    result = await remove_admin_common(user_id, from_user_id)
+    result = await remove_admin_common(user_id=user_id, from_user_id=from_user_id)
     await message.reply(result)
 
 
@@ -99,7 +94,7 @@ async def remove_admin(message: types.Message, state: FSMContext):
     user_id = message.text
     from_user_id = message.from_user.id
     sent_message = (await state.get_data()).get("sent_message")
-    result = await remove_admin_common(user_id, from_user_id)
+    result = await remove_admin_common(user_id=user_id, from_user_id=from_user_id)
     await message.reply(result)
 
     await sent_message.delete()

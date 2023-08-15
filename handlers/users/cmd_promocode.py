@@ -5,10 +5,15 @@ from aiogram.fsm.context import FSMContext
 
 from decorators import MessageLogging
 from filters import ChatTypeFilter
+from keyboards.inline import btn_contact_admin
 from loader import db
 from states.users import Users
 
 command_promocode_router = Router()
+
+
+class ActivationError(Exception):
+    pass
 
 
 async def promocode_activation_common(*, promocode, user_id):
@@ -17,7 +22,7 @@ async def promocode_activation_common(*, promocode, user_id):
     if await db.check_promocode(promocode):
         if await db.grant_or_remove_subscription(user_id=user_id, is_subscriber=True):
             return f"Промокод <code>{promocode}</code> был успешно активирован ✅"
-        return "Произошла ошибка при активации промокода. Пожалуйста, свяжитесь с администратором."
+        raise ActivationError("Произошла ошибка при активации промокода. Пожалуйста, свяжитесь с администратором.")
     return f"Промокод <code>{promocode}</code> не является действительным."
 
 
@@ -43,8 +48,11 @@ async def command_promocode(call: types.CallbackQuery, state: FSMContext):
 async def promocode_activation(message: types.Message, state: FSMContext):
     promocode = message.text
     user_id = message.from_user.id
-    result = await promocode_activation_common(promocode=promocode, user_id=user_id)
-    await message.reply(result)
+    try:
+        result = await promocode_activation_common(promocode=promocode, user_id=user_id)
+        await message.reply(result)
+    except ActivationError as error:
+        await message.reply(str(error), reply_markup=btn_contact_admin)
     await state.clear()
 
 

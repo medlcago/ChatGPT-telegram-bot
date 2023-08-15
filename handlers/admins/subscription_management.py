@@ -11,23 +11,20 @@ from states.admins import Administrators
 subscription_management_router = Router()
 
 
-async def grant_subscription_common(user_id: str):
+async def grant_subscription_common(*, user_id: str):
     if user_id and user_id.isnumeric():
         user = await db.user_exists(user_id=user_id)
         if user:
             if user.is_subscriber:
                 return f"<b>{user.fullname}({user.user_id})</b> уже является подписчиком."
-            else:
-                if await db.grant_or_remove_subscription(user_id=user_id, is_subscriber=True):
-                    return f"<b>{user.fullname}({user.user_id})</b> получил подписку."
-                return f"Произошла ошибка. <b>{user.fullname}({user.user_id})</b> не получил подписку."
-        else:
-            return f"user_id <i>{user_id}</i> не найден в базе данных."
-    else:
-        return "Аргумент не является идентификатором пользователя."
+            if await db.grant_or_remove_subscription(user_id=user_id, is_subscriber=True):
+                return f"<b>{user.fullname}({user.user_id})</b> получил подписку."
+            return f"Произошла ошибка. <b>{user.fullname}({user.user_id})</b> не получил подписку."
+        return f"user_id <i>{user_id}</i> не найден в базе данных."
+    return "Аргумент не является идентификатором пользователя."
 
 
-async def remove_subscription_common(user_id: str):
+async def remove_subscription_common(*, user_id: str):
     if user_id and user_id.isnumeric():
         user = await db.user_exists(user_id=user_id)
         if user:
@@ -35,12 +32,9 @@ async def remove_subscription_common(user_id: str):
                 if await db.grant_or_remove_subscription(user_id=user_id, is_subscriber=False):
                     return f"<b>{user.fullname}({user.user_id})</b> лишился подписки."
                 return f"Произошла ошибка. <b>{user.fullname}({user.user_id})</b> не лишился подписки."
-            else:
-                return f"<b>{user.fullname}({user.user_id})</b> не является подписчиком."
-        else:
-            return f"user_id <i>{user_id}</i> не найден в базе данных."
-    else:
-        return "Аргумент не является идентификатором пользователя."
+            return f"<b>{user.fullname}({user.user_id})</b> не является подписчиком."
+        return f"user_id <i>{user_id}</i> не найден в базе данных."
+    return "Аргумент не является идентификатором пользователя."
 
 
 # Выдача подписки
@@ -48,7 +42,7 @@ async def remove_subscription_common(user_id: str):
 @MessageLogging
 async def command_grant_subscription(message: types.Message, command: CommandObject):
     user_id = command.args
-    result = await grant_subscription_common(user_id)
+    result = await grant_subscription_common(user_id=user_id)
     await message.reply(result)
 
 
@@ -66,7 +60,7 @@ async def command_grant_subscription(call: types.CallbackQuery, state: FSMContex
 async def grant_subscription(message: types.Message, state: FSMContext):
     user_id = message.text
     sent_message = (await state.get_data()).get("sent_message")
-    result = await grant_subscription_common(user_id)
+    result = await grant_subscription_common(user_id=user_id)
     await message.reply(result)
 
     await sent_message.delete()
@@ -78,7 +72,7 @@ async def grant_subscription(message: types.Message, state: FSMContext):
 @MessageLogging
 async def command_remove_subscription(message: types.Message, command: CommandObject):
     user_id = command.args
-    result = await remove_subscription_common(user_id)
+    result = await remove_subscription_common(user_id=user_id)
     await message.reply(result)
 
 
@@ -96,7 +90,7 @@ async def command_remove_subscription(call: types.CallbackQuery, state: FSMConte
 async def remove_subscription(message: types.Message, state: FSMContext):
     user_id = message.text
     sent_message = (await state.get_data()).get("sent_message")
-    result = await remove_subscription_common(user_id)
+    result = await remove_subscription_common(user_id=user_id)
     await message.reply(result)
 
     await sent_message.delete()

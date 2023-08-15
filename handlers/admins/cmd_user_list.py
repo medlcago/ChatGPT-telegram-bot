@@ -15,8 +15,7 @@ async def user_list():
     if users:
         data = (f"{user.fullname}({user.user_id})" for user in users)
         return '<b>Пользователи бота:</b>\n' + "\n".join(data)
-    else:
-        return "Пользователи отсутствуют."
+    return "Пользователи отсутствуют."
 
 
 @command_user_list_router.message(Command(commands=["user_list"], prefix="/"), ChatTypeFilter(is_group=False), IsAdmin())

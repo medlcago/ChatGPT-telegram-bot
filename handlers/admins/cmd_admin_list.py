@@ -15,8 +15,7 @@ async def admin_list():
     if admins:
         data = (f"{admin.fullname}({admin.user_id})" for admin in admins)
         return '<b>Администраторы бота:</b>\n' + "\n".join(data)
-    else:
-        return "Администраторы отсутствуют."
+    return "Администраторы отсутствуют."
 
 
 @command_admin_list_router.message(Command(commands=["admin_list"], prefix="/"), ChatTypeFilter(is_group=False), IsAdmin())

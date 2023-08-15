@@ -44,8 +44,10 @@ class Database:
             session = await self.get_session()
             await session.execute(update(User).filter_by(user_id=user_id).values(is_admin=is_admin))
             await session.commit()
+            return True
         except Exception as e:
             logging.error(f"Database error: {e}")
+            return False
         finally:
             await session.close()
 
@@ -56,9 +58,7 @@ class Database:
         try:
             session = await self.get_session()
             user = await session.scalar(select(User).filter_by(user_id=user_id))
-            if user:
-                return user
-            return False
+            return user
         except Exception as e:
             logging.error(f"Database error: {e}")
         finally:

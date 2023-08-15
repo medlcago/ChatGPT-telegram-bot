@@ -11,23 +11,20 @@ from states.admins import Administrators
 user_management_router = Router()
 
 
-async def block_user_common(user_id: str):
+async def block_user_common(*, user_id: str):
     if user_id and user_id.isnumeric():
         user = await db.user_exists(user_id=user_id)
         if user:
             if user.is_blocked:
                 return f"<b>{user.fullname}({user.user_id})</b> уже заблокирован."
-            else:
-                if await db.block_or_unblock_user(user_id=user_id, is_blocked=True):
-                    return f"<b>{user.fullname}({user.user_id})</b> был заблокирован."
-                return f"Произошла ошибка. <b>{user.fullname}({user.user_id})</b> не был заблокирован."
-        else:
-            return f"user_id <i>{user_id}</i> не найден в базе данных."
-    else:
-        return "Аргумент не является идентификатором пользователя."
+            if await db.block_or_unblock_user(user_id=user_id, is_blocked=True):
+                return f"<b>{user.fullname}({user.user_id})</b> был заблокирован."
+            return f"Произошла ошибка. <b>{user.fullname}({user.user_id})</b> не был заблокирован."
+        return f"user_id <i>{user_id}</i> не найден в базе данных."
+    return "Аргумент не является идентификатором пользователя."
 
 
-async def unblock_user_common(user_id: str):
+async def unblock_user_common(*, user_id: str):
     if user_id and user_id.isnumeric():
         user = await db.user_exists(user_id=user_id)
         if user:
@@ -35,12 +32,9 @@ async def unblock_user_common(user_id: str):
                 if await db.block_or_unblock_user(user_id=user_id, is_blocked=False):
                     return f"<b>{user.fullname}({user.user_id})</b> был разблокирован."
                 return f"Произошла ошибка. <b>{user.fullname}({user.user_id})</b> не был разблокирован."
-            else:
-                return f"<b>{user.fullname}({user.user_id})</b> не заблокирован."
-        else:
-            return f"user_id <i>{user_id}</i> не найден в базе данных."
-    else:
-        return "Аргумент не является идентификатором пользователя."
+            return f"<b>{user.fullname}({user.user_id})</b> не заблокирован."
+        return f"user_id <i>{user_id}</i> не найден в базе данных."
+    return "Аргумент не является идентификатором пользователя."
 
 
 # Блокировка пользователя
@@ -48,7 +42,7 @@ async def unblock_user_common(user_id: str):
 @MessageLogging
 async def command_block_user(message: types.Message, command: CommandObject):
     user_id = command.args
-    result = await block_user_common(user_id)
+    result = await block_user_common(user_id=user_id)
     await message.reply(result)
 
 
@@ -66,7 +60,7 @@ async def command_block_user(call: types.CallbackQuery, state: FSMContext):
 async def block_user(message: types.Message, state: FSMContext):
     user_id = message.text
     sent_message = (await state.get_data()).get("sent_message")
-    result = await block_user_common(user_id)
+    result = await block_user_common(user_id=user_id)
     await message.reply(result)
 
     await sent_message.delete()
@@ -78,7 +72,7 @@ async def block_user(message: types.Message, state: FSMContext):
 @MessageLogging
 async def command_unblock_user(message: types.Message, command: CommandObject):
     user_id = command.args
-    result = await unblock_user_common(user_id)
+    result = await unblock_user_common(user_id=user_id)
     await message.reply(result)
 
 
@@ -96,7 +90,7 @@ async def command_unblock_user(call: types.CallbackQuery, state: FSMContext):
 async def unblock_user(message: types.Message, state: FSMContext):
     user_id = message.text
     sent_message = (await state.get_data()).get("sent_message")
-    result = await unblock_user_common(user_id)
+    result = await unblock_user_common(user_id=user_id)
     await message.reply(result)
 
     await sent_message.delete()
