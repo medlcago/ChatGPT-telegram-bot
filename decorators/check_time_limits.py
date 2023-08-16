@@ -27,7 +27,6 @@ class CheckTimeLimits:
 
         if last_command_time is not None:
             time_since_last_command = now - last_command_time
-            print(time_since_last_command)
 
             if time_since_last_command < timedelta(seconds=30):
                 time_period = (timedelta(seconds=30) - time_since_last_command).seconds

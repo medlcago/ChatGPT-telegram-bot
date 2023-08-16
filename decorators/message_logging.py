@@ -1,4 +1,3 @@
-import datetime
 import logging
 from functools import wraps
 
@@ -11,21 +10,15 @@ class MessageLogging:
         wraps(func)(self)
 
     async def __call__(self, event, *args, **kwargs):
-        logging.info(f"Function {self.func.__name__} called")
+        func_name = self.func.__name__
+        logger = logging.getLogger(func_name)
 
         full_name = event.from_user.full_name
         user_id = event.from_user.id
         username = event.from_user.username
         text, chat_id = self._extract_text_and_chat_id(event)
 
-        time_format = '%d-%m-%Y %H:%M:%S'
-        timezone_offset = datetime.timedelta(hours=3)
-        current_time = datetime.datetime.now(datetime.timezone(timezone_offset)).strftime(time_format)
-
-        log_message = (
-            f"{full_name}[{user_id}({username})] --- {text} [{current_time}] [chat_id = {chat_id}]"
-        )
-        print(log_message)
+        logger.info(f"{full_name}[{user_id}({username})] --- {text} [chat_id = {chat_id}]")
 
         return await self.func(event, *args, **kwargs)
 
