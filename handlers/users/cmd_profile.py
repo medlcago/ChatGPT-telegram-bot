@@ -1,25 +1,26 @@
 from aiogram import Router, types
 from aiogram.filters.text import Text
+from aiogram.utils.markdown import hcode
 
 from decorators import MessageLogging
 from keyboards.inline import btn_promocode_activation
-from loader import db
+from database.db import Database
 
 command_profile_router = Router()
 
 
 @command_profile_router.callback_query(Text(text="my_profile"))
 @MessageLogging
-async def command_profile(call: types.CallbackQuery):
+async def command_profile(call: types.CallbackQuery, request: Database):
     await call.answer()
     user_id = call.from_user.id
-    is_subscriber = await db.check_user_subscription(user_id)
+    is_subscriber = await request.check_user_subscription(user_id)
     status = ("отсутствует", "присутствует")[is_subscriber]
-    current_model = await db.get_chat_type(user_id)
+    current_model = await request.get_chat_type(user_id)
     message = f"""👤 Ваш профиль
-├ ID: <code>{user_id}</code>
-├ Подписка: <code>{status}</code>
-└ Текущая модель: <code>{current_model}</code>"""
+├ ID: {hcode(user_id)}
+├ Подписка: {hcode(status)}
+└ Текущая модель: {hcode(current_model)}"""
     if is_subscriber:
         await call.message.answer(message)
     else:

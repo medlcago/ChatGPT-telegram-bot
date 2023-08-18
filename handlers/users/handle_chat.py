@@ -1,13 +1,15 @@
 import asyncio
+
+from aiogram import Bot
 from aiogram import types, Router, F, html
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command, CommandObject
 
 from data import config
+from database.db import Database
 from decorators import CheckTimeLimits, MessageLogging
 from filters import ChatTypeFilter, IsAdmin, IsSubscription
 from keyboards.inline import btn_promocode_activation
-from loader import db, bot
 from utils.neural_networks import ChatBot
 
 handle_chat_router = Router()
@@ -16,13 +18,13 @@ handle_chat_router = Router()
 @handle_chat_router.message(Command(commands=["switch"]), ChatTypeFilter(is_group=False), IsSubscription())
 @handle_chat_router.message(Command(commands=["switch"]), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
-async def switch_chat_type(message: types.Message, command: CommandObject):
+async def switch_chat_type(message: types.Message, command: CommandObject, request: Database):
     chat_type = command.args
     if chat_type:
         if chat_type in config.models:
             await message.reply(
                 html.quote(
-                    f"Текущая модель: {await db.switch_chat_type(user_id=message.from_user.id, chat_type=chat_type)}"))
+                    f"Текущая модель: {await request.switch_chat_type(user_id=message.from_user.id, chat_type=chat_type)}"))
         else:
             available_models = "\n".join(config.models)
             await message.reply(f"Ошибка смены модели. Повторите попытку.\n\nДоступные модели:\n{available_models}")
@@ -48,28 +50,23 @@ async def switch_chat_type(message: types.Message, command: CommandObject):
             reply_markup=btn_promocode_activation)
 
 
-@MessageLogging
-@CheckTimeLimits
-async def command_gpt(message: types.Message, model: str):
-    loop = asyncio.get_event_loop()
-    gpt_bot = ChatBot(api_key=config.OpenAI_API_KEY, model=model)
-    sent_message = await message.reply("Обработка запроса, ожидайте")
-    bot_response = await loop.run_in_executor(None, gpt_bot.chat, message.text)
-    try:
-        await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id, text=bot_response,
-                                    parse_mode="markdown", disable_web_page_preview=True)
-    except TelegramBadRequest as error:
-        await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id,
-                                    text=error.message)
-
-
 @handle_chat_router.message(ChatTypeFilter(is_group=False), F.content_type.in_({'text'}))
 @MessageLogging
-async def handle_chat(message: types.Message):
-    model = await db.get_chat_type(user_id=message.from_user.id)
-
+@CheckTimeLimits
+async def command_gpt(message: types.Message, request: Database, bot: Bot):
+    model = await request.get_chat_type(user_id=message.from_user.id)
     if model:
-        await command_gpt(message, model)
+        loop = asyncio.get_event_loop()
+        gpt_bot = ChatBot(api_key=config.OpenAI_API_KEY, model=model)
+        sent_message = await message.reply("Обработка запроса, ожидайте")
+        bot_response = await loop.run_in_executor(None, gpt_bot.chat, message.text)
+        try:
+            await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id,
+                                        text=bot_response,
+                                        parse_mode="markdown", disable_web_page_preview=True)
+        except TelegramBadRequest as error:
+            await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id,
+                                        text=str(error))
     else:
         await message.reply("Ошибка: модель не найдена.")
 

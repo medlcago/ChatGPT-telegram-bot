@@ -5,7 +5,7 @@ from aiogram.types import Message, CallbackQuery
 
 from data.config import DEBUG
 from data.templates import DEBUG_MESSAGE
-from loader import db
+from database.db import Database
 
 
 class DebugMiddleware(BaseMiddleware):
@@ -16,7 +16,8 @@ class DebugMiddleware(BaseMiddleware):
             data: Dict[str, Any]
     ) -> Any:
         user_id = event.from_user.id
-        if not DEBUG or await db.check_admin_permissions(user_id=user_id):
+        request: Database = data["request"]
+        if not DEBUG or await request.check_admin_permissions(user_id=user_id):
             return await handler(event, data)
 
         if isinstance(event, CallbackQuery):

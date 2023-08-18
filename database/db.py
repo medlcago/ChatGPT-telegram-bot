@@ -3,24 +3,19 @@ from datetime import datetime
 
 import pytz
 from sqlalchemy import update, select, delete
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 from .models import User, Member, Promocode
 
 
 class Database:
-    __slots__ = ("_url", "_engine")
-
-    def __init__(self, url: str):
-        self._url = url
-        self._engine = create_async_engine(url=self._url)
+    def __init__(self, session):
+        self.session = session
 
     async def get_session(self):
         """
         Returns the database session.
         """
-        session = async_sessionmaker(bind=self._engine, expire_on_commit=False, autoflush=False)
-        return session()
+        return self.session
 
     async def add_user(self, user_id, fullname):
         """
@@ -33,8 +28,6 @@ class Database:
             await session.commit()
         except Exception as e:
             logging.error(f"Database error: {e}")
-        finally:
-            await session.close()
 
     async def add_or_remove_admin(self, user_id, is_admin):
         """
@@ -48,8 +41,6 @@ class Database:
         except Exception as e:
             logging.error(f"Database error: {e}")
             return False
-        finally:
-            await session.close()
 
     async def user_exists(self, user_id):
         """
@@ -61,8 +52,6 @@ class Database:
             return user
         except Exception as e:
             logging.error(f"Database error: {e}")
-        finally:
-            await session.close()
 
     async def get_all_users(self):
         """
@@ -74,8 +63,6 @@ class Database:
             return users
         except Exception as e:
             logging.error(f"Database error: {e}")
-        finally:
-            await session.close()
 
     async def block_or_unblock_user(self, user_id, is_blocked):
         """
@@ -88,8 +75,6 @@ class Database:
             return True
         except Exception as e:
             logging.error(f"Database error: {e}")
-        finally:
-            await session.close()
 
     async def check_user_blocked(self, user_id):
         """
@@ -101,8 +86,6 @@ class Database:
             return is_blocked
         except Exception as e:
             logging.error(f"Database error: {e}")
-        finally:
-            await session.close()
 
     async def get_all_blocked(self):
         """
@@ -114,8 +97,6 @@ class Database:
             return blocked_users
         except Exception as e:
             logging.error(f"Database error: {e}")
-        finally:
-            await session.close()
 
     async def get_admins(self):
         """
@@ -127,8 +108,6 @@ class Database:
             return admins
         except Exception as e:
             logging.error(f"Database error: {e}")
-        finally:
-            await session.close()
 
     async def check_admin_permissions(self, user_id):
         """
@@ -140,8 +119,6 @@ class Database:
             return is_admin
         except Exception as e:
             logging.error(f"Database error: {e}")
-        finally:
-            await session.close()
 
     async def get_command_count(self, user_id):
         """
@@ -153,8 +130,6 @@ class Database:
             return command_count
         except Exception as e:
             logging.error(f"Database error: {e}")
-        finally:
-            await session.close()
 
     async def get_last_command_time(self, user_id):
         """
@@ -170,8 +145,6 @@ class Database:
                 return moscow_tz.localize(last_command_time)
         except Exception as e:
             logging.error(f"Database error: {e}")
-        finally:
-            await session.close()
 
     async def reset_command_count(self, user_id):
         """
@@ -183,8 +156,6 @@ class Database:
             await session.commit()
         except Exception as e:
             logging.error(f"Database error: {e}")
-        finally:
-            await session.close()
 
     async def increment_command_count(self, user_id):
         """
@@ -196,8 +167,6 @@ class Database:
             await session.commit()
         except Exception as e:
             logging.error(f"Database error: {e}")
-        finally:
-            await session.close()
 
     async def update_last_command_time(self, user_id, time):
         """
@@ -209,8 +178,6 @@ class Database:
             await session.commit()
         except Exception as e:
             logging.error(f"Database error: {e}")
-        finally:
-            await session.close()
 
     async def get_members(self):
         """
@@ -222,8 +189,6 @@ class Database:
             return members.all()
         except Exception as e:
             logging.error(f"Database error: {e}")
-        finally:
-            await session.close()
 
     async def get_chat_type(self, user_id):
         """
@@ -235,8 +200,6 @@ class Database:
             return chat_type
         except Exception as e:
             logging.error(f"Database error: {e}")
-        finally:
-            await session.close()
 
     async def switch_chat_type(self, user_id, chat_type):
         """
@@ -249,8 +212,6 @@ class Database:
             return chat_type
         except Exception as e:
             logging.error(f"Database error: {e}")
-        finally:
-            await session.close()
 
     async def check_user_subscription(self, user_id):
         """
@@ -262,8 +223,6 @@ class Database:
             return is_subscriber
         except Exception as e:
             logging.error(f"Database error: {e}")
-        finally:
-            await session.close()
 
     async def grant_or_remove_subscription(self, user_id, is_subscriber):
         """
@@ -277,12 +236,10 @@ class Database:
         except Exception as e:
             logging.error(f"Database error: {e}")
             return False
-        finally:
-            await session.close()
 
     async def check_promocode(self, promocode):
         """
-        Checks the promo code for validity and increases the number of its activations
+        Checks the promo code for validity and increases the number of its activations.
         """
         try:
             session = await self.get_session()
@@ -295,12 +252,10 @@ class Database:
         except Exception as e:
             logging.error(f"Database error: {e}")
             return False
-        finally:
-            await session.close()
 
     async def promocode_exists(self, promocode):
         """
-        Checks if a promo code exists
+        Checks if a promo code exists.
         """
         try:
             session = await self.get_session()
@@ -309,12 +264,10 @@ class Database:
         except Exception as e:
             logging.error(f"Database error: {e}")
             return False
-        finally:
-            await session.close()
 
     async def add_promocode(self, promocode, activations_count=1):
         """
-        Adds a new promo code to the database
+        Adds a new promo code to the database.
         """
         try:
             session = await self.get_session()
@@ -325,12 +278,10 @@ class Database:
         except Exception as e:
             logging.error(f"Database error: {e}")
             return False
-        finally:
-            await session.close()
 
     async def delete_promocode(self, promocode):
         """
-        Deletes the promo code in the database
+        Deletes the promo code in the database.
         """
         try:
             session = await self.get_session()
@@ -340,5 +291,3 @@ class Database:
         except Exception as e:
             logging.error(f"Database error: {e}")
             return False
-        finally:
-            await session.close()

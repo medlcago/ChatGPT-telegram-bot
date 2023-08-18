@@ -6,7 +6,6 @@ from aiogram import types
 from aiogram.utils.markdown import hbold
 
 from data import config
-from loader import db
 
 
 class CheckTimeLimits:
@@ -19,12 +18,16 @@ class CheckTimeLimits:
         now = datetime.now(moscow_tz)
         user_id = message.from_user.id
 
-        if await db.check_admin_permissions(user_id=user_id):
+        request = kwargs.get("request", None)
+        if request is None:
+            raise ValueError("Request argument missing.")
+
+        if await request.check_admin_permissions(user_id=user_id):
             return await self.handler(message, *args, **kwargs)
 
         date_format = '%Y-%m-%d %H:%M:%S'
-        command_count = await db.get_command_count(user_id)
-        last_command_time = await db.get_last_command_time(user_id)
+        command_count = await request.get_command_count(user_id)
+        last_command_time = await request.get_last_command_time(user_id)
 
         wait_time = timedelta(seconds=30)
 
@@ -33,16 +36,17 @@ class CheckTimeLimits:
 
             if time_since_last_command < wait_time:
                 seconds = (wait_time - time_since_last_command).seconds
-                await message.reply(f"⏳ Подождите еще {hbold(self._get_seconds_suffix(seconds))} перед тем, как отправить следующий запрос..")
+                await message.reply(
+                    f"⏳ Подождите еще {hbold(self._get_seconds_suffix(seconds))} перед тем, как отправить следующий запрос..")
                 return
 
             if time_since_last_command > timedelta(hours=1):
                 command_count = 0
-                await db.reset_command_count(user_id)
+                await request.reset_command_count(user_id)
 
         if command_count < config.request_limit:
-            await db.increment_command_count(user_id)
-            await db.update_last_command_time(user_id, now.strftime(date_format))
+            await request.increment_command_count(user_id)
+            await request.update_last_command_time(user_id, now.strftime(date_format))
             return await self.handler(message, *args, **kwargs)
 
         wait_time = timedelta(hours=1)

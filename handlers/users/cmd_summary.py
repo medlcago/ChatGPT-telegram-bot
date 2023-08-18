@@ -1,5 +1,6 @@
 import asyncio
 
+from aiogram import Bot
 from aiogram import Router
 from aiogram import html
 from aiogram import types
@@ -8,7 +9,6 @@ from aiogram.filters.command import Command, CommandObject
 
 from decorators import MessageLogging
 from filters import ChatTypeFilter
-from loader import bot
 from utils.neural_networks import summarize_youtube_video
 
 command_summary_router = Router()
@@ -16,7 +16,7 @@ command_summary_router = Router()
 
 @command_summary_router.message(Command(commands=["summary"], prefix="/"), ChatTypeFilter(is_group=False))
 @MessageLogging
-async def command_summarize(message: types.Message, command: CommandObject):
+async def command_summarize(message: types.Message, command: CommandObject, bot: Bot):
     url = command.args
     if url:
         loop = asyncio.get_event_loop()
@@ -27,7 +27,7 @@ async def command_summarize(message: types.Message, command: CommandObject):
             await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id,
                                         text=summarize, disable_web_page_preview=True)
         except TelegramBadRequest as error:
-            await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id, text=error)
+            await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id, text=str(error))
     else:
         if message.from_user.language_code == "ru":
             await message.reply(

@@ -1,4 +1,7 @@
 DEBUG_MESSAGE = "Technical work is underway. The bot is temporarily unavailable."
+
+BLOCKED_MESSAGE = "Access is denied.\nMost likely, you have been banned for violating the rules of the bot."
+
 SUBSCRIBERS_ONLY_MESSAGE = "To use the bot, you must purchase a subscription."
 
 START_MESSAGE = {

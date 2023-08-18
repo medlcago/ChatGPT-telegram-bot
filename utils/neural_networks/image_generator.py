@@ -10,6 +10,7 @@ def image_generator(prompt):
         openai.api_key = OpenAI_API_KEY
         openai.api_base = OpenAI_API_BASE
         response = openai.Image.create(
+            model="sdxl",
             prompt=prompt,
             n=1,
             size="1024x1024"

@@ -1,25 +1,26 @@
 import asyncio
 import logging
 
+from aiogram import Bot
 from aiogram import types, Router
 from aiogram.filters.command import Command, CommandObject
 from aiogram.filters.text import Text
 from aiogram.fsm.context import FSMContext
 
+from database.db import Database
 from decorators import MessageLogging
 from filters import ChatTypeFilter
 from filters import IsAdmin
 from keyboards.inline import btn_send_all
-from loader import db, bot
 from states.admins import Administrators
 
 command_send_all_router = Router()
 
 
-async def send_all(message_to_user: str, command: CommandObject = None):
+async def send_all(*, message_to_user: str, request: Database, bot: Bot, command: CommandObject = None):
     if message_to_user:
         count = 0
-        users = await db.get_all_users()
+        users = await request.get_all_users()
         for user in users:
             try:
                 await bot.send_message(chat_id=user.user_id, text=message_to_user)
@@ -34,9 +35,9 @@ async def send_all(message_to_user: str, command: CommandObject = None):
 
 @command_send_all_router.message(Command(commands=["send_all"], prefix="/"), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
-async def command_send_all(message: types.Message, command: CommandObject):
+async def command_send_all(message: types.Message, command: CommandObject, request: Database, bot: Bot):
     args = command.args
-    await message.reply(await send_all(args, command))
+    await message.reply(await send_all(message_to_user=args, request=request, bot=bot, command=command))
 
 
 @command_send_all_router.callback_query(Text(text="send_all"), IsAdmin())
@@ -57,9 +58,9 @@ async def message_send_all(message: types.Message, state: FSMContext):
 
 @command_send_all_router.callback_query(Administrators.Mailing.confirmation, Text(text="confirmation_send_all"), IsAdmin())
 @MessageLogging
-async def confirmation_send_all(call: types.CallbackQuery, state: FSMContext):
+async def confirmation_send_all(call: types.CallbackQuery, state: FSMContext, request: Database, bot: Bot):
     message_to_user = (await state.get_data()).get("message")
-    await call.message.edit_text(await send_all(message_to_user))
+    await call.message.edit_text(await send_all(message_to_user=message_to_user, request=request, bot=bot))
     await call.answer()
     await state.clear()
 

@@ -2,11 +2,9 @@ from dataclasses import dataclass
 
 from sqlalchemy import Column, String, Text, BOOLEAN
 from sqlalchemy.dialects.mysql import BIGINT, SMALLINT
-from sqlalchemy.orm import declarative_base
 
 from data.config import default_model
-
-Base = declarative_base()
+from settings.database import Base
 
 
 @dataclass

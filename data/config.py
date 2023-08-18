@@ -22,7 +22,7 @@ models = [
 default_model = "gpt-3.5-turbo"
 
 OpenAI_API_KEY = os.getenv("OpenAI_API_KEY")
-OpenAI_API_BASE = "https://chimeragpt.adventblocks.cc/api/v1"
+OpenAI_API_BASE = os.getenv("OpenAI_API_BASE")
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 

@@ -2,9 +2,8 @@ from dataclasses import dataclass
 
 from sqlalchemy import Column, Text
 from sqlalchemy.dialects.mysql import BIGINT
-from sqlalchemy.orm import declarative_base
 
-Base = declarative_base()
+from settings.database import Base
 
 
 @dataclass

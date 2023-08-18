@@ -1,15 +1,15 @@
 import logging
 
+from aiogram import Bot
 from aiogram import Router, types
 from aiogram.filters.command import Command
 from aiogram.filters.text import Text
 from aiogram.fsm.context import FSMContext
 
+from database.db import Database
 from decorators import MessageLogging
 from filters import IsAdmin, ChatTypeFilter
 from keyboards.inline import btn_send_message
-from loader import bot
-from loader import db
 from states.admins import Administrators
 
 command_send_message_router = Router()
@@ -40,12 +40,12 @@ async def get_recipient_user_id(message: types.Message, state: FSMContext):
 
 @command_send_message_router.message(Administrators.SendMessage.user_id)
 @MessageLogging
-async def message_to_send(message: types.Message, state: FSMContext):
+async def message_to_send(message: types.Message, state: FSMContext, request: Database):
     await state.update_data(user_id=message.text)
 
     message_to_user = ((await state.get_data()).get("message")).text
     user_id = (await state.get_data()).get("user_id")
-    user_exists = await db.user_exists(user_id=user_id)
+    user_exists = await request.user_exists(user_id=user_id)
 
     if user_exists:
         await message.answer(f"Сообщение:\n{message_to_user}\n\nПолучатель:\n{user_exists.fullname}({user_id})",
@@ -63,7 +63,7 @@ async def message_to_send(message: types.Message, state: FSMContext):
 
 @command_send_message_router.callback_query(Administrators.SendMessage.confirmation, Text(text="confirmation_send_message"), IsAdmin())
 @MessageLogging
-async def confirmation_send_message(call: types.CallbackQuery, state: FSMContext):
+async def confirmation_send_message(call: types.CallbackQuery, state: FSMContext, bot: Bot):
     message_to_user = ((await state.get_data()).get("message")).text
     user_id = (await state.get_data()).get("user_id")
     reply_to_message_id = (await state.get_data()).get("reply_to_message_id")

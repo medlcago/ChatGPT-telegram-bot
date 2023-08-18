@@ -5,8 +5,8 @@ from aiogram.types import Message, CallbackQuery
 
 from data.config import SUBSCRIBERS_ONLY
 from data.templates import SUBSCRIBERS_ONLY_MESSAGE
+from database.db import Database
 from keyboards.inline import btn_contact_admin
-from loader import db
 
 
 class SubscribersMiddleware(BaseMiddleware):
@@ -17,8 +17,9 @@ class SubscribersMiddleware(BaseMiddleware):
             data: Dict[str, Any]
     ) -> Any:
         user_id = event.from_user.id
+        request: Database = data["request"]
         if (not SUBSCRIBERS_ONLY or
-                await db.check_user_subscription(user_id=user_id) or await db.check_admin_permissions(user_id=user_id)):
+                await request.check_user_subscription(user_id=user_id) or await request.check_admin_permissions(user_id=user_id)):
             return await handler(event, data)
 
         if isinstance(event, CallbackQuery):
