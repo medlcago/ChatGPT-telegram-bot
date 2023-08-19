@@ -16,11 +16,11 @@ command_limits_router = Router()
 @MessageLogging
 async def command_limits(message: types.Message, request: Database):
     date_format = '%d.%m.%Y %H:%M:%S'
-    last_command_time = await request.get_last_command_time(message.from_user.id)
+    last_command_time = await request.get_user_last_command_time(message.from_user.id)
     full_name = message.from_user.full_name
-    current_model = await request.get_chat_type(user_id=message.from_user.id)
+    current_model = await request.get_user_chat_type(user_id=message.from_user.id)
     request_limit = config.request_limit
-    command_count = await request.get_command_count(user_id=message.from_user.id)
+    command_count = await request.get_user_command_count(user_id=message.from_user.id)
 
     message_reply = (f"{full_name}!\n\n"
                      f"Текущая модель: {current_model}\n\n"

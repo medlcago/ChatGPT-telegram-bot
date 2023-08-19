@@ -29,9 +29,9 @@ class Database:
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def add_or_remove_admin(self, user_id, is_admin):
+    async def update_admin_rights_status(self, user_id, is_admin):
         """
-        Grants or removes administrative rights to the user with the given user ID.
+        Updates the admin rights status of a user in the database.
         """
         try:
             session = await self.get_session()
@@ -64,9 +64,9 @@ class Database:
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def block_or_unblock_user(self, user_id, is_blocked):
+    async def update_user_block_status(self, user_id, is_blocked):
         """
-        Updates the user's lock status in the database.
+        Updates the user's block status in the database.
         """
         try:
             session = await self.get_session()
@@ -120,7 +120,7 @@ class Database:
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def get_command_count(self, user_id):
+    async def get_user_command_count(self, user_id):
         """
         Retrieves the command count for a specific user in the database.
         """
@@ -131,7 +131,7 @@ class Database:
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def get_last_command_time(self, user_id):
+    async def get_user_last_command_time(self, user_id):
         """
         Retrieves the last command time for a specific user in the database.
         """
@@ -146,7 +146,7 @@ class Database:
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def reset_command_count(self, user_id):
+    async def reset_user_command_count(self, user_id):
         """
         Resets the command count for a specific user in the database.
         """
@@ -157,7 +157,7 @@ class Database:
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def increment_command_count(self, user_id):
+    async def increment_user_command_count(self, user_id):
         """
         Increments the command count for a user in the database.
         """
@@ -168,7 +168,7 @@ class Database:
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def update_last_command_time(self, user_id, time):
+    async def update_user_last_command_time(self, user_id, time):
         """
         Updates the last command time for a user in the database.
         """
@@ -190,7 +190,7 @@ class Database:
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def get_chat_type(self, user_id):
+    async def get_user_chat_type(self, user_id):
         """
         Gets user's chat type by its user id.
         """
@@ -201,7 +201,7 @@ class Database:
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def switch_chat_type(self, user_id, chat_type):
+    async def update_user_chat_type(self, user_id, chat_type):
         """
         Updates the chat type associated with a given user ID in the database.
         """
@@ -224,9 +224,9 @@ class Database:
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def grant_or_remove_subscription(self, user_id, is_subscriber):
+    async def update_user_subscription_status(self, user_id, is_subscriber):
         """
-        Grants or removes a subscription to the user with the given user ID.
+        Updates the user's subscription status in the database.
         """
         try:
             session = await self.get_session()

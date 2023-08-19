@@ -16,7 +16,7 @@ async def command_profile(call: types.CallbackQuery, request: Database):
     user_id = call.from_user.id
     is_subscriber = await request.check_user_subscription(user_id)
     status = ("отсутствует", "присутствует")[is_subscriber]
-    current_model = await request.get_chat_type(user_id)
+    current_model = await request.get_user_chat_type(user_id)
     message = f"""👤 Ваш профиль
 ├ ID: {hcode(user_id)}
 ├ Подписка: {hcode(status)}

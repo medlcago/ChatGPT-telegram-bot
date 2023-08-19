@@ -20,14 +20,14 @@ def middlewares_registration(dp: Dispatcher, session_pool=None):
         dp.message.outer_middleware(DatabaseMiddleware(session_pool))
         dp.callback_query.outer_middleware(DatabaseMiddleware(session_pool))
 
-    dp.message.middleware.register(BlockMiddleware())
-    dp.callback_query.middleware.register(BlockMiddleware())
+    dp.message.outer_middleware(BlockMiddleware())
+    dp.callback_query.outer_middleware(BlockMiddleware())
 
-    dp.message.middleware.register(DebugMiddleware())
-    dp.callback_query.middleware.register(DebugMiddleware())
+    dp.message.outer_middleware(DebugMiddleware())
+    dp.callback_query.outer_middleware(DebugMiddleware())
 
-    dp.message.middleware.register(SubscribersMiddleware())
-    dp.callback_query.middleware.register(SubscribersMiddleware())
+    dp.message.outer_middleware(SubscribersMiddleware())
+    dp.callback_query.outer_middleware(SubscribersMiddleware())
 
 
 def routers_registration(dp: Dispatcher):

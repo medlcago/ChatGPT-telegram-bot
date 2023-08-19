@@ -24,7 +24,7 @@ async def command_start_help(message: types.Message, request: Database):
     await message.answer(
         await cmd_start_help(username=html.quote(message.from_user.full_name),
                              language=message.from_user.language_code))
-    await message.answer(f"Текущая модель: {await request.get_chat_type(message.from_user.id)}\n"
+    await message.answer(f"Текущая модель: {await request.get_user_chat_type(message.from_user.id)}\n"
                          f"Отправьте сообщение, чтобы начать диалог\n\n"
                          f"/switch - Сменить модель\n"
                          f"/models - Список доступных моделей", reply_markup=btn_my_profile)

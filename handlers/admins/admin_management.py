@@ -17,7 +17,7 @@ async def add_admin_common(*, user_id: str, request: Database):
         if user:
             if user.is_admin:
                 return f"<b>{user.fullname}({user.user_id})</b> уже является администратором."
-            if await request.add_or_remove_admin(user_id=user_id, is_admin=True):
+            if await request.update_admin_rights_status(user_id=user_id, is_admin=True):
                 return f"<b>{user.fullname}({user.user_id})</b> назначен администратором."
             return f"<b>{user.fullname}({user.user_id})</b> не назначен администратором."
         return f"user_id <i>{user_id}</i> не найден в базе данных."
@@ -30,7 +30,7 @@ async def remove_admin_common(*, user_id: str, from_user_id: int, request: Datab
         if user:
             if user.is_admin:
                 if user.user_id != from_user_id:
-                    if await request.add_or_remove_admin(user_id=user_id, is_admin=False):
+                    if await request.update_admin_rights_status(user_id=user_id, is_admin=False):
                         return f"<b>{user.fullname}({user.user_id})</b> удален из администраторов."
                     return f"<b>{user.fullname}({user.user_id})</b> не удален из администраторов."
                 return "Нельзя удалить самого себя!"

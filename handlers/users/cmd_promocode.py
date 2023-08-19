@@ -21,7 +21,7 @@ async def promocode_activation_common(*, promocode, user_id, request: Database):
     if await request.check_user_subscription(user_id=user_id):
         return "Промокод не был активирован, т.к вы уже являетесь подписчиком."
     if await request.check_promocode(promocode):
-        if await request.grant_or_remove_subscription(user_id=user_id, is_subscriber=True):
+        if await request.update_user_subscription_status(user_id=user_id, is_subscriber=True):
             return f"Промокод {hcode(promocode)} был успешно активирован ✅"
         raise ActivationError("Произошла ошибка при активации промокода. Пожалуйста, свяжитесь с администратором.")
     return f"Промокод {hcode(promocode)} не является действительным."
