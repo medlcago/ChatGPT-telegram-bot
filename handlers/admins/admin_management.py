@@ -24,7 +24,7 @@ async def add_admin_common(*, user_id: str, request: Database):
     return "Аргумент не является идентификатором пользователя."
 
 
-async def remove_admin_common(*, user_id: str, from_user_id: int | str, request: Database):
+async def remove_admin_common(*, user_id: str, from_user_id: int, request: Database):
     if user_id and user_id.isnumeric():
         user = await request.user_exists(user_id=user_id)
         if user:

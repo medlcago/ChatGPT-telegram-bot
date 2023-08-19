@@ -70,7 +70,7 @@ class CreatePromocode(StatesGroup):
 
 class Administrators:
     """
-    Класс, объединяющий состояния для управления администраторами.
+    Класс, объединяющий состояния для работы администраторов.
     """
     Mailing = Mailing
     SendMessage = SendMessage

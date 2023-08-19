@@ -53,7 +53,7 @@ async def switch_chat_type(message: types.Message, command: CommandObject):
 @handle_chat_router.message(ChatTypeFilter(is_group=False), F.content_type.in_({'text'}))
 @MessageLogging
 @CheckTimeLimits
-async def command_gpt(message: types.Message, request: Database, bot: Bot):
+async def handle_chat(message: types.Message, request: Database, bot: Bot):
     model = await request.get_chat_type(user_id=message.from_user.id)
     if model:
         loop = asyncio.get_event_loop()

@@ -4,7 +4,7 @@ import logging
 from aiogram import Dispatcher, Bot
 from aiogram.fsm.storage.memory import MemoryStorage
 
-from data.config import BOT_TOKEN
+from data.config import BOT_TOKEN, connection_db_string
 from handlers import admins, general, groups, users
 from middlewares import (
     DatabaseMiddleware,
@@ -15,7 +15,7 @@ from settings.database.setup import create_db_session
 from utils.misc import set_commands
 
 
-def middleware_registration(dp: Dispatcher, session_pool=None):
+def middlewares_registration(dp: Dispatcher, session_pool=None):
     if session_pool:
         dp.message.outer_middleware(DatabaseMiddleware(session_pool))
         dp.callback_query.outer_middleware(DatabaseMiddleware(session_pool))
@@ -63,14 +63,13 @@ def routers_registration(dp: Dispatcher):
 async def main():
     bot = Bot(token=BOT_TOKEN, parse_mode="html")
     dp = Dispatcher(storage=MemoryStorage())
+    session_pool = await create_db_session(url=connection_db_string)
 
     routers_registration(dp=dp)
+    middlewares_registration(dp=dp, session_pool=session_pool)
 
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s: %(message)s',
                         datefmt='%d.%m.%Y %H:%M:%S')
-
-    session_pool = await create_db_session()
-    middleware_registration(dp=dp, session_pool=session_pool)
 
     await set_commands(bot)
 
