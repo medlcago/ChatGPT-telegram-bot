@@ -4,7 +4,7 @@ from aiogram import Router, types
 from aiogram.filters.command import Command
 from aiogram.utils.markdown import hitalic, hbold
 
-from data import config
+from data.config import Config
 from database.db import Database
 from decorators import MessageLogging
 from filters import ChatTypeFilter
@@ -14,12 +14,12 @@ command_limits_router = Router()
 
 @command_limits_router.message(Command(commands=["limits"], prefix="/"), ChatTypeFilter(is_group=False))
 @MessageLogging
-async def command_limits(message: types.Message, request: Database):
+async def command_limits(message: types.Message, request: Database, config: Config):
     date_format = '%d.%m.%Y %H:%M:%S'
     last_command_time = await request.get_user_last_command_time(message.from_user.id)
     full_name = message.from_user.full_name
     current_model = await request.get_user_chat_type(user_id=message.from_user.id)
-    request_limit = config.request_limit
+    request_limit = config.models.request_limit
     command_count = await request.get_user_command_count(user_id=message.from_user.id)
 
     message_reply = (f"{full_name}!\n\n"

@@ -3,8 +3,11 @@ from dataclasses import dataclass
 from sqlalchemy import Column, String, Text, BOOLEAN
 from sqlalchemy.dialects.mysql import BIGINT, SMALLINT
 
-from data.config import default_model
+from data.config import load_config
 from settings.database import Base
+
+config = load_config()
+default_model = config.models.default_model
 
 
 @dataclass

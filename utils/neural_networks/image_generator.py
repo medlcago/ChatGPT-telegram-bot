@@ -2,13 +2,14 @@ import logging
 
 import openai
 
-from data.config import OpenAI_API_KEY, OpenAI_API_BASE
+from data.config import load_config
 
 
 def image_generator(prompt):
     try:
-        openai.api_key = OpenAI_API_KEY
-        openai.api_base = OpenAI_API_BASE
+        config = load_config()
+        openai.api_key = config.openai.api_key
+        openai.api_base = config.openai.api_base
         response = openai.Image.create(
             model="sdxl",
             prompt=prompt,

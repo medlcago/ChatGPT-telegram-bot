@@ -2,13 +2,11 @@ import logging
 
 import openai
 
-from data.config import OpenAI_API_BASE
-
 
 class ChatBot:
-    def __init__(self, api_key=None, model=None):
+    def __init__(self, api_key=None, api_base=None, model=None):
         self.api_key = api_key
-        self.api_base = OpenAI_API_BASE
+        self.api_base = api_base
         self.model = model
 
         # Setup logging
@@ -26,6 +24,8 @@ class ChatBot:
     def _get_response(self, content):
         if not self.api_key:
             raise ValueError("API Key is not specified.")
+        if not self.api_base:
+            raise ValueError("API Base is not specified.")
 
         openai.api_key = self.api_key
         openai.api_base = self.api_base

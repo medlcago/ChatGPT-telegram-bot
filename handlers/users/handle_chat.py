@@ -5,7 +5,7 @@ from aiogram import types, Router, F, html
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command, CommandObject
 
-from data import config
+from data.config import Config
 from database.db import Database
 from decorators import CheckTimeLimits, MessageLogging
 from filters import ChatTypeFilter, IsAdmin, IsSubscription
@@ -18,15 +18,15 @@ handle_chat_router = Router()
 @handle_chat_router.message(Command(commands=["switch"]), ChatTypeFilter(is_group=False), IsSubscription())
 @handle_chat_router.message(Command(commands=["switch"]), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
-async def switch_chat_type(message: types.Message, command: CommandObject, request: Database):
+async def switch_chat_type(message: types.Message, command: CommandObject, request: Database, config: Config):
     chat_type = command.args
     if chat_type:
-        if chat_type in config.models:
+        if chat_type in config.models.available_models:
             await message.reply(
                 html.quote(
                     f"Текущая модель: {await request.update_user_chat_type(user_id=message.from_user.id, chat_type=chat_type)}"))
         else:
-            available_models = "\n".join(config.models)
+            available_models = "\n".join(config.models.available_models)
             await message.reply(f"Ошибка смены модели. Повторите попытку.\n\nДоступные модели:\n{available_models}")
     else:
         if message.from_user.language_code == "ru":
@@ -53,11 +53,13 @@ async def switch_chat_type(message: types.Message, command: CommandObject):
 @handle_chat_router.message(ChatTypeFilter(is_group=False), F.content_type.in_({'text'}))
 @MessageLogging
 @CheckTimeLimits
-async def handle_chat(message: types.Message, request: Database, bot: Bot):
+async def handle_chat(message: types.Message, request: Database, bot: Bot, config: Config):
     model = await request.get_user_chat_type(user_id=message.from_user.id)
-    if model:
+    available_models = config.models.available_models
+
+    if model and model in available_models:
         loop = asyncio.get_event_loop()
-        gpt_bot = ChatBot(api_key=config.OpenAI_API_KEY, model=model)
+        gpt_bot = ChatBot(api_key=config.openai.api_key, api_base=config.openai.api_base, model=model)
         sent_message = await message.reply("Обработка запроса, ожидайте")
         bot_response = await loop.run_in_executor(None, gpt_bot.chat, message.text)
         try:
