@@ -27,7 +27,7 @@ OpenAI_API_BASE = os.getenv("OpenAI_API_BASE")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 host = os.getenv("host")
-port = int(os.getenv("port"))
+port = os.getenv("port")
 user = os.getenv("user")
 password = os.getenv("password")
 db = os.getenv("db")
