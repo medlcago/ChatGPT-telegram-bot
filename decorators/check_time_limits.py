@@ -4,8 +4,9 @@ from functools import wraps
 import pytz
 from aiogram import types
 from aiogram.utils.markdown import hbold
+from database.db import Database
 
-from data import config
+from data.config import Config
 
 
 class CheckTimeLimits:
@@ -18,7 +19,12 @@ class CheckTimeLimits:
         now = datetime.now(moscow_tz)
         user_id = message.from_user.id
 
-        request = kwargs.get("request", None)
+        config: Config = kwargs.get("config", None)
+        request: Database = kwargs.get("request", None)
+
+        if config is None:
+            raise ValueError("Config argument missing.")
+
         if request is None:
             raise ValueError("Request argument missing.")
 
@@ -26,8 +32,8 @@ class CheckTimeLimits:
             return await self.handler(message, *args, **kwargs)
 
         date_format = '%Y-%m-%d %H:%M:%S'
-        command_count = await request.get_command_count(user_id)
-        last_command_time = await request.get_last_command_time(user_id)
+        command_count = await request.get_user_command_count(user_id)
+        last_command_time = await request.get_user_last_command_time(user_id)
 
         wait_time = timedelta(seconds=30)
 
@@ -42,11 +48,11 @@ class CheckTimeLimits:
 
             if time_since_last_command > timedelta(hours=1):
                 command_count = 0
-                await request.reset_command_count(user_id)
+                await request.reset_user_command_count(user_id)
 
-        if command_count < config.request_limit:
-            await request.increment_command_count(user_id)
-            await request.update_last_command_time(user_id, now.strftime(date_format))
+        if command_count < config.models.request_limit:
+            await request.increment_user_command_count(user_id)
+            await request.update_user_last_command_time(user_id, now.strftime(date_format))
             return await self.handler(message, *args, **kwargs)
 
         wait_time = timedelta(hours=1)
