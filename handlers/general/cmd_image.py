@@ -6,22 +6,24 @@ from aiogram import types
 from aiogram.filters import Command, CommandObject
 from aiogram.types import URLInputFile
 
+from data.config import Config
 from decorators import MessageLogging
-from utils.neural_networks import image_generator
+from utils.neural_networks import ImageGenerator
 
 command_image_router = Router()
 
 
 @command_image_router.message(Command(commands=["image"], prefix="!/"))
 @MessageLogging
-async def command_image(message: types.Message, command: CommandObject):
+async def command_image(message: types.Message, command: CommandObject, config: Config):
     prompt = command.args
     if prompt:
         loop = asyncio.get_event_loop()
         prompt = html.quote(prompt)
+        image_generator = ImageGenerator(api_key=config.openai.api_key, api_base=config.openai.api_base, model="sdxl")
         sent_message = await message.reply("Обработка запроса, ожидайте")
         image = URLInputFile(
-            await loop.run_in_executor(None, image_generator, prompt),
+            await loop.run_in_executor(None, image_generator.generate_image, prompt),
             filename=prompt
         )
         if image:
