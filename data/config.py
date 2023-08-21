@@ -72,7 +72,8 @@ def load_config():
                 "gpt-4-0314",
                 "gpt-3.5-turbo",
                 "gpt-3.5-turbo-0301",
-                "gpt-3.5-turbo-16k"
+                "gpt-3.5-turbo-16k",
+                "llama-2-70b-chat"
             ],
             default_model="gpt-3.5-turbo",
             request_limit=20
