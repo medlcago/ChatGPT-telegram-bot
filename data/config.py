@@ -29,6 +29,11 @@ class DbConfig:
 
 
 @dataclass
+class RedisConfig:
+    redis_url: str
+
+
+@dataclass
 class OpenAIConfig:
     api_key: str
     api_base: str
@@ -45,6 +50,7 @@ class ModelsConfig:
 class Config:
     tg: TgBotConfig
     db: DbConfig
+    redis: RedisConfig
     openai: OpenAIConfig
     models: ModelsConfig
 
@@ -53,6 +59,9 @@ def load_config():
     return Config(
         tg=TgBotConfig(
             token=os.getenv("BOT_TOKEN"),
+        ),
+        redis=RedisConfig(
+            redis_url=os.getenv("REDIS_URL")
         ),
         db=DbConfig(
             user=os.getenv("user"),
