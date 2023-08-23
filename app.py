@@ -11,14 +11,19 @@ from middlewares import (
     BlockMiddleware,
     DebugMiddleware,
     SubscribersMiddleware,
-    ConfigMiddleware)
+    ConfigMiddleware,
+    RedisMiddleware)
 from settings.database.setup import create_db_session
+from settings.redis.setup import create_redis_session
 from utils.misc import set_commands
 
 
-def middlewares_registration(dp: Dispatcher, config, session_pool):
+def middlewares_registration(dp: Dispatcher, config, session_pool, redis):
     dp.message.outer_middleware(DatabaseMiddleware(session_pool))
     dp.callback_query.outer_middleware(DatabaseMiddleware(session_pool))
+
+    dp.message.outer_middleware(RedisMiddleware(redis))
+    dp.callback_query.outer_middleware(RedisMiddleware(redis))
 
     dp.message.outer_middleware(ConfigMiddleware(config))
     dp.callback_query.outer_middleware(ConfigMiddleware(config))
@@ -68,9 +73,10 @@ async def main():
     bot = Bot(token=config.tg.token, parse_mode="html")
     dp = Dispatcher(storage=MemoryStorage())
     session_pool = await create_db_session(url=config.db.connection_db_string)
+    redis = await create_redis_session(url=config.redis.redis_url)
 
     routers_registration(dp=dp)
-    middlewares_registration(dp=dp, config=config, session_pool=session_pool)
+    middlewares_registration(dp=dp, config=config, session_pool=session_pool, redis=redis)
 
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s: %(message)s',
                         datefmt='%d.%m.%Y %H:%M:%S')
