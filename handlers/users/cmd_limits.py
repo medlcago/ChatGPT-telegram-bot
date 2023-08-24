@@ -27,5 +27,5 @@ async def command_limits(message: types.Message, request: Database, config: Conf
                      f"Лимит запросов в час: {hitalic(request_limit)}\n"
                      f"Сделано запросов: {hitalic(command_count)}\n" +
                      ((
-                          f"\nДанные обновятся {hbold((last_command_time + timedelta(hours=1)).strftime(date_format))}") if last_command_time else ""))
+                          f"\nДанные обновятся {hbold((last_command_time + timedelta(hours=1)).strftime(date_format))} (UTC+3)") if last_command_time else ""))
     await message.reply(message_reply)

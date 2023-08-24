@@ -1,6 +1,5 @@
-from aiogram import Router, types
+from aiogram import Router, types, F
 from aiogram.filters.command import Command, CommandObject
-from aiogram.filters.text import Text
 from aiogram.fsm.context import FSMContext
 
 from database.db import Database
@@ -46,7 +45,7 @@ async def command_grant_subscription(message: types.Message, command: CommandObj
     await message.reply(result)
 
 
-@subscription_management_router.callback_query(Text(text="grant_sub"), IsAdmin())
+@subscription_management_router.callback_query(F.data.in_({"grant_sub"}), IsAdmin())
 @MessageLogging
 async def command_grant_subscription(call: types.CallbackQuery, state: FSMContext):
     await call.answer("Выдача подписки")
@@ -76,7 +75,7 @@ async def command_remove_subscription(message: types.Message, command: CommandOb
     await message.reply(result)
 
 
-@subscription_management_router.callback_query(Text(text="remove_sub"), IsAdmin())
+@subscription_management_router.callback_query(F.data.in_({"remove_sub"}), IsAdmin())
 @MessageLogging
 async def command_remove_subscription(call: types.CallbackQuery, state: FSMContext):
     await call.answer("Удаление подписки")

@@ -1,6 +1,5 @@
-from aiogram import Router, types
+from aiogram import Router, types, F
 from aiogram.filters.command import Command, CommandObject
-from aiogram.filters.text import Text
 from aiogram.fsm.context import FSMContext
 
 from database.db import Database
@@ -48,7 +47,7 @@ async def command_add_admin(message: types.Message, command: CommandObject, requ
     await message.reply(result)
 
 
-@admin_management_router.callback_query(Text(text="add_admin"), IsAdmin())
+@admin_management_router.callback_query(F.data.in_({"add_admin"}), IsAdmin())
 @MessageLogging
 async def command_add_admin(call: types.CallbackQuery, state: FSMContext):
     await call.answer("Добавление администратора")
@@ -79,7 +78,7 @@ async def command_remove_admin(message: types.Message, command: CommandObject, r
     await message.reply(result)
 
 
-@admin_management_router.callback_query(Text(text="remove_admin"), IsAdmin())
+@admin_management_router.callback_query(F.data.in_({"remove_admin"}), IsAdmin())
 @MessageLogging
 async def command_remove_admin(call: types.CallbackQuery, state: FSMContext):
     await call.answer("Удаление администратора")

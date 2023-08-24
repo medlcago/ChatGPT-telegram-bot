@@ -1,6 +1,5 @@
-from aiogram import Router, types
+from aiogram import Router, types, F
 from aiogram.filters.command import Command
-from aiogram.filters.text import Text
 
 from database.db import Database
 from decorators import MessageLogging
@@ -25,7 +24,7 @@ async def command_user_list(message: types.Message, request: Database):
     await message.reply(result)
 
 
-@command_user_list_router.callback_query(Text(text="user_list"), IsAdmin())
+@command_user_list_router.callback_query(F.data.in_({"user_list"}), IsAdmin())
 @MessageLogging
 async def command_user_list(call: types.CallbackQuery, request: Database):
     result = await user_list(request=request)

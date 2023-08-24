@@ -1,9 +1,8 @@
 import logging
 
-from aiogram import Bot
+from aiogram import Bot, F
 from aiogram import Router, types
 from aiogram.filters.command import Command
-from aiogram.filters.text import Text
 from aiogram.fsm.context import FSMContext
 
 from database.db import Database
@@ -22,7 +21,7 @@ async def command_send_message(message: types.Message, state: FSMContext):
     await state.set_state(Administrators.SendMessage.message)
 
 
-@command_send_message_router.callback_query(Text(text="send_message"), IsAdmin())
+@command_send_message_router.callback_query(F.data.in_({"send_message"}), IsAdmin())
 @MessageLogging
 async def command_send_message(call: types.callback_query, state: FSMContext):
     await call.answer()
@@ -61,7 +60,7 @@ async def message_to_send(message: types.Message, state: FSMContext, request: Da
         await state.clear()
 
 
-@command_send_message_router.callback_query(Administrators.SendMessage.confirmation, Text(text="confirmation_send_message"), IsAdmin())
+@command_send_message_router.callback_query(Administrators.SendMessage.confirmation, F.data.in_({"confirmation_send_message"}), IsAdmin())
 @MessageLogging
 async def confirmation_send_message(call: types.CallbackQuery, state: FSMContext, bot: Bot):
     message_to_user = ((await state.get_data()).get("message")).text
@@ -82,7 +81,7 @@ async def confirmation_send_message(call: types.CallbackQuery, state: FSMContext
     await call.answer()
 
 
-@command_send_message_router.callback_query(Administrators.SendMessage.confirmation, Text(text="cancel_send_message"))
+@command_send_message_router.callback_query(Administrators.SendMessage.confirmation, F.data.in_({"cancel_send_message"}))
 @MessageLogging
 async def cancel_send_message(call: types.CallbackQuery, state: FSMContext):
     await state.clear()

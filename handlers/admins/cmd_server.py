@@ -2,9 +2,8 @@ import datetime
 import platform
 
 import psutil
-from aiogram import types, Router
+from aiogram import types, Router, F
 from aiogram.filters.command import Command
-from aiogram.filters.text import Text
 
 from decorators import MessageLogging
 from filters import IsAdmin, ChatTypeFilter
@@ -45,7 +44,7 @@ async def command_server(message: types.Message):
     await message.reply(result)
 
 
-@command_server_router.callback_query(Text(text="server_info"), IsAdmin())
+@command_server_router.callback_query(F.data.in_({"server_info"}), IsAdmin())
 @MessageLogging
 async def command_server(call: types.CallbackQuery):
     result = await get_server_system_info()

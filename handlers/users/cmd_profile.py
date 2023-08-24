@@ -1,15 +1,14 @@
-from aiogram import Router, types
-from aiogram.filters.text import Text
+from aiogram import Router, types, F
 from aiogram.utils.markdown import hcode
 
+from database.db import Database
 from decorators import MessageLogging
 from keyboards.inline import btn_promocode_activation
-from database.db import Database
 
 command_profile_router = Router()
 
 
-@command_profile_router.callback_query(Text(text="my_profile"))
+@command_profile_router.callback_query(F.data.in_({"my_profile"}))
 @MessageLogging
 async def command_profile(call: types.CallbackQuery, request: Database):
     await call.answer()

@@ -1,20 +1,16 @@
 from aiogram import Router, types, F
 from aiogram.filters.command import Command
-from aiogram.filters.text import Text
 from aiogram.fsm.context import FSMContext
 from aiogram.utils.markdown import hcode
 
 from database.db import Database
 from decorators import MessageLogging
+from exceptions import ActivationError
 from filters import ChatTypeFilter
 from keyboards.inline import btn_contact_admin
 from states.users import Users
 
 command_promocode_router = Router()
-
-
-class ActivationError(Exception):
-    pass
 
 
 async def promocode_activation_common(*, promocode, user_id, request: Database):
@@ -35,7 +31,7 @@ async def command_promocode(message: types.Message, state: FSMContext):
     await state.set_state(Users.PromocodeActivation.promocode)
 
 
-@command_promocode_router.callback_query(Text(text="activate_promocode"))
+@command_promocode_router.callback_query(F.data.in_({"activate_promocode"}))
 @MessageLogging
 async def command_promocode(call: types.CallbackQuery, state: FSMContext):
     await call.answer("Активация промокода")
@@ -44,8 +40,7 @@ async def command_promocode(call: types.CallbackQuery, state: FSMContext):
     await state.set_state(Users.PromocodeActivation.promocode)
 
 
-@command_promocode_router.message(F.text.regexp(r"^PROMO-[A-Z]{3}-\d{3}-[A-Z]{3}$"),
-                                  Users.PromocodeActivation.promocode)
+@command_promocode_router.message(F.text.regexp(r"^PROMO-[A-Z]{3}-\d{3}-[A-Z]{3}$"), Users.PromocodeActivation.promocode)
 @MessageLogging
 async def promocode_activation(message: types.Message, state: FSMContext, request: Database):
     promocode = message.text

@@ -1,10 +1,9 @@
 import asyncio
 import logging
 
-from aiogram import Bot
+from aiogram import Bot, F
 from aiogram import types, Router
 from aiogram.filters.command import Command, CommandObject
-from aiogram.filters.text import Text
 from aiogram.fsm.context import FSMContext
 
 from database.db import Database
@@ -40,7 +39,7 @@ async def command_send_all(message: types.Message, command: CommandObject, reque
     await message.reply(await send_all(message_to_user=args, request=request, bot=bot, command=command))
 
 
-@command_send_all_router.callback_query(Text(text="send_all"), IsAdmin())
+@command_send_all_router.callback_query(F.data.in_({"send_all"}), IsAdmin())
 @MessageLogging
 async def command_send_all(call: types.CallbackQuery, state: FSMContext):
     await call.message.answer("Введите сообщение для рассылки")
@@ -56,7 +55,7 @@ async def message_send_all(message: types.Message, state: FSMContext):
     await state.set_state(Administrators.Mailing.confirmation)
 
 
-@command_send_all_router.callback_query(Administrators.Mailing.confirmation, Text(text="confirmation_send_all"), IsAdmin())
+@command_send_all_router.callback_query(Administrators.Mailing.confirmation, F.data.in_({"confirmation_send_all"}), IsAdmin())
 @MessageLogging
 async def confirmation_send_all(call: types.CallbackQuery, state: FSMContext, request: Database, bot: Bot):
     message_to_user = (await state.get_data()).get("message")
@@ -65,7 +64,7 @@ async def confirmation_send_all(call: types.CallbackQuery, state: FSMContext, re
     await state.clear()
 
 
-@command_send_all_router.callback_query(Administrators.Mailing.confirmation, Text(text="cancel_send_all"))
+@command_send_all_router.callback_query(Administrators.Mailing.confirmation, F.data.in_({"cancel_send_all"}))
 @MessageLogging
 async def cancel_send_all(call: types.CallbackQuery, state: FSMContext):
     await state.clear()

@@ -1,5 +1,4 @@
-from aiogram import Router, types
-from aiogram.filters.text import Text
+from aiogram import Router, types, F
 from aiogram.fsm.context import FSMContext
 
 from database.db import Database
@@ -29,7 +28,7 @@ async def delete_promocode_common(*, promocode: str, request: Database):
 
 
 # Создание промокода
-@promocode_management_router.callback_query(Text(text="create_promocode"), IsAdmin())
+@promocode_management_router.callback_query(F.data.in_({"create_promocode"}), IsAdmin())
 @MessageLogging
 async def command_add_promocode(call: types.CallbackQuery, state: FSMContext):
     await call.answer("Создание промокода")
@@ -51,7 +50,7 @@ async def add_promocode(message: types.Message, state: FSMContext, request: Data
 
 
 # Деактивация промокода
-@promocode_management_router.callback_query(Text(text="deactivate_promocode"), IsAdmin())
+@promocode_management_router.callback_query(F.data.in_({"deactivate_promocode"}), IsAdmin())
 @MessageLogging
 async def command_delete_promocode(call: types.CallbackQuery, state: FSMContext):
     await call.answer("Деактивация промокода")

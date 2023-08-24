@@ -1,6 +1,5 @@
-from aiogram import Router, types
+from aiogram import Router, types, F
 from aiogram.filters.command import Command, CommandObject
-from aiogram.filters.text import Text
 from aiogram.fsm.context import FSMContext
 
 from database.db import Database
@@ -48,7 +47,7 @@ async def command_block_user(message: types.Message, command: CommandObject, req
     await message.reply(result)
 
 
-@user_management_router.callback_query(Text(text="block_user"), IsAdmin())
+@user_management_router.callback_query(F.data.in_({"block_user"}), IsAdmin())
 @MessageLogging
 async def command_block_user(call: types.CallbackQuery, state: FSMContext):
     await call.answer("Блокировка пользователя")
@@ -78,7 +77,7 @@ async def command_unblock_user(message: types.Message, command: CommandObject, r
     await message.reply(result)
 
 
-@user_management_router.callback_query(Text(text="unblock_user"), IsAdmin())
+@user_management_router.callback_query(F.data.in_({"unblock_user"}), IsAdmin())
 @MessageLogging
 async def command_unblock_user(call: types.CallbackQuery, state: FSMContext):
     await call.answer("Разблокировка пользователя")

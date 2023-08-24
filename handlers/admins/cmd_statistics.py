@@ -1,5 +1,4 @@
-from aiogram import Router, types
-from aiogram.filters.text import Text
+from aiogram import Router, types, F
 
 from database.db import Database
 from decorators import MessageLogging
@@ -9,7 +8,7 @@ from keyboards.inline import btn_back_admin_panel
 command_statistics_router = Router()
 
 
-@command_statistics_router.callback_query(Text(text="statistics"), IsAdmin())
+@command_statistics_router.callback_query(F.data.in_({"statistics"}), IsAdmin())
 @MessageLogging
 async def command_statistics(call: types.CallbackQuery, request: Database):
     await call.answer()
