@@ -3,7 +3,7 @@ from aiogram.filters.command import Command, CommandObject
 from aiogram.fsm.context import FSMContext
 
 from database.db import Database
-from decorators import MessageLogging
+from decorators import MessageLogging, check_command_args
 from filters import IsAdmin, ChatTypeFilter
 from states.admins import Administrators
 
@@ -39,8 +39,9 @@ async def unblock_user_common(*, user_id: str, request: Database):
 
 
 # Блокировка пользователя
-@user_management_router.message(Command(commands=["block"], prefix="/"), ChatTypeFilter(is_group=False), IsAdmin())
+@user_management_router.message(Command(commands=["block"]), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
+@check_command_args
 async def command_block_user(message: types.Message, command: CommandObject, request: Database):
     user_id = command.args
     result = await block_user_common(user_id=user_id, request=request)
@@ -69,8 +70,9 @@ async def block_user(message: types.Message, state: FSMContext, request: Databas
 
 
 # Разблокировка пользователя
-@user_management_router.message(Command(commands=["unblock"], prefix="/"), ChatTypeFilter(is_group=False), IsAdmin())
+@user_management_router.message(Command(commands=["unblock"]), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
+@check_command_args
 async def command_unblock_user(message: types.Message, command: CommandObject, request: Database):
     user_id = command.args
     result = await unblock_user_common(user_id=user_id, request=request)

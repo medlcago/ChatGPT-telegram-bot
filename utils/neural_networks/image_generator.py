@@ -8,16 +8,16 @@ class ImageGenerator:
         self.api_base = api_base
         self.model = model
 
-    def get_response(self, content):
+    async def get_response(self, content):
         if not self.model:
             raise ValueError("Model is not specified.")
         try:
-            return self._get_response(content)
+            return await self._get_response(content)
         except Exception as e:
             logging.error(f'Error processing request: {e}')
             return "Ошибка обработки запроса. Пожалуйста, повторите попытку."
 
-    def _get_response(self, content):
+    async def _get_response(self, content):
         if not self.api_key:
             raise ValueError("API Key is not specified.")
         if not self.api_base:
@@ -25,7 +25,7 @@ class ImageGenerator:
 
         openai.api_key = self.api_key
         openai.api_base = self.api_base
-        response = openai.Image.create(
+        response = await openai.Image.acreate(
             model=self.model,
             prompt=content,
             n=1,
@@ -33,5 +33,5 @@ class ImageGenerator:
         )
         return response['data'][0]['url']
 
-    def generate_image(self, prompt):
-        return self.get_response(prompt)
+    async def generate_image(self, prompt):
+        return await self.get_response(prompt)

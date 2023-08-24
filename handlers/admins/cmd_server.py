@@ -37,7 +37,7 @@ async def get_server_system_info():
         delimiter + (cpu_load + memory_load) + delimiter + disk_information + delimiter
 
 
-@command_server_router.message(Command(commands=["server"], prefix="!/"), ChatTypeFilter(is_group=False), IsAdmin())
+@command_server_router.message(Command(commands=["server"]), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
 async def command_server(message: types.Message):
     result = await get_server_system_info()

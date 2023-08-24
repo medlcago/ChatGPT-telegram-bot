@@ -23,7 +23,7 @@ async def promocode_activation_common(*, promocode, user_id, request: Database):
     return f"Промокод {hcode(promocode)} не является действительным."
 
 
-@command_promocode_router.message(Command(commands=["promocode"], prefix="/"), ChatTypeFilter(is_group=False))
+@command_promocode_router.message(Command(commands=["promocode"]), ChatTypeFilter(is_group=False))
 @MessageLogging
 async def command_promocode(message: types.Message, state: FSMContext):
     await message.answer(

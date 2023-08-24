@@ -14,7 +14,7 @@ from states.admins import Administrators
 command_send_message_router = Router()
 
 
-@command_send_message_router.message(Command(commands=["send_message"], prefix="/"), ChatTypeFilter(is_group=False), IsAdmin())
+@command_send_message_router.message(Command(commands=["send_message"]), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
 async def command_send_message(message: types.Message, state: FSMContext):
     await message.reply("Введите сообщение, которое хотите отправить")

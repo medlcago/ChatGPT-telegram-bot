@@ -17,7 +17,7 @@ async def admin_list(*, request: Database):
     return "Администраторы отсутствуют."
 
 
-@command_admin_list_router.message(Command(commands=["admin_list"], prefix="/"), ChatTypeFilter(is_group=False), IsAdmin())
+@command_admin_list_router.message(Command(commands=["admin_list"]), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
 async def command_admin_list(message: types.Message, request: Database):
     result = await admin_list(request=request)

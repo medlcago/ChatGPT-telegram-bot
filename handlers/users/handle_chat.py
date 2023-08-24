@@ -1,5 +1,3 @@
-import asyncio
-
 from aiogram import Bot
 from aiogram import types, Router, F, html
 from aiogram.exceptions import TelegramBadRequest
@@ -7,7 +5,7 @@ from aiogram.filters import Command, CommandObject
 
 from data.config import Config
 from database.db import Database
-from decorators import CheckTimeLimits, MessageLogging
+from decorators import CheckTimeLimits, MessageLogging, check_command_args
 from filters import ChatTypeFilter, IsAdmin, IsSubscription
 from keyboards.inline import btn_promocode_activation
 from utils.neural_networks import ChatBot
@@ -18,23 +16,16 @@ handle_chat_router = Router()
 @handle_chat_router.message(Command(commands=["switch"]), ChatTypeFilter(is_group=False), IsSubscription())
 @handle_chat_router.message(Command(commands=["switch"]), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
+@check_command_args
 async def switch_chat_type(message: types.Message, command: CommandObject, request: Database, config: Config):
     chat_type = command.args
-    if chat_type:
-        if chat_type in config.models.available_models:
-            await message.reply(
-                html.quote(
-                    f"Текущая модель: {await request.update_user_chat_type(user_id=message.from_user.id, chat_type=chat_type)}"))
-        else:
-            available_models = "\n".join(config.models.available_models)
-            await message.reply(f"Ошибка смены модели. Повторите попытку.\n\nДоступные модели:\n{available_models}")
+    if chat_type in config.models.available_models:
+        await message.reply(
+            html.quote(
+                f"Текущая модель: {await request.update_user_chat_type(user_id=message.from_user.id, chat_type=chat_type)}"))
     else:
-        if message.from_user.language_code == "ru":
-            await message.reply(
-                f"Команда <b><i>{command.prefix + command.command}</i></b> оказалась пустой, запрос не может быть выполнен.")
-        else:
-            await message.reply(
-                f"The command <b><i>{command.prefix + command.command}</i></b> was empty, the request could not be completed.")
+        available_models = "\n".join(config.models.available_models)
+        await message.reply(f"Ошибка смены модели. Повторите попытку.\n\nДоступные модели:\n{available_models}")
 
 
 @handle_chat_router.message(Command(commands=["switch"]), ChatTypeFilter(is_group=False))
@@ -58,10 +49,9 @@ async def handle_chat(message: types.Message, request: Database, bot: Bot, confi
     available_models = config.models.available_models
 
     if model and model in available_models:
-        loop = asyncio.get_event_loop()
         gpt_bot = ChatBot(api_key=config.openai.api_key, api_base=config.openai.api_base, model=model)
         sent_message = await message.reply("Обработка запроса, ожидайте")
-        bot_response = await loop.run_in_executor(None, gpt_bot.chat, message.text)
+        bot_response = await gpt_bot.chat(prompt=message.text)
         try:
             await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id,
                                         text=bot_response,

@@ -7,7 +7,7 @@ from aiogram.filters.command import Command, CommandObject
 from aiogram.fsm.context import FSMContext
 
 from database.db import Database
-from decorators import MessageLogging
+from decorators import MessageLogging, check_command_args
 from filters import ChatTypeFilter
 from filters import IsAdmin
 from keyboards.inline import btn_send_all
@@ -16,27 +16,28 @@ from states.admins import Administrators
 command_send_all_router = Router()
 
 
-async def send_all(*, message_to_user: str, request: Database, bot: Bot, command: CommandObject = None):
-    if message_to_user:
-        count = 0
-        users = await request.get_all_users()
-        for user in users:
-            try:
-                await bot.send_message(chat_id=user.user_id, text=message_to_user)
-                count += 1
-            except Exception as e:
-                logging.error(e)
-            finally:
-                await asyncio.sleep(2)
-            return f"Рассылка завершена. Сообщение получили {count}/{len(users)}"
-    return f"Команда <b><i>{command.prefix + command.command}</i></b> оказалась пустой, запрос не может быть выполнен."
+async def send_all(*, message_to_user: str, request: Database, bot: Bot):
+    count = 0
+    users = await request.get_all_users()
+    for user in users:
+        try:
+            await bot.send_message(chat_id=user.user_id, text=message_to_user)
+            count += 1
+        except Exception as e:
+            logging.error(f"Error sending message: {e}")
+        finally:
+            await asyncio.sleep(2)
+        return f"Рассылка завершена. Сообщение получили {count}/{len(users)}"
 
 
-@command_send_all_router.message(Command(commands=["send_all"], prefix="/"), ChatTypeFilter(is_group=False), IsAdmin())
+@command_send_all_router.message(Command(commands=["send_all"]), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
+@check_command_args
 async def command_send_all(message: types.Message, command: CommandObject, request: Database, bot: Bot):
     args = command.args
-    await message.reply(await send_all(message_to_user=args, request=request, bot=bot, command=command))
+    sent_message = await message.reply("Рассылка была запущена.")
+    result = await send_all(message_to_user=args, request=request, bot=bot)
+    await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id, text=result)
 
 
 @command_send_all_router.callback_query(F.data.in_({"send_all"}), IsAdmin())
@@ -58,10 +59,12 @@ async def message_send_all(message: types.Message, state: FSMContext):
 @command_send_all_router.callback_query(Administrators.Mailing.confirmation, F.data.in_({"confirmation_send_all"}), IsAdmin())
 @MessageLogging
 async def confirmation_send_all(call: types.CallbackQuery, state: FSMContext, request: Database, bot: Bot):
+    await call.answer("Рассылка была запущена.")
     message_to_user = (await state.get_data()).get("message")
-    await call.message.edit_text(await send_all(message_to_user=message_to_user, request=request, bot=bot))
-    await call.answer()
     await state.clear()
+    sent_message = await call.message.edit_text("Рассылка была запущена.")
+    result = await send_all(message_to_user=message_to_user, request=request, bot=bot)
+    await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id, text=result)
 
 
 @command_send_all_router.callback_query(Administrators.Mailing.confirmation, F.data.in_({"cancel_send_all"}))

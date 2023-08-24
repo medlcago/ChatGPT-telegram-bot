@@ -12,7 +12,7 @@ from filters import ChatTypeFilter
 command_limits_router = Router()
 
 
-@command_limits_router.message(Command(commands=["limits"], prefix="/"), ChatTypeFilter(is_group=False))
+@command_limits_router.message(Command(commands=["limits"]), ChatTypeFilter(is_group=False))
 @MessageLogging
 async def command_limits(message: types.Message, request: Database, config: Config):
     date_format = '%d.%m.%Y %H:%M:%S'

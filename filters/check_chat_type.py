@@ -1,5 +1,5 @@
-from aiogram import types
 from aiogram.filters import Filter
+from aiogram.types import Message
 
 
 class ChatTypeFilter(Filter):
@@ -7,7 +7,7 @@ class ChatTypeFilter(Filter):
         self.is_group = is_group
         self.chat_id = chat_id
 
-    async def __call__(self, message: types.Message) -> bool:
+    async def __call__(self, message: Message) -> bool:
         if self.chat_id:
             return (message.chat.type != 'private' if self.is_group else message.chat.type == 'private') and (message.chat.id == self.chat_id)
         return message.chat.type != 'private' if self.is_group else message.chat.type == 'private'

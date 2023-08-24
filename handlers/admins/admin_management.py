@@ -3,7 +3,7 @@ from aiogram.filters.command import Command, CommandObject
 from aiogram.fsm.context import FSMContext
 
 from database.db import Database
-from decorators import MessageLogging
+from decorators import MessageLogging, check_command_args
 from filters import IsAdmin, ChatTypeFilter
 from states.admins import Administrators
 
@@ -39,8 +39,9 @@ async def remove_admin_common(*, user_id: str, from_user_id: int, request: Datab
 
 
 # Добавление администратора
-@admin_management_router.message(Command(commands=["add_admin"], prefix="/"), ChatTypeFilter(is_group=False), IsAdmin())
+@admin_management_router.message(Command(commands=["add_admin"]), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
+@check_command_args
 async def command_add_admin(message: types.Message, command: CommandObject, request: Database):
     user_id = command.args
     result = await add_admin_common(user_id=user_id, request=request)
@@ -69,8 +70,9 @@ async def add_admin(message: types.Message, state: FSMContext, request: Database
 
 
 # Удаление администратора
-@admin_management_router.message(Command(commands=["remove_admin"], prefix="/"), ChatTypeFilter(is_group=False), IsAdmin())
+@admin_management_router.message(Command(commands=["remove_admin"]), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
+@check_command_args
 async def command_remove_admin(message: types.Message, command: CommandObject, request: Database):
     user_id = command.args
     from_user_id = message.from_user.id

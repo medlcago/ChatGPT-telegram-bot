@@ -2,11 +2,11 @@ from datetime import datetime, timedelta
 from functools import wraps
 
 import pytz
-from aiogram import types
+from aiogram.types import Message
 from aiogram.utils.markdown import hbold
-from database.db import Database
 
 from data.config import Config
+from database.db import Database
 
 
 class CheckTimeLimits:
@@ -14,7 +14,7 @@ class CheckTimeLimits:
         self.handler = handler
         wraps(handler)(self)
 
-    async def __call__(self, message: types.Message, *args, **kwargs):
+    async def __call__(self, message: Message, *args, **kwargs):
         moscow_tz = pytz.timezone('Europe/Moscow')
         now = datetime.now(moscow_tz)
         user_id = message.from_user.id
@@ -66,7 +66,7 @@ class CheckTimeLimits:
         return
 
     @staticmethod
-    def _get_minutes_suffix(minutes):
+    def _get_minutes_suffix(minutes: int) -> str:
         if minutes == 1:
             return f"{minutes} минуту"
         elif minutes not in (12, 13, 14) and minutes % 10 in (2, 3, 4):
@@ -75,7 +75,7 @@ class CheckTimeLimits:
             return f"{minutes} минут"
 
     @staticmethod
-    def _get_seconds_suffix(seconds):
+    def _get_seconds_suffix(seconds: int) -> str:
         if seconds % 10 == 1 and seconds % 100 != 11:
             return f"{seconds} секунду"
         elif seconds % 100 not in (12, 13, 14) and seconds % 10 in (2, 3, 4):

@@ -3,7 +3,7 @@ from aiogram.filters.command import Command, CommandObject
 from aiogram.fsm.context import FSMContext
 
 from database.db import Database
-from decorators import MessageLogging
+from decorators import MessageLogging, check_command_args
 from filters import IsAdmin, ChatTypeFilter
 from states.admins import Administrators
 
@@ -37,8 +37,9 @@ async def remove_subscription_common(*, user_id: str, request: Database):
 
 
 # Выдача подписки
-@subscription_management_router.message(Command(commands=["grant_sub"], prefix="/"), ChatTypeFilter(is_group=False), IsAdmin())
+@subscription_management_router.message(Command(commands=["grant_sub"]), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
+@check_command_args
 async def command_grant_subscription(message: types.Message, command: CommandObject, request: Database):
     user_id = command.args
     result = await grant_subscription_common(user_id=user_id, request=request)
@@ -67,8 +68,9 @@ async def grant_subscription(message: types.Message, state: FSMContext, request:
 
 
 # Удаление подписки
-@subscription_management_router.message(Command(commands=["remove_sub"], prefix="/"), ChatTypeFilter(is_group=False), IsAdmin())
+@subscription_management_router.message(Command(commands=["remove_sub"]), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
+@check_command_args
 async def command_remove_subscription(message: types.Message, command: CommandObject, request: Database):
     user_id = command.args
     result = await remove_subscription_common(user_id=user_id, request=request)

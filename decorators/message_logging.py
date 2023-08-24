@@ -1,7 +1,8 @@
 import logging
 from functools import wraps
+from typing import Union
 
-from aiogram import types
+from aiogram.types import Message, CallbackQuery
 
 
 class MessageLogging:
@@ -9,7 +10,7 @@ class MessageLogging:
         self.func = func
         wraps(func)(self)
 
-    async def __call__(self, event, *args, **kwargs):
+    async def __call__(self, event: Union[Message, CallbackQuery], *args, **kwargs):
         func_name = self.func.__name__
         logger = logging.getLogger(func_name)
 
@@ -24,7 +25,7 @@ class MessageLogging:
 
     @staticmethod
     def _extract_text_and_chat_id(event):
-        if isinstance(event, types.Message):
+        if isinstance(event, Message):
             text = event.text if event.text else 'not supported'
             chat_id = event.chat.id
         else:

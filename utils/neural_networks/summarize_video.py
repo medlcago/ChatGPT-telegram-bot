@@ -27,7 +27,7 @@ def get_video_transcript(video_id: str) -> Optional[str]:
     try:
         transcript = YouTubeTranscriptApi.get_transcript(video_id=video_id, languages=["ru", "en", "de", "es"])
     except TranscriptsDisabled:
-        return None
+        return
 
     text = " ".join([line["text"] for line in transcript])
     return text
@@ -54,7 +54,7 @@ def generate_summary(text: str, language: str = "ru") -> str:
             ],
             temperature=0.2,
             n=1,
-            max_tokens=200,
+            max_tokens=4096,
             presence_penalty=0,
             frequency_penalty=0.1,
         )
@@ -68,12 +68,12 @@ def generate_summary(text: str, language: str = "ru") -> str:
 def summarize_youtube_video(video_url: str, language: str = "ru") -> str:
     video_id = extract_youtube_video_id(video_url)
 
-    if not video_id:
+    if video_id is None:
         return "Ссылка не является ссылкой на видео с YouTube"
 
     transcript = get_video_transcript(video_id)
 
-    if not transcript:
+    if transcript is None:
         return f"Для данного видео нет транскрипта на английском или русском языке: {video_url}"
 
     summary = generate_summary(transcript, language=language)

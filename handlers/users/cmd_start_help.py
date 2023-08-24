@@ -16,7 +16,7 @@ async def cmd_start_help(username, language="ru"):
     return message.format(username=username)
 
 
-@command_start_help_router.message(Command(commands=["start", "help"], prefix="/"), ChatTypeFilter(is_group=False))
+@command_start_help_router.message(Command(commands=["start", "help"]), ChatTypeFilter(is_group=False))
 @MessageLogging
 async def command_start_help(message: types.Message, request: Database):
     if await request.user_exists(message.from_user.id) is None:
