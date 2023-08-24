@@ -6,7 +6,7 @@ import openai
 from openai import InvalidRequestError
 from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled
 
-from data import config
+from data.config import load_config
 
 
 def extract_youtube_video_id(url: str) -> Optional[str]:
@@ -34,9 +34,9 @@ def get_video_transcript(video_id: str) -> Optional[str]:
 
 
 def generate_summary(text: str, language: str = "ru") -> str:
-    from data.config import OpenAI_API_BASE
-    openai.api_key = config.OpenAI_API_KEY
-    openai.api_base = OpenAI_API_BASE
+    config = load_config()
+    openai.api_key = config.openai.api_key
+    openai.api_base = config.openai.api_base
 
     instructions_map = {
         "ru": "Пожалуйста, резюмируйте предоставленный текст на русском языке",
