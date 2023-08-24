@@ -1,12 +1,13 @@
 python-dotenv==1.0.0
-openai==0.27.8
+openai==0.27.9
 aiomysql==0.2.0
 pytz==2023.3
-aiogram==3.0.0b7
+aiogram==3.0.0rc2
 asyncio==3.4.3
-youtube-transcript-api==0.6.0
+youtube-transcript-api==0.6.1
 cryptography==41.0.1
 psutil==5.9.5
 urllib3==1.26.6
 alembic==1.11.3
-sqlalchemy==2.0.19
+sqlalchemy==2.0.20
+aioredis==2.0.1
