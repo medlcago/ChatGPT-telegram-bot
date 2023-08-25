@@ -1,6 +1,6 @@
-from aiogram import Router, types
+from aiogram import Router, types, Bot
 from aiogram import html
-from aiogram.filters.command import Command
+from aiogram.filters.command import Command, CommandObject
 
 from data.templates import START_MESSAGE
 from database.db import Database
@@ -18,13 +18,23 @@ async def cmd_start_help(username, language="ru"):
 
 @command_start_help_router.message(Command(commands=["start", "help"]), ChatTypeFilter(is_group=False))
 @MessageLogging
-async def command_start_help(message: types.Message, request: Database):
-    if await request.user_exists(message.from_user.id) is None:
-        await request.add_user(message.from_user.id, message.from_user.full_name)
+async def command_start_help(message: types.Message, command: CommandObject, request: Database, bot: Bot):
+    referrer_id = command.args
+    user_id = message.from_user.id
+    fullname = message.from_user.full_name
+    current_model = await request.get_user_chat_type(user_id=user_id)
+
+    if await request.user_exists(user_id=user_id) is None:
+        if referrer_id and referrer_id.isdigit() and user_id != int(referrer_id) and await request.user_exists(user_id=referrer_id):
+            await request.add_user(user_id=user_id, fullname=fullname, referrer=referrer_id)
+            await bot.send_message(chat_id=referrer_id, text=f"<b>Новый реферал — <code>{user_id}</code>!</b>")
+        else:
+            await request.add_user(user_id=user_id, fullname=fullname)
+
     await message.answer(
         await cmd_start_help(username=html.quote(message.from_user.full_name),
                              language=message.from_user.language_code))
-    await message.answer(f"Текущая модель: {await request.get_user_chat_type(message.from_user.id)}\n"
+    await message.answer(f"Текущая модель: {current_model}\n"
                          f"Отправьте сообщение, чтобы начать диалог\n\n"
                          f"/switch - Сменить модель\n"
                          f"/models - Список доступных моделей", reply_markup=btn_my_profile)

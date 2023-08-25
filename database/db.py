@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 
 import pytz
-from sqlalchemy import update, select, delete
+from sqlalchemy import update, select, delete, func
 
 from .models import User, Member, Promocode
 
@@ -17,13 +17,13 @@ class Database:
         """
         return self.session
 
-    async def add_user(self, user_id, fullname):
+    async def add_user(self, user_id, fullname, referrer=None):
         """
         Adds a new user to the database.
         """
         try:
             session = await self.get_session()
-            user = User(user_id=user_id, fullname=fullname)
+            user = User(user_id=user_id, fullname=fullname, referrer=referrer)
             session.add(user)
             await session.commit()
         except Exception as e:
@@ -291,3 +291,14 @@ class Database:
         except Exception as e:
             logging.error(f"Database error: {e}")
             return False
+
+    async def get_user_referral_count(self, user_id):
+        """
+        Gets the number of user referrals.
+        """
+        try:
+            session = await self.get_session()
+            referral_count = await session.scalar(select(func.count()).where(User.referrer == user_id).select_from(User))
+            return referral_count
+        except Exception as e:
+            logging.error(f"Database error: {e}")
