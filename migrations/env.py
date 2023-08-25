@@ -18,7 +18,7 @@ config.set_section_option(section, "user", cfg.db.user)
 config.set_section_option(section, "password", cfg.db.password)
 config.set_section_option(section, "host", cfg.db.host)
 config.set_section_option(section, "port", cfg.db.port)
-config.set_section_option(section, "db", cfg.db.db)
+config.set_section_option(section, "db", cfg.db.database)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
