@@ -1,8 +1,8 @@
-"""Swap columns
+"""Added referrer column
 
-Revision ID: 0b39fb7da0ac
+Revision ID: cc3c539ba9c1
 Revises: 
-Create Date: 2023-08-25 18:54:28.355559
+Create Date: 2023-08-25 19:11:40.552674
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import mysql
 
 # revision identifiers, used by Alembic.
-revision: str = '0b39fb7da0ac'
+revision: str = 'cc3c539ba9c1'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -37,6 +37,7 @@ def downgrade() -> None:
     sa.Column('id', mysql.BIGINT(unsigned=True), autoincrement=True, nullable=False),
     sa.Column('user_id', mysql.BIGINT(), autoincrement=False, nullable=True),
     sa.Column('fullname', mysql.TEXT(), nullable=True),
+    sa.Column('referrer', mysql.BIGINT(), autoincrement=False, nullable=True),
     sa.Column('is_blocked', mysql.INTEGER(), server_default=sa.text("'0'"), autoincrement=False, nullable=True),
     sa.Column('is_admin', mysql.INTEGER(), server_default=sa.text("'0'"), autoincrement=False, nullable=True),
     sa.Column('is_subscriber', mysql.TINYINT(display_width=1), server_default=sa.text("'0'"), autoincrement=False, nullable=True),

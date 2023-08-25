@@ -17,6 +17,7 @@ class User(Base):
     id: int = Column(BIGINT(unsigned=True), primary_key=True)
     user_id: int = Column(BIGINT(unsigned=True), unique=True)
     fullname: str = Column(Text)
+    referrer: int = Column(BIGINT(unsigned=True))
     is_blocked: bool = Column(BOOLEAN, default=False)
     is_admin: bool = Column(BOOLEAN, default=False)
     is_subscriber: bool = Column(BOOLEAN, default=False)
