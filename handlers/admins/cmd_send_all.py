@@ -10,7 +10,7 @@ from database.db import Database
 from decorators import MessageLogging, check_command_args
 from filters import ChatTypeFilter
 from filters import IsAdmin
-from keyboards.inline import btn_send_all
+from keyboards.inline import get_keyboard_message, SendMessage
 from states.admins import Administrators
 
 command_send_all_router = Router()
@@ -33,9 +33,10 @@ async def send_all(*, message_to_user: str, request: Database, bot: Bot):
 @command_send_all_router.message(Command(commands=["send_all"]), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
 @check_command_args
-async def command_send_all(message: types.Message, command: CommandObject, request: Database, bot: Bot):
+async def command_send_all(message: types.Message, state: FSMContext, command: CommandObject, request: Database, bot: Bot):
     args = command.args
     sent_message = await message.reply("Рассылка была запущена.")
+    await state.set_state(Administrators.Mailing.message)
     result = await send_all(message_to_user=args, request=request, bot=bot)
     await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id, text=result)
 
@@ -52,11 +53,14 @@ async def command_send_all(call: types.CallbackQuery, state: FSMContext):
 @MessageLogging
 async def message_send_all(message: types.Message, state: FSMContext):
     await state.update_data(message=message.text)
-    await message.answer(f"Сообщение для рассылки:\n{message.text}", reply_markup=btn_send_all)
+    await message.answer(f"Сообщение для рассылки:\n{message.text}",
+                         reply_markup=get_keyboard_message("all").as_markup())
     await state.set_state(Administrators.Mailing.confirmation)
 
 
-@command_send_all_router.callback_query(Administrators.Mailing.confirmation, F.data.in_({"confirmation_send_all"}), IsAdmin())
+@command_send_all_router.callback_query(Administrators.Mailing.confirmation,
+                                        SendMessage.filter((F.action == "confirmation") & (F.recipients == "all")),
+                                        IsAdmin())
 @MessageLogging
 async def confirmation_send_all(call: types.CallbackQuery, state: FSMContext, request: Database, bot: Bot):
     await call.answer("Рассылка была запущена.")
@@ -67,7 +71,8 @@ async def confirmation_send_all(call: types.CallbackQuery, state: FSMContext, re
     await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id, text=result)
 
 
-@command_send_all_router.callback_query(Administrators.Mailing.confirmation, F.data.in_({"cancel_send_all"}))
+@command_send_all_router.callback_query(Administrators.Mailing.confirmation,
+                                        SendMessage.filter((F.action == "cancel") & (F.recipients == "all")))
 @MessageLogging
 async def cancel_send_all(call: types.CallbackQuery, state: FSMContext):
     await state.clear()

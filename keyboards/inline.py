@@ -1,4 +1,8 @@
+from enum import Enum
+
+from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 btn_my_profile = InlineKeyboardMarkup(inline_keyboard=[
     [
@@ -49,24 +53,6 @@ btn_back_admin_panel = InlineKeyboardMarkup(inline_keyboard=[
     ]
 ])
 
-btn_send_all = InlineKeyboardMarkup(inline_keyboard=[
-    [
-        InlineKeyboardButton(text="Подтвердить", callback_data="confirmation_send_all")
-    ],
-    [
-        InlineKeyboardButton(text="Отмена", callback_data="cancel_send_all")
-    ]
-])
-
-btn_send_message = InlineKeyboardMarkup(inline_keyboard=[
-    [
-        InlineKeyboardButton(text="Подтвердить", callback_data="confirmation_send_message")
-    ],
-    [
-        InlineKeyboardButton(text="Отмена", callback_data="cancel_send_message")
-    ]
-])
-
 btn_contact_admin = InlineKeyboardMarkup(inline_keyboard=[
     [
         InlineKeyboardButton(text="Contact the bot administrator", url="https://t.me/medlcago")
@@ -78,3 +64,25 @@ btn_promocode_activation = InlineKeyboardMarkup(inline_keyboard=[
         InlineKeyboardButton(text="Активировать промокод", callback_data="activate_promocode")
     ]
 ])
+
+
+class Action(str, Enum):
+    confirmation = "confirmation"
+    cancel = "cancel"
+
+
+class SendMessage(CallbackData, prefix="send"):
+    action: Action
+    recipients: str
+
+
+def get_keyboard_message(recipients: str):
+    if recipients not in ("one", "all"):
+        raise ValueError("recipients must be one of: 'one' or 'all'")
+    builder = InlineKeyboardBuilder()
+    builder.button(text="Подтвердить",
+                   callback_data=SendMessage(action=Action.confirmation, recipients=recipients))
+    builder.button(text="Отмена",
+                   callback_data=SendMessage(action=Action.cancel, recipients=recipients))
+    builder.adjust(1, 1)
+    return builder
