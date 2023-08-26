@@ -33,10 +33,9 @@ async def send_all(*, message_to_user: str, request: Database, bot: Bot):
 @command_send_all_router.message(Command(commands=["send_all"]), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
 @check_command_args
-async def command_send_all(message: types.Message, state: FSMContext, command: CommandObject, request: Database, bot: Bot):
+async def command_send_all(message: types.Message, command: CommandObject, request: Database, bot: Bot):
     args = command.args
     sent_message = await message.reply("Рассылка была запущена.")
-    await state.set_state(Administrators.Mailing.message)
     result = await send_all(message_to_user=args, request=request, bot=bot)
     await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id, text=result)
 
