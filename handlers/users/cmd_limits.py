@@ -21,11 +21,11 @@ async def command_limits(message: types.Message, request: Database, config: Conf
     current_model = await request.get_user_chat_type(user_id=message.from_user.id)
     request_limit = config.models.request_limit
     command_count = await request.get_user_command_count(user_id=message.from_user.id)
+    data_update_time = (last_command_time + timedelta(hours=1)).strftime(date_format) if last_command_time else ""
 
     message_reply = (f"{full_name}!\n\n"
                      f"Текущая модель: {current_model}\n\n"
                      f"Лимит запросов в час: {hitalic(request_limit)}\n"
-                     f"Сделано запросов: {hitalic(command_count)}\n" +
-                     ((
-                          f"\nДанные обновятся {hbold((last_command_time + timedelta(hours=1)).strftime(date_format))} (UTC+3)") if last_command_time else ""))
+                     f"Сделано запросов: {hitalic(command_count)}\n\n" +
+                     (f"Данные обновятся {hbold(data_update_time)} (UTC+3)" if data_update_time else ""))
     await message.reply(message_reply)

@@ -15,6 +15,4 @@ class RedisMiddleware(BaseMiddleware):
             event: Union[Message, CallbackQuery],
             data: Dict[str, Any]) -> Any:
         data['redis'] = self.redis_session
-        result = await handler(event, data)
-        await self.redis_session.close()
-        return result
+        return await handler(event, data)

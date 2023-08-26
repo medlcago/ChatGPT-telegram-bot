@@ -76,7 +76,7 @@ class SendMessage(CallbackData, prefix="send"):
     recipients: str
 
 
-def get_keyboard_message(recipients: str):
+def get_keyboard_message(recipients: str) -> InlineKeyboardBuilder:
     if recipients not in ("one", "all"):
         raise ValueError("recipients must be one of: 'one' or 'all'")
     builder = InlineKeyboardBuilder()
