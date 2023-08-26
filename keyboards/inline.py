@@ -86,3 +86,15 @@ def get_keyboard_message(recipients: str):
                    callback_data=SendMessage(action=Action.cancel, recipients=recipients))
     builder.adjust(1, 1)
     return builder
+
+
+class Model(CallbackData, prefix="model"):
+    model: str
+
+
+def get_models_list(models: list) -> InlineKeyboardBuilder:
+    builder = InlineKeyboardBuilder()
+    for model in models:
+        builder.button(text=model, callback_data=Model(model=model))
+    builder.adjust(1, 1)
+    return builder

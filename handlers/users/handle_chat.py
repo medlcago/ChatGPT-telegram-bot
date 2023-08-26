@@ -1,13 +1,12 @@
-from aiogram import Bot
-from aiogram import types, Router, F, html
+from aiogram import Bot, Router, types, F
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command, CommandObject
 
 from data.config import Config
 from database.db import Database
-from decorators import CheckTimeLimits, MessageLogging, check_command_args
+from decorators import CheckTimeLimits, MessageLogging
 from filters import ChatTypeFilter, IsAdmin, IsSubscription
-from keyboards.inline import btn_promocode_activation
+from keyboards.inline import btn_promocode_activation, get_models_list, Model
 from utils.neural_networks import ChatBot
 
 handle_chat_router = Router()
@@ -16,21 +15,23 @@ handle_chat_router = Router()
 @handle_chat_router.message(Command(commands=["switch"]), ChatTypeFilter(is_group=False), IsSubscription())
 @handle_chat_router.message(Command(commands=["switch"]), ChatTypeFilter(is_group=False), IsAdmin())
 @MessageLogging
-@check_command_args
-async def switch_chat_type(message: types.Message, command: CommandObject, request: Database, config: Config):
-    chat_type = command.args
-    if chat_type in config.models.available_models:
-        await message.reply(
-            html.quote(
-                f"Текущая модель: {await request.update_user_chat_type(user_id=message.from_user.id, chat_type=chat_type)}"))
-    else:
-        available_models = "\n".join(config.models.available_models)
-        await message.reply(f"Ошибка смены модели. Повторите попытку.\n\nДоступные модели:\n{available_models}")
+async def switch_chat_type(message: types.Message, config: Config):
+    available_models = config.models.available_models
+    await message.answer("Выберите модель ниже 👇", reply_markup=get_models_list(available_models).as_markup())
+
+
+@handle_chat_router.callback_query(Model.filter())
+@MessageLogging
+async def switch_chat_type(call: types.CallbackQuery, callback_data: Model, request: Database):
+    model = callback_data.model
+    current_model = await request.update_user_chat_type(user_id=call.from_user.id, chat_type=model)
+    await call.message.edit_text(f"Текущая модель: <b><i>{current_model}</i></b>")
+    await call.answer(current_model)
 
 
 @handle_chat_router.message(Command(commands=["switch"]), ChatTypeFilter(is_group=False))
 @MessageLogging
-async def switch_chat_type(message: types.Message, command: CommandObject):
+async def switch_chat_type_non_premium(message: types.Message, command: CommandObject):
     if message.from_user.language_code == "ru":
         await message.reply(
             f"Команда <b><i>{command.prefix + command.command}</i></b> доступна только premium пользователям.",
