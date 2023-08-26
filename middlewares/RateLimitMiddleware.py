@@ -1,27 +1,33 @@
 from typing import Callable, Any, Awaitable, Dict
 
 from aiogram import BaseMiddleware
+from aiogram.dispatcher.flags import get_flag
 from aiogram.fsm.storage.redis import Redis
 from aiogram.types import Message
+from aiogram.utils.markdown import hbold
 
 
 class RateLimitMiddleware(BaseMiddleware):
-    def __init__(self, limit: int = 60):
-        self.limit = limit
-
     async def __call__(
             self,
             handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
             event: Message,
             data: Dict[str, Any]) -> Any:
+        rate_limit = get_flag(data, "rate_limit")
+        if rate_limit is None:
+            return await handler(event, data)
+
         redis: Redis = data.get("redis")
-        user = f"User{event.from_user.id}"
+        limit = rate_limit.get("limit", 120)
+        key = rate_limit.get("key", "key")
+        user = f"User_{event.from_user.id}_{key}"
 
         if await redis.get(name=user):
             seconds = await redis.ttl(name=user)
-            await event.answer(f"Повторите попытку через {self._get_seconds_suffix(seconds)}")
+            await event.answer(
+                f"⏳ Подождите еще {hbold(self._get_seconds_suffix(seconds))} перед тем, как отправить следующий запрос..")
             return
-        await redis.set(name=user, value=1, ex=self.limit, nx=True)
+        await redis.set(name=user, value=1, ex=limit, nx=True)
         return await handler(event, data)
 
     @staticmethod

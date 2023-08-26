@@ -1,6 +1,4 @@
-from aiogram import Router
-from aiogram import html
-from aiogram import types
+from aiogram import Router, html, types, flags
 from aiogram.filters import Command, CommandObject
 from aiogram.types import URLInputFile
 
@@ -14,6 +12,7 @@ command_image_router = Router()
 @command_image_router.message(Command(commands=["image"], prefix="!/"))
 @MessageLogging
 @check_command_args
+@flags.rate_limit(limit=30, key="image")
 async def command_image(message: types.Message, command: CommandObject, config: Config):
     prompt = html.quote(command.args)
     image_generator = ImageGenerator(api_key=config.openai.api_key, api_base=config.openai.api_base, model="sdxl")

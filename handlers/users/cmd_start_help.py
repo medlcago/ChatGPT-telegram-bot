@@ -1,4 +1,4 @@
-from aiogram import Router, types, Bot
+from aiogram import Router, types, Bot, flags
 from aiogram import html
 from aiogram.filters.command import Command, CommandObject
 
@@ -7,11 +7,9 @@ from database.db import Database
 from decorators import MessageLogging
 from filters import ChatTypeFilter
 from keyboards.inline import btn_my_profile
-from middlewares import RateLimitMiddleware
 from utils.misc import payload_decode
 
 command_start_help_router = Router()
-command_start_help_router.message.middleware(RateLimitMiddleware())
 
 
 async def cmd_start_help(username, language="ru"):
@@ -21,6 +19,7 @@ async def cmd_start_help(username, language="ru"):
 
 @command_start_help_router.message(Command(commands=["start", "help"]), ChatTypeFilter(is_group=False))
 @MessageLogging
+@flags.rate_limit(limit=120, key="start")
 async def command_start_help(message: types.Message, command: CommandObject, request: Database, bot: Bot):
     referrer_id = payload_decode(payload=command.args)
     user_id = message.from_user.id

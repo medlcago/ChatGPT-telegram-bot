@@ -1,12 +1,13 @@
 from typing import Callable, Dict, Any, Awaitable, Union
 
 from aiogram import BaseMiddleware
+from aiogram.dispatcher.flags import get_flag
 from aiogram.types import Message, CallbackQuery
 
 from data.config import SUBSCRIBERS_ONLY
 from data.templates import SUBSCRIBERS_ONLY_MESSAGE
 from database.db import Database
-from keyboards.inline import btn_contact_admin
+from keyboards.inline import get_keyboard_activate_subscription
 
 
 class SubscribersMiddleware(BaseMiddleware):
@@ -18,8 +19,9 @@ class SubscribersMiddleware(BaseMiddleware):
     ) -> Any:
         user_id = event.from_user.id
         request: Database = data["request"]
+        skip = get_flag(data, "skip")
 
-        if await self.is_allowed(user_id, request):
+        if skip or await self.is_allowed(user_id, request):
             return await handler(event, data)
         await self.handle_restriction(event)
 
@@ -33,6 +35,6 @@ class SubscribersMiddleware(BaseMiddleware):
     async def handle_restriction(event: Union[Message, CallbackQuery]) -> None:
         if isinstance(event, CallbackQuery):
             await event.answer(SUBSCRIBERS_ONLY_MESSAGE)
-            await event.message.answer(SUBSCRIBERS_ONLY_MESSAGE, reply_markup=btn_contact_admin)
+            await event.message.answer(SUBSCRIBERS_ONLY_MESSAGE, reply_markup=get_keyboard_activate_subscription().as_markup())
         else:
-            await event.answer(SUBSCRIBERS_ONLY_MESSAGE, reply_markup=btn_contact_admin)
+            await event.answer(SUBSCRIBERS_ONLY_MESSAGE, reply_markup=get_keyboard_activate_subscription().as_markup())

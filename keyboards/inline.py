@@ -55,7 +55,7 @@ btn_back_admin_panel = InlineKeyboardMarkup(inline_keyboard=[
 
 btn_contact_admin = InlineKeyboardMarkup(inline_keyboard=[
     [
-        InlineKeyboardButton(text="Contact the bot administrator", url="https://t.me/medlcago")
+        InlineKeyboardButton(text="Связаться с администратором", url="https://t.me/medlcago")
     ]
 ])
 
@@ -64,6 +64,14 @@ btn_promocode_activation = InlineKeyboardMarkup(inline_keyboard=[
         InlineKeyboardButton(text="Активировать промокод", callback_data="activate_promocode")
     ]
 ])
+
+
+def get_keyboard_activate_subscription() -> InlineKeyboardBuilder:
+    builder = InlineKeyboardBuilder()
+    builder.attach(InlineKeyboardBuilder.from_markup(btn_contact_admin))
+    builder.attach(InlineKeyboardBuilder.from_markup(btn_promocode_activation))
+    builder.adjust(1, 1)
+    return builder
 
 
 class Action(str, Enum):

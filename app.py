@@ -12,7 +12,8 @@ from middlewares import (
     DebugMiddleware,
     SubscribersMiddleware,
     ConfigMiddleware,
-    RedisMiddleware)
+    RedisMiddleware,
+    RateLimitMiddleware)
 from settings.database.setup import create_db_session
 from settings.redis.setup import create_redis_session
 from utils.misc import set_commands
@@ -34,8 +35,10 @@ def middlewares_registration(dp: Dispatcher, config, session_pool, redis):
     dp.message.outer_middleware(DebugMiddleware())
     dp.callback_query.outer_middleware(DebugMiddleware())
 
-    dp.message.outer_middleware(SubscribersMiddleware())
-    dp.callback_query.outer_middleware(SubscribersMiddleware())
+    dp.message.middleware(SubscribersMiddleware())
+    dp.callback_query.middleware(SubscribersMiddleware())
+
+    dp.message.middleware(RateLimitMiddleware())
 
 
 def routers_registration(dp: Dispatcher):
