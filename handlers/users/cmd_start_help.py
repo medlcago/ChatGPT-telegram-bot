@@ -7,9 +7,11 @@ from database.db import Database
 from decorators import MessageLogging
 from filters import ChatTypeFilter
 from keyboards.inline import btn_my_profile
+from middlewares import RateLimitMiddleware
 from utils.misc import payload_decode
 
 command_start_help_router = Router()
+command_start_help_router.message.middleware(RateLimitMiddleware())
 
 
 async def cmd_start_help(username, language="ru"):
@@ -38,5 +40,6 @@ async def command_start_help(message: types.Message, command: CommandObject, req
                              language=message.from_user.language_code))
     await message.answer(f"Текущая модель: {current_model}\n"
                          f"Отправьте сообщение, чтобы начать диалог\n\n"
+                         f"/ref - Реферальная ссылка\n"
                          f"/switch - Сменить модель\n"
                          f"/models - Список доступных моделей", reply_markup=btn_my_profile)
