@@ -11,3 +11,4 @@ urllib3==1.26.6
 alembic==1.11.3
 sqlalchemy==2.0.20
 aioredis==2.0.1
+redis==5.0.0
