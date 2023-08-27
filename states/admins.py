@@ -68,6 +68,13 @@ class CreatePromocode(StatesGroup):
     activations_count = State()
 
 
+class ReplyUser(StatesGroup):
+    """
+    Класс состояний для ответа пользователю.
+    """
+    message = State()
+
+
 class Administrators:
     """
     Класс, объединяющий состояния для работы администраторов.
@@ -81,3 +88,4 @@ class Administrators:
     BlockUser = BlockUser
     UnblockUser = UnblockUser
     CreatePromocode = CreatePromocode
+    ReplyUser = ReplyUser

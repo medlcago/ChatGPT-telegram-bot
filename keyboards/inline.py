@@ -55,7 +55,7 @@ btn_back_admin_panel = InlineKeyboardMarkup(inline_keyboard=[
 
 btn_contact_admin = InlineKeyboardMarkup(inline_keyboard=[
     [
-        InlineKeyboardButton(text="Связаться с администратором", url="https://t.me/medlcago")
+        InlineKeyboardButton(text="Связаться с администратором", callback_data="contact_admin")
     ]
 ])
 
@@ -74,24 +74,43 @@ def get_keyboard_activate_subscription() -> InlineKeyboardBuilder:
     return builder
 
 
-class Action(str, Enum):
+class SendMessageAction(str, Enum):
     confirmation = "confirmation"
     cancel = "cancel"
 
 
 class SendMessage(CallbackData, prefix="send"):
-    action: Action
+    action: SendMessageAction
     recipients: str
 
 
 def get_keyboard_message(recipients: str) -> InlineKeyboardBuilder:
-    if recipients not in ("one", "all"):
-        raise ValueError("recipients must be one of: 'one' or 'all'")
+    if recipients not in ("one", "all", "creator"):
+        raise ValueError("recipients must be one of: 'one', 'all', 'creator'")
     builder = InlineKeyboardBuilder()
     builder.button(text="Подтвердить",
-                   callback_data=SendMessage(action=Action.confirmation, recipients=recipients))
+                   callback_data=SendMessage(action=SendMessageAction.confirmation, recipients=recipients))
     builder.button(text="Отмена",
-                   callback_data=SendMessage(action=Action.cancel, recipients=recipients))
+                   callback_data=SendMessage(action=SendMessageAction.cancel, recipients=recipients))
+    builder.adjust(1, 1)
+    return builder
+
+
+class ReplyUserAction(str, Enum):
+    reply_to_user = "reply_to_user"
+    dont_reply_to_user = "dont_reply_to_user"
+
+
+class ReplyUser(CallbackData, prefix="reply"):
+    action: ReplyUserAction
+    user_id: int
+    message_id: int
+
+
+def get_keyboard_reply_to_user(user_id: int, message_id: int) -> InlineKeyboardBuilder:
+    builder = InlineKeyboardBuilder()
+    builder.button(text="✉️ Ответить", callback_data=ReplyUser(action=ReplyUserAction.reply_to_user, user_id=user_id, message_id=message_id))
+    builder.button(text="❌ Оставить без ответа", callback_data=ReplyUser(action=ReplyUserAction.dont_reply_to_user, user_id=user_id, message_id=message_id))
     builder.adjust(1, 1)
     return builder
 

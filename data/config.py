@@ -53,6 +53,7 @@ class Config:
     redis: RedisConfig
     openai: OpenAIConfig
     models: ModelsConfig
+    creator_user_id: int
 
 
 def load_config():
@@ -86,7 +87,8 @@ def load_config():
             ],
             default_model="gpt-3.5-turbo",
             request_limit=20
-        )
+        ),
+        creator_user_id=int(os.getenv("CREATOR_USER_ID"))
     )
 
 

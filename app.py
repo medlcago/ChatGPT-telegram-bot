@@ -46,6 +46,7 @@ def routers_registration(dp: Dispatcher):
     dp.include_router(general.command_image_router)
 
     dp.include_router(admins.command_admin_router)
+    dp.include_router(admins.command_contact_admin_router)
     dp.include_router(admins.command_send_all_router)
     dp.include_router(admins.command_send_message_router)
     dp.include_router(admins.command_user_list_router)
@@ -65,6 +66,7 @@ def routers_registration(dp: Dispatcher):
     dp.include_router(users.command_start_help_router)
     dp.include_router(users.command_profile_router)
     dp.include_router(users.command_ref_router)
+    dp.include_router(users.command_contact_admin_router)
     dp.include_router(users.command_promocode_router)
     dp.include_router(users.command_summary_router)
     dp.include_router(users.command_limits_router)

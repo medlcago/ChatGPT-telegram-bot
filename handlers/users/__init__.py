@@ -1,3 +1,4 @@
+from .cmd_contact_admin import command_contact_admin_router
 from .cmd_limits import command_limits_router
 from .cmd_models import command_models_router
 from .cmd_profile import command_profile_router
