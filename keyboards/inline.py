@@ -88,9 +88,9 @@ def get_keyboard_message(recipients: str) -> InlineKeyboardBuilder:
     if recipients not in ("one", "all", "creator"):
         raise ValueError("recipients must be one of: 'one', 'all', 'creator'")
     builder = InlineKeyboardBuilder()
-    builder.button(text="Подтвердить",
+    builder.button(text="✅ Подтвердить",
                    callback_data=SendMessage(action=SendMessageAction.confirmation, recipients=recipients))
-    builder.button(text="Отмена",
+    builder.button(text="❌ Отмена",
                    callback_data=SendMessage(action=SendMessageAction.cancel, recipients=recipients))
     builder.adjust(1, 1)
     return builder

@@ -33,8 +33,9 @@ class SubscribersMiddleware(BaseMiddleware):
 
     @staticmethod
     async def handle_restriction(event: Union[Message, CallbackQuery]) -> None:
+        markup = get_keyboard_activate_subscription().as_markup()
         if isinstance(event, CallbackQuery):
             await event.answer(SUBSCRIBERS_ONLY_MESSAGE)
-            await event.message.answer(SUBSCRIBERS_ONLY_MESSAGE, reply_markup=get_keyboard_activate_subscription().as_markup())
+            await event.message.answer(SUBSCRIBERS_ONLY_MESSAGE, reply_markup=markup)
         else:
-            await event.answer(SUBSCRIBERS_ONLY_MESSAGE, reply_markup=get_keyboard_activate_subscription().as_markup())
+            await event.answer(SUBSCRIBERS_ONLY_MESSAGE, reply_markup=markup)

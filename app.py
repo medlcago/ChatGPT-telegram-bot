@@ -16,7 +16,7 @@ from middlewares import (
     RateLimitMiddleware)
 from settings.database.setup import create_db_session
 from settings.redis.setup import create_redis_session
-from utils.misc import set_commands
+from utils.misc import get_bot_commands
 
 
 def middlewares_registration(dp: Dispatcher, config, session_pool, redis):
@@ -74,10 +74,16 @@ def routers_registration(dp: Dispatcher):
     dp.include_router(users.handle_chat_router)
 
 
+async def on_startup(bot: Bot):
+    await bot.set_my_commands(await get_bot_commands())
+
+
 async def main():
     config = load_config()
     bot = Bot(token=config.tg.token, parse_mode="html")
     dp = Dispatcher(storage=MemoryStorage())
+    dp.startup.register(on_startup)
+
     session_pool = await create_db_session(url=config.db.connection_db_string)
     redis = await create_redis_session(url=config.redis.redis_url)
 
@@ -86,8 +92,6 @@ async def main():
 
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s: %(message)s',
                         datefmt='%d.%m.%Y %H:%M:%S')
-
-    await set_commands(bot)
 
     try:
         await dp.start_polling(bot)

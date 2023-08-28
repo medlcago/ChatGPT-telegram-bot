@@ -39,21 +39,22 @@ async def get_recipient_user_id(message: types.Message, state: FSMContext):
 @command_send_message_router.message(Administrators.SendMessage.user_id)
 @MessageLogging
 async def message_to_send(message: types.Message, state: FSMContext, request: Database):
-    await state.update_data(user_id=message.text)
+    data = await state.get_data()
 
-    message_to_user = ((await state.get_data()).get("message")).text
-    user_id = (await state.get_data()).get("user_id")
+    message_to_user = data.get("message").text
+    user_id = message.text
     user_exists = await request.user_exists(user_id=user_id)
 
     if user_exists:
+        markup = get_keyboard_message("one").as_markup()
         await message.answer(f"Сообщение:\n{message_to_user}\n\nПолучатель:\n{user_exists.fullname}({user_id})",
-                             reply_markup=get_keyboard_message("one").as_markup())
-        await state.set_state(Administrators.SendMessage.confirmation)
+                             reply_markup=markup)
+        reply_to_message_id = data.get("message").message_id
 
-        reply_to_message_id = ((await state.get_data()).get("message")).message_id
-
+        await state.update_data(user_id=user_id)
         await state.update_data(reply_to_message_id=reply_to_message_id)
         await state.update_data(recipient=f"{user_exists.fullname}({user_id})")
+        await state.set_state(Administrators.SendMessage.confirmation)
     else:
         await message.reply(f"user_id <i>{user_id}</i> не найден в базе данных.")
         await state.clear()
@@ -64,10 +65,12 @@ async def message_to_send(message: types.Message, state: FSMContext, request: Da
                                             IsAdmin())
 @MessageLogging
 async def confirmation_send_message(call: types.CallbackQuery, state: FSMContext, bot: Bot):
-    message_to_user = ((await state.get_data()).get("message")).text
-    user_id = (await state.get_data()).get("user_id")
-    reply_to_message_id = (await state.get_data()).get("reply_to_message_id")
-    recipient = (await state.get_data()).get("recipient")
+    data = await state.get_data()
+
+    message_to_user = data.get("message").text
+    user_id = data.get("user_id")
+    reply_to_message_id = data.get("reply_to_message_id")
+    recipient = data.get("recipient")
 
     try:
         await bot.send_message(chat_id=user_id, text=message_to_user)
@@ -75,11 +78,12 @@ async def confirmation_send_message(call: types.CallbackQuery, state: FSMContext
         await call.message.answer(f"Сообщение успешно отправлено пользователю <b>{recipient}</b>",
                                   reply_to_message_id=reply_to_message_id)
     except Exception as e:
-        logging.error(e)
+        logging.error(f"Error sending message: {e}")
         await call.message.edit_text(
             "Произошла ошибка при отправке сообщения. Возможно, пользователь заблокировал бота.")
-    await state.clear()
-    await call.answer()
+    finally:
+        await state.clear()
+        await call.answer()
 
 
 @command_send_message_router.callback_query(Administrators.SendMessage.confirmation,

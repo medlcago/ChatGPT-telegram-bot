@@ -1,8 +1,7 @@
-from aiogram import Bot
-from aiogram.types import BotCommand, BotCommandScopeDefault
+from aiogram.types import BotCommand
 
 
-async def set_commands(bot: Bot):
+async def get_bot_commands():
     commands = [
         BotCommand(
             command="start",
@@ -17,4 +16,4 @@ async def set_commands(bot: Bot):
             description="Список моделей"
         )
     ]
-    await bot.set_my_commands(commands, scope=BotCommandScopeDefault())
+    return commands
