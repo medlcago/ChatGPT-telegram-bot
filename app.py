@@ -79,7 +79,7 @@ async def on_startup(bot: Bot):
 
 
 async def main():
-    config = load_config()
+    config = load_config(mode := "debug")
     bot = Bot(token=config.tg.token, parse_mode="html")
     dp = Dispatcher(storage=MemoryStorage())
     dp.startup.register(on_startup)
@@ -92,6 +92,7 @@ async def main():
 
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s: %(message)s',
                         datefmt='%d.%m.%Y %H:%M:%S')
+    logging.info(f"Bot running in {mode.upper()} mode!")
 
     try:
         await dp.start_polling(bot)

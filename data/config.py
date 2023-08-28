@@ -1,5 +1,6 @@
-import os
 from dataclasses import dataclass
+
+from environs import Env
 
 """
 -1001620211812 учебка
@@ -7,10 +8,6 @@ from dataclasses import dataclass
 -1001803035829 Гринчи ББСО🍃💥👹
 -1001633082765 Тестовая группа
 """
-
-from dotenv import load_dotenv
-
-load_dotenv()
 
 
 @dataclass
@@ -56,25 +53,28 @@ class Config:
     creator_user_id: int
 
 
-def load_config():
+def load_config(mode: str, path: str | None = None) -> Config:
+    env = Env()
+    env.read_env(path=path)
+
     return Config(
         tg=TgBotConfig(
-            token=os.getenv("BOT_TOKEN"),
+            token=env.str("BOT_TOKEN") if mode == "release" else env.str("BOT_TOKEN_DEBUG")
         ),
         redis=RedisConfig(
-            redis_url=os.getenv("REDIS_URL")
+            redis_url=env.str("REDIS_URL")
         ),
         db=DbConfig(
-            user=os.getenv("user"),
-            password=os.getenv("password"),
-            host=os.getenv("host"),
-            port=os.getenv("port"),
-            database=os.getenv("db"),
-            connection_db_string=f'mysql+aiomysql://{os.getenv("user")}:{os.getenv("password")}@{os.getenv("host")}:{os.getenv("port")}/{os.getenv("db")}'
+            user=env.str("user"),
+            password=env.str("password"),
+            host=env.str("host"),
+            port=env.str("port"),
+            database=env.str("db"),
+            connection_db_string=f'mysql+aiomysql://{env.str("user")}:{env.str("password")}@{env.str("host")}:{env.str("port")}/{env.str("db")}'
         ),
         openai=OpenAIConfig(
-            api_key=os.getenv("OpenAI_API_KEY"),
-            api_base=os.getenv("OpenAI_API_BASE")
+            api_key=env.str("OpenAI_API_KEY"),
+            api_base=env.str("OpenAI_API_BASE")
         ),
         models=ModelsConfig(
             available_models=[
@@ -88,7 +88,7 @@ def load_config():
             default_model="gpt-3.5-turbo",
             request_limit=20
         ),
-        creator_user_id=int(os.getenv("CREATOR_USER_ID"))
+        creator_user_id=env.int("CREATOR_USER_ID")
     )
 
 

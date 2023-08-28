@@ -3,11 +3,7 @@ from dataclasses import dataclass
 from sqlalchemy import Column, String, Text, BOOLEAN
 from sqlalchemy.dialects.mysql import BIGINT, SMALLINT
 
-from data.config import load_config
 from settings.database import Base
-
-config = load_config()
-default_model = config.models.default_model
 
 
 @dataclass
@@ -23,4 +19,4 @@ class User(Base):
     is_subscriber: bool = Column(BOOLEAN, default=False)
     last_command_time: str = Column(Text)
     command_count: int = Column(SMALLINT(unsigned=True), default=0)
-    chat_type: str = Column(String(255), nullable=False, default=default_model)
+    chat_type: str = Column(String(255), nullable=False, default="gpt-3.5-turbo")
