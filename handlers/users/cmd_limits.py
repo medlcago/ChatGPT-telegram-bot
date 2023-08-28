@@ -14,7 +14,7 @@ command_limits_router = Router()
 
 @command_limits_router.message(Command(commands=["limits"]), ChatTypeFilter(is_group=False))
 @MessageLogging
-@flags.rate_limit(limit=300, key="limits")
+@flags.rate_limit(rate=300, limit=2, key="limits")
 async def command_limits(message: types.Message, request: Database, config: Config):
     date_format = '%d.%m.%Y %H:%M:%S'
     last_command_time = await request.get_user_last_command_time(message.from_user.id)

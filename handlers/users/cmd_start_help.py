@@ -19,7 +19,7 @@ async def cmd_start_help(username, language="ru"):
 
 @command_start_help_router.message(Command(commands=["start", "help"]), ChatTypeFilter(is_group=False))
 @MessageLogging
-@flags.rate_limit(limit=120, key="start")
+@flags.rate_limit(rate=120, limit=1, key="start")
 async def command_start_help(message: types.Message, command: CommandObject, request: Database, bot: Bot):
     referrer_id = payload_decode(payload=command.args)
     user_id = message.from_user.id

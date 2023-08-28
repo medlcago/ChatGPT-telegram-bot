@@ -18,16 +18,20 @@ class RateLimitMiddleware(BaseMiddleware):
             return await handler(event, data)
 
         redis: Redis = data.get("redis")
-        limit = rate_limit.get("limit", 120)
+        rate = rate_limit.get("rate", 120)
+        limit = rate_limit.get("limit", 1)
         key = rate_limit.get("key", "key")
         user = f"User_{event.from_user.id}_{key}"
 
-        if await redis.get(name=user):
+        if await redis.get(name=user) is not None:
+            if int(await redis.get(name=user)) < limit:
+                await redis.incr(name=user)
+                return await handler(event, data)
             seconds = await redis.ttl(name=user)
             await event.answer(
                 f"⏳ Подождите еще {hbold(self._get_seconds_suffix(seconds))} перед тем, как отправить следующий запрос..")
             return
-        await redis.set(name=user, value=1, ex=limit, nx=True)
+        await redis.set(name=user, value=1, ex=rate, nx=True)
         return await handler(event, data)
 
     @staticmethod
