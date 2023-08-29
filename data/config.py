@@ -83,7 +83,8 @@ def load_config(mode: str, path: str | None = None) -> Config:
                 "gpt-3.5-turbo",
                 "gpt-3.5-turbo-0301",
                 "gpt-3.5-turbo-16k",
-                "llama-2-70b-chat"
+                "llama-2-70b-chat",
+                "code-llama-34b-instruct"
             ],
             default_model="gpt-3.5-turbo",
             request_limit=20
