@@ -5,7 +5,9 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from data.config import load_config
-from settings.database.db_base import metadata
+from database.models.members import metadata as members_metadata
+from database.models.promocodes import metadata as promocodes_metadata
+from database.models.users import metadata as users_metadata
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -29,7 +31,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = metadata
+target_metadata = [members_metadata, promocodes_metadata, users_metadata]
 
 
 # other values from the config, defined by the needs of env.py,

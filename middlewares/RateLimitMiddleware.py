@@ -1,9 +1,9 @@
-from typing import Callable, Any, Awaitable, Dict
+from typing import Callable, Any, Awaitable, Dict, Union
 
 from aiogram import BaseMiddleware
 from aiogram.dispatcher.flags import get_flag
 from aiogram.fsm.storage.redis import Redis
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 from aiogram.utils.markdown import hbold
 
 
@@ -11,7 +11,7 @@ class RateLimitMiddleware(BaseMiddleware):
     async def __call__(
             self,
             handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
-            event: Message,
+            event: Union[Message, CallbackQuery],
             data: Dict[str, Any]) -> Any:
         rate_limit = get_flag(data, "rate_limit")
         if rate_limit is None:
@@ -27,12 +27,19 @@ class RateLimitMiddleware(BaseMiddleware):
             if int(await redis.get(name=user)) < limit:
                 await redis.incr(name=user)
                 return await handler(event, data)
-            seconds = await redis.ttl(name=user)
-            await event.answer(
-                f"⏳ Подождите еще {hbold(self._get_seconds_suffix(seconds))} перед тем, как отправить следующий запрос..")
+
+            self.seconds = await redis.ttl(name=user)
+            await self.handle_restriction(event=event)
             return
         await redis.set(name=user, value=1, ex=rate, nx=True)
         return await handler(event, data)
+
+    async def handle_restriction(self, event: Union[Message, CallbackQuery]) -> None:
+        if isinstance(event, CallbackQuery):
+            await event.answer(f"Повторите попытку через {self._get_seconds_suffix(self.seconds)}")
+        else:
+            await event.answer(
+                f"⏳ Подождите еще {hbold(self._get_seconds_suffix(self.seconds))} перед тем, как отправить следующий запрос..")
 
     @staticmethod
     def _get_seconds_suffix(seconds: int) -> str:

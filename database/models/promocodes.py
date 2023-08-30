@@ -1,9 +1,12 @@
 from dataclasses import dataclass
 
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, MetaData
 from sqlalchemy.dialects.mysql import TINYINT, BIGINT
+from sqlalchemy.orm import declarative_base
 
-from settings.database import Base
+metadata = MetaData()
+
+Base = declarative_base(metadata=metadata)
 
 
 @dataclass

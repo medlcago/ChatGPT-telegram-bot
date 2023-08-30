@@ -39,6 +39,7 @@ def middlewares_registration(dp: Dispatcher, config, session_pool, redis):
     dp.callback_query.middleware(SubscribersMiddleware())
 
     dp.message.middleware(RateLimitMiddleware())
+    dp.callback_query.middleware(RateLimitMiddleware())
 
 
 def routers_registration(dp: Dispatcher):
@@ -79,7 +80,7 @@ async def on_startup(bot: Bot):
 
 
 async def main():
-    config = load_config(mode := "release")
+    config = load_config(debug := False)
     bot = Bot(token=config.tg.token, parse_mode="html")
     dp = Dispatcher(storage=MemoryStorage())
     dp.startup.register(on_startup)
@@ -92,7 +93,7 @@ async def main():
 
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s: %(message)s',
                         datefmt='%d.%m.%Y %H:%M:%S')
-    logging.info(f"Bot running in {mode.upper()} mode!")
+    logging.info(f"Bot running in {'DEBUG' if debug else 'RELEASE'} mode!")
 
     try:
         await dp.start_polling(bot)

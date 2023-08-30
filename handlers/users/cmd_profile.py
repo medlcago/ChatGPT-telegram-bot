@@ -1,4 +1,4 @@
-from aiogram import Router, types, F
+from aiogram import Router, types, F, flags
 from aiogram.utils.markdown import hcode
 
 from database.db import Database
@@ -10,6 +10,7 @@ command_profile_router = Router()
 
 @command_profile_router.callback_query(F.data.in_({"my_profile"}))
 @MessageLogging
+@flags.rate_limit(rate=180, limit=1, key="profile")
 async def command_profile(call: types.CallbackQuery, request: Database):
     await call.answer()
     user_id = call.from_user.id

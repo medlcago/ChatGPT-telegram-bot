@@ -3,12 +3,13 @@ from datetime import datetime
 
 import pytz
 from sqlalchemy import update, select, delete, func
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from .models import User, Member, Promocode
 
 
 class Database:
-    def __init__(self, session):
+    def __init__(self, session: AsyncSession):
         self.session = session
 
     async def get_session(self):
@@ -298,7 +299,8 @@ class Database:
         """
         try:
             session = await self.get_session()
-            referral_count = await session.scalar(select(func.count()).where(User.referrer == user_id).select_from(User))
+            referral_count = await session.scalar(
+                select(func.count()).where(User.referrer == user_id).select_from(User))
             return referral_count
         except Exception as e:
             logging.error(f"Database error: {e}")

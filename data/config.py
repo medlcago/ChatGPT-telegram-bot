@@ -53,13 +53,13 @@ class Config:
     creator_user_id: int
 
 
-def load_config(mode: str, path: str | None = None) -> Config:
+def load_config(debug: bool = False, path: str | None = None) -> Config:
     env = Env()
     env.read_env(path=path)
 
     return Config(
         tg=TgBotConfig(
-            token=env.str("BOT_TOKEN") if mode == "release" else env.str("BOT_TOKEN_DEBUG")
+            token=env.str("BOT_TOKEN_DEBUG") if debug else env.str("BOT_TOKEN")
         ),
         redis=RedisConfig(
             redis_url=env.str("REDIS_URL")
