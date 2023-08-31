@@ -3,7 +3,7 @@ from aiogram import Router, types, F
 from database.db import Database
 from decorators import MessageLogging
 from filters import IsAdmin
-from keyboards.inline import btn_back_admin_panel
+from keyboards.inline import get_keyboard_back
 
 command_statistics_router = Router()
 
@@ -21,4 +21,4 @@ async def command_statistics(call: types.CallbackQuery, request: Database):
 ├ Количество пользователей в боте: <b>{number_users}</b>
 ├ Количество заблокированных: <b>{number_blocked}</b> 
 └ Количество администраторов в боте: <b>{number_administrators}</b>"""
-    await call.message.edit_text(message, reply_markup=btn_back_admin_panel)
+    await call.message.edit_text(message, reply_markup=get_keyboard_back(back="admin_panel").as_markup())

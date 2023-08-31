@@ -1,4 +1,4 @@
-from aiogram import Router, types, Bot, flags
+from aiogram import Router, types, Bot, flags, F
 from aiogram import html
 from aiogram.filters.command import Command, CommandObject
 
@@ -6,7 +6,7 @@ from data.templates import START_MESSAGE
 from database.db import Database
 from decorators import MessageLogging
 from filters import ChatTypeFilter
-from keyboards.inline import btn_my_profile
+from keyboards.inline import btn_my_profile, ComeBack
 from utils.misc import payload_decode
 
 command_start_help_router = Router()
@@ -42,3 +42,15 @@ async def command_start_help(message: types.Message, command: CommandObject, req
                          f"/ref - Реферальная ссылка\n"
                          f"/switch - Сменить модель\n"
                          f"/models - Список доступных моделей", reply_markup=btn_my_profile)
+
+
+@command_start_help_router.callback_query(ComeBack.filter(F.back == "start"))
+async def command_back_start(call: types.CallbackQuery, request: Database):
+    await call.answer()
+    user_id = call.from_user.id
+    current_model = await request.get_user_chat_type(user_id=user_id)
+    await call.message.edit_text(f"Текущая модель: {current_model}\n"
+                                 f"Отправьте сообщение, чтобы начать диалог\n\n"
+                                 f"/ref - Реферальная ссылка\n"
+                                 f"/switch - Сменить модель\n"
+                                 f"/models - Список доступных моделей", reply_markup=btn_my_profile)

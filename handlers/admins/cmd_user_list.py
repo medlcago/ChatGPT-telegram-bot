@@ -4,7 +4,7 @@ from aiogram.filters.command import Command
 from database.db import Database
 from decorators import MessageLogging
 from filters import IsAdmin, ChatTypeFilter
-from keyboards.inline import btn_back_admin_panel
+from keyboards.inline import get_keyboard_back
 
 command_user_list_router = Router()
 
@@ -28,5 +28,5 @@ async def command_user_list(message: types.Message, request: Database):
 @MessageLogging
 async def command_user_list(call: types.CallbackQuery, request: Database):
     result = await user_list(request=request)
-    await call.message.edit_text(result, reply_markup=btn_back_admin_panel)
+    await call.message.edit_text(result, reply_markup=get_keyboard_back(back="admin_panel").as_markup())
     await call.answer("Успех!")

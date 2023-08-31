@@ -3,7 +3,7 @@ from aiogram.filters.command import Command
 
 from decorators import MessageLogging
 from filters import IsAdmin, ChatTypeFilter
-from keyboards.inline import btn_cmd_admin
+from keyboards.inline import btn_cmd_admin, ComeBack
 
 command_admin_router = Router()
 
@@ -20,7 +20,7 @@ async def command_admin(message: types.Message):
     await message.reply("Nice try, bro! 🤣")
 
 
-@command_admin_router.callback_query(F.data.in_({"back_admin_panel"}), IsAdmin())
+@command_admin_router.callback_query(ComeBack.filter(F.back == "admin_panel"), IsAdmin())
 @MessageLogging
 async def back_admin_panel(call: types.CallbackQuery):
     await call.answer("Панель администратора")

@@ -6,7 +6,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 btn_my_profile = InlineKeyboardMarkup(inline_keyboard=[
     [
-        InlineKeyboardButton(text="Мой профиль", callback_data="my_profile")
+        InlineKeyboardButton(text="👤 Мой профиль", callback_data="my_profile")
     ]
 ])
 
@@ -47,23 +47,27 @@ btn_cmd_admin = InlineKeyboardMarkup(inline_keyboard=[
     ]
 ])
 
-btn_back_admin_panel = InlineKeyboardMarkup(inline_keyboard=[
-    [
-        InlineKeyboardButton(text="Назад", callback_data="back_admin_panel")
-    ]
-])
-
 btn_contact_admin = InlineKeyboardMarkup(inline_keyboard=[
     [
-        InlineKeyboardButton(text="Связаться с администратором", callback_data="contact_admin")
+        InlineKeyboardButton(text="✉️ Связаться с администратором", callback_data="contact_admin")
     ]
 ])
 
 btn_promocode_activation = InlineKeyboardMarkup(inline_keyboard=[
     [
-        InlineKeyboardButton(text="Активировать промокод", callback_data="activate_promocode")
+        InlineKeyboardButton(text="✅ Активировать промокод", callback_data="activate_promocode")
     ]
 ])
+
+
+class ComeBack(CallbackData, prefix="back"):
+    back: str
+
+
+def get_keyboard_back(back: str) -> InlineKeyboardBuilder:
+    builder = InlineKeyboardBuilder()
+    builder.button(text="🔙 Назад", callback_data=ComeBack(back=back))
+    return builder
 
 
 def get_keyboard_activate_subscription() -> InlineKeyboardBuilder:
@@ -109,8 +113,11 @@ class ReplyUser(CallbackData, prefix="reply"):
 
 def get_keyboard_reply_to_user(user_id: int, message_id: int) -> InlineKeyboardBuilder:
     builder = InlineKeyboardBuilder()
-    builder.button(text="✉️ Ответить", callback_data=ReplyUser(action=ReplyUserAction.reply_to_user, user_id=user_id, message_id=message_id))
-    builder.button(text="❌ Оставить без ответа", callback_data=ReplyUser(action=ReplyUserAction.dont_reply_to_user, user_id=user_id, message_id=message_id))
+    builder.button(text="✉️ Ответить", callback_data=ReplyUser(action=ReplyUserAction.reply_to_user, user_id=user_id,
+                                                               message_id=message_id))
+    builder.button(text="❌ Оставить без ответа",
+                   callback_data=ReplyUser(action=ReplyUserAction.dont_reply_to_user, user_id=user_id,
+                                           message_id=message_id))
     builder.adjust(1, 1)
     return builder
 
@@ -123,5 +130,5 @@ def get_models_list(models: list) -> InlineKeyboardBuilder:
     builder = InlineKeyboardBuilder()
     for model in models:
         builder.button(text=model, callback_data=Model(model=model))
-    builder.adjust(1, 1)
+    builder.adjust(2, 2)
     return builder
