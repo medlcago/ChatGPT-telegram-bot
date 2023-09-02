@@ -7,9 +7,23 @@
 - **pip install -r requirements.txt**
 ___
 ## Environment variables
-- **`API_KEY` - your API_KEY from https://openai.com/**
+- **`OpenAI_API_KEY` - your API_KEY from https://chimeragpt.adventblocks.cc/ru**
+- **`OpenAI_API_BASE` - your API_BASE to which api requests will be sent**
 
-- **`TOKEN` - your telegram bot token(@BotFather)**
+
+- **`BOT_TOKEN` - your basic telegram bot token(@BotFather)**
+- **`BOT_TOKEN_DEBUG` - your telegram bot token to be used in debug mode**
+
+
+- **`host` - database host**
+- **`port` - database connection port**
+- **`user` - database user name**
+- **`password` - database password**
+- **`db` - database name**
+- **`REDIS_URL` - redis url**
+
+
+- **`CREATOR_USER_ID` - user_id of the Telegram user who is the bot administrator**
 ___
 
 ## Run bot
