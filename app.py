@@ -29,8 +29,8 @@ def middlewares_registration(dp: Dispatcher, config, session_pool, redis):
     dp.message.outer_middleware(ConfigMiddleware(config))
     dp.callback_query.outer_middleware(ConfigMiddleware(config))
 
-    dp.message.outer_middleware(BlockMiddleware())
-    dp.callback_query.outer_middleware(BlockMiddleware())
+    dp.message.middleware(BlockMiddleware())
+    dp.callback_query.middleware(BlockMiddleware())
 
     dp.message.outer_middleware(DebugMiddleware())
     dp.callback_query.outer_middleware(DebugMiddleware())
