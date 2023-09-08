@@ -43,7 +43,7 @@ class Database:
             logging.error(f"Database error: {e}")
             return False
 
-    async def user_exists(self, user_id):
+    async def get_user(self, user_id):
         """
         Checks if a user exists in the database and return their data as a User object.
         """
@@ -237,6 +237,17 @@ class Database:
         except Exception as e:
             logging.error(f"Database error: {e}")
             return False
+
+    async def get_user_limit(self, user_id):
+        """
+        Gets the user's request limit.
+        """
+        try:
+            session = await self.get_session()
+            request_limit = await session.scalar(select(User.limit).filter_by(user_id=user_id))
+            return request_limit
+        except Exception as e:
+            logging.error(f"Database error: {e}")
 
     async def check_promocode(self, promocode):
         """

@@ -43,7 +43,7 @@ async def message_to_send(message: types.Message, state: FSMContext, request: Da
 
     message_to_user = data.get("message").text
     user_id = message.text
-    user_exists = await request.user_exists(user_id=user_id)
+    user_exists = await request.get_user(user_id=user_id)
 
     if user_exists:
         markup = get_keyboard_message("one").as_markup()

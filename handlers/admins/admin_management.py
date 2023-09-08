@@ -12,7 +12,7 @@ admin_management_router = Router()
 
 async def add_admin_common(*, user_id: str, request: Database):
     if user_id and user_id.isnumeric():
-        user = await request.user_exists(user_id=user_id)
+        user = await request.get_user(user_id=user_id)
         if user:
             if user.is_admin:
                 return f"<b>{user.fullname}({user.user_id})</b> уже является администратором."
@@ -25,7 +25,7 @@ async def add_admin_common(*, user_id: str, request: Database):
 
 async def remove_admin_common(*, user_id: str, from_user_id: int, request: Database):
     if user_id and user_id.isnumeric():
-        user = await request.user_exists(user_id=user_id)
+        user = await request.get_user(user_id=user_id)
         if user:
             if user.is_admin:
                 if user.user_id != from_user_id:

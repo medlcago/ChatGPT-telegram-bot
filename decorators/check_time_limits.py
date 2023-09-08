@@ -22,9 +22,6 @@ class CheckTimeLimits:
         config: Config = kwargs.get("config", None)
         request: Database = kwargs.get("request", None)
 
-        if config is None:
-            raise ValueError("Config argument missing.")
-
         if request is None:
             raise ValueError("Request argument missing.")
 
@@ -34,7 +31,7 @@ class CheckTimeLimits:
         date_format = '%Y-%m-%d %H:%M:%S'
         command_count = await request.get_user_command_count(user_id)
         last_command_time = await request.get_user_last_command_time(user_id)
-
+        refresh_time = timedelta(hours=config.refresh_time)
         wait_time = timedelta(seconds=30)
 
         if last_command_time is not None:
@@ -46,22 +43,22 @@ class CheckTimeLimits:
                     f"⏳ Подождите еще {hbold(self._get_seconds_suffix(seconds))} перед тем, как отправить следующий запрос..")
                 return
 
-            if time_since_last_command > timedelta(hours=1):
+            if time_since_last_command > refresh_time:
                 command_count = 0
                 await request.reset_user_command_count(user_id)
 
-        if command_count < config.models.request_limit:
+        request_limit = await request.get_user_limit(user_id=user_id)
+        if command_count < request_limit:
             await request.increment_user_command_count(user_id)
             await request.update_user_last_command_time(user_id, now.strftime(date_format))
             return await self.handler(message, *args, **kwargs)
 
-        wait_time = timedelta(hours=1)
         elapsed_time = datetime.now(moscow_tz) - last_command_time
-        remaining_time = (wait_time - elapsed_time)
+        remaining_time = (refresh_time - elapsed_time)
         minutes = remaining_time // timedelta(minutes=1)
 
         await message.reply(
-            f"Превышен часовой лимит запросов.\nПопробуйте снова через {hbold(self._get_minutes_suffix(minutes))}"
+            f"Превышен лимит запросов за последние {hbold('12 часов.')}\nПопробуйте снова через {hbold(self._get_minutes_suffix(minutes))}"
             f"\n\nПодробнее /limits")
         return
 
@@ -69,7 +66,9 @@ class CheckTimeLimits:
     def _get_minutes_suffix(minutes: int) -> str:
         if minutes == 1:
             return f"{minutes} минуту"
-        elif minutes not in (12, 13, 14) and minutes % 10 in (2, 3, 4):
+        elif minutes % 100 in (11, 12, 13, 14):
+            return f"{minutes} минут"
+        elif minutes % 10 in (2, 3, 4):
             return f"{minutes} минуты"
         else:
             return f"{minutes} минут"

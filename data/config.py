@@ -40,7 +40,6 @@ class OpenAIConfig:
 class ModelsConfig:
     available_models: list
     default_model: str
-    request_limit: int
 
 
 @dataclass
@@ -51,6 +50,7 @@ class Config:
     openai: OpenAIConfig
     models: ModelsConfig
     creator_user_id: int
+    refresh_time: int  # время (в часах) следующего обновления данных
 
 
 def load_config(debug: bool = False, path: str | None = None) -> Config:
@@ -90,17 +90,13 @@ def load_config(debug: bool = False, path: str | None = None) -> Config:
                 "llama-2-70b-chat",
                 "code-llama-34b-instruct"
             ],
-            default_model="gpt-3.5-turbo",
-            request_limit=20
+            default_model="gpt-3.5-turbo"
         ),
-        creator_user_id=env.int("CREATOR_USER_ID")
-    )
+        creator_user_id=env.int("CREATOR_USER_ID"),
+        refresh_time=12)
 
 
 main_chat_ids = (-1001633082765, -1001525007729)
-
-response_chance = 0
-response_delay = 5
 
 SUBSCRIBERS_ONLY = False
 DEBUG = False

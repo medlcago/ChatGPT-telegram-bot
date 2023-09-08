@@ -15,10 +15,13 @@ command_profile_router = Router()
 async def command_profile(call: types.CallbackQuery, request: Database):
     await call.answer()
     user_id = call.from_user.id
-    is_subscriber = await request.check_user_subscription(user_id)
+
+    user = await request.get_user(user_id=user_id)
+
+    is_subscriber = user.is_subscriber
     status = ("отсутствует", "присутствует")[is_subscriber]
     referral_count = await request.get_user_referral_count(user_id)
-    current_model = await request.get_user_chat_type(user_id)
+    current_model = user.chat_type
     message = f"""👤 Ваш профиль
 ├ ID: {hcode(user_id)}
 ├ Подписка: {hcode(status)}

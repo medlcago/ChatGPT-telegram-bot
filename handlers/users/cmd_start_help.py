@@ -26,8 +26,8 @@ async def command_start_help(message: types.Message, command: CommandObject, req
     fullname = message.from_user.full_name
     current_model = await request.get_user_chat_type(user_id=user_id)
 
-    if await request.user_exists(user_id=user_id) is None:
-        if referrer_id and referrer_id.isdigit() and user_id != int(referrer_id) and await request.user_exists(
+    if await request.get_user(user_id=user_id) is None:
+        if referrer_id and referrer_id.isdigit() and user_id != int(referrer_id) and await request.get_user(
                 user_id=referrer_id):
             await request.add_user(user_id=user_id, fullname=fullname, referrer=referrer_id)
             await bot.send_message(chat_id=referrer_id, text=f"<b>Новый реферал — <code>{user_id}</code>!</b>")

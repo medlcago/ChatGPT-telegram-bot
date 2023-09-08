@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from sqlalchemy import Column, String, Text, BOOLEAN
+from sqlalchemy import Column, String, Text, BOOLEAN, SMALLINT
 from sqlalchemy import MetaData
 from sqlalchemy.dialects.mysql import BIGINT, SMALLINT
 from sqlalchemy.orm import declarative_base
@@ -24,3 +24,21 @@ class User(Base):
     last_command_time: str = Column(Text)
     command_count: int = Column(SMALLINT(unsigned=True), default=0)
     chat_type: str = Column(String(255), nullable=False, default="gpt-3.5-turbo")
+    limit: int = Column(SMALLINT(unsigned=True), nullable=False, default=20)
+
+
+update_limit_trigger = """
+CREATE TRIGGER IF NOT EXISTS update_limit_trigger
+BEFORE UPDATE ON users
+FOR EACH ROW
+BEGIN
+    IF NEW.is_subscriber = 1 AND OLD.is_subscriber = 0 THEN
+        SET NEW.`limit` = OLD.`limit` * 2;
+    ELSEIF NEW.is_subscriber = 0 AND OLD.is_subscriber = 1 THEN
+        IF OLD.`limit` / 2 < 20 THEN
+            SET NEW.`limit` = 20;
+        ELSE
+            SET NEW.`limit` = OLD.`limit` / 2;
+        END IF;
+    END IF;
+END;"""

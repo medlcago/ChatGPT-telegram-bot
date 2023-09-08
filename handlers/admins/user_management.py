@@ -12,7 +12,7 @@ user_management_router = Router()
 
 async def block_user_common(*, user_id: str, request: Database):
     if user_id and user_id.isnumeric():
-        user = await request.user_exists(user_id=user_id)
+        user = await request.get_user(user_id=user_id)
         if user:
             if user.is_admin:
                 return f"Нельзя заблокировать администратора <b>{user.fullname}({user.user_id})</b>."
@@ -27,7 +27,7 @@ async def block_user_common(*, user_id: str, request: Database):
 
 async def unblock_user_common(*, user_id: str, request: Database):
     if user_id and user_id.isnumeric():
-        user = await request.user_exists(user_id=user_id)
+        user = await request.get_user(user_id=user_id)
         if user:
             if user.is_blocked:
                 if await request.update_user_block_status(user_id=user_id, is_blocked=False):
