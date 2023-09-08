@@ -22,6 +22,9 @@ class CheckTimeLimits:
         config: Config = kwargs.get("config", None)
         request: Database = kwargs.get("request", None)
 
+        if config is None:
+            raise ValueError("Config argument missing.")
+
         if request is None:
             raise ValueError("Request argument missing.")
 
