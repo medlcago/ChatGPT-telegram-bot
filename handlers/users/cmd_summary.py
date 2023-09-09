@@ -8,6 +8,7 @@ from aiogram.filters.command import Command, CommandObject
 
 from data.config import Config
 from decorators import MessageLogging, check_command_args
+from exceptions import RequestProcessingError
 from filters import ChatTypeFilter
 from utils.neural_networks import SummarizeVideo
 
@@ -29,5 +30,5 @@ async def command_summarize(message: types.Message, command: CommandObject, bot:
     try:
         await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id,
                                     text=response, disable_web_page_preview=True, parse_mode="markdown")
-    except TelegramBadRequest as error:
+    except (TelegramBadRequest, RequestProcessingError) as error:
         await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id, text=str(error))

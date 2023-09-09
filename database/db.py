@@ -5,7 +5,7 @@ import pytz
 from sqlalchemy import update, select, delete, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .models import User, Member, Promocode
+from .models import User, Member, Promocode, UserDialogues
 
 
 class Database:
@@ -313,5 +313,42 @@ class Database:
             referral_count = await session.scalar(
                 select(func.count()).where(User.referrer == user_id).select_from(User))
             return referral_count
+        except Exception as e:
+            logging.error(f"Database error: {e}")
+
+    async def add_message_to_dialog(self, user_id, messages):
+        """
+        Adds a new messages to the user's dialog
+        """
+        try:
+            session = await self.get_session()
+            for m in messages:
+                message = UserDialogues(user_id=user_id, message=m)
+                session.add(message)
+            await session.commit()
+        except Exception as e:
+            logging.error(f"Database error: {e}")
+
+    async def get_user_dialog(self, user_id, limit=40):
+        """
+        Gets the user's dialog.
+        """
+        try:
+            session = await self.get_session()
+            dialog = (await session.scalars(
+                select(UserDialogues.message).filter_by(user_id=user_id).order_by(UserDialogues.id).limit(
+                    limit))).all()
+            return dialog
+        except Exception as e:
+            logging.error(f"Database error: {e}")
+
+    async def clear_user_dialog_history(self, user_id):
+        """
+        Clears the user's dialog history
+        """
+        try:
+            session = await self.get_session()
+            await session.execute(delete(UserDialogues).filter_by(user_id=user_id))
+            await session.commit()
         except Exception as e:
             logging.error(f"Database error: {e}")

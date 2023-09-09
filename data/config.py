@@ -34,6 +34,7 @@ class RedisConfig:
 class OpenAIConfig:
     api_key: str
     api_base: str
+    context_limit: int
 
 
 @dataclass
@@ -74,7 +75,8 @@ def load_config(debug: bool = False, path: str | None = None) -> Config:
         ),
         openai=OpenAIConfig(
             api_key=env.str("OpenAI_API_KEY"),
-            api_base=env.str("OpenAI_API_BASE")
+            api_base=env.str("OpenAI_API_BASE"),
+            context_limit=40
         ),
         models=ModelsConfig(
             available_models=[

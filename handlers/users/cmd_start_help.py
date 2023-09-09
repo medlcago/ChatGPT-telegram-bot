@@ -39,6 +39,7 @@ async def command_start_help(message: types.Message, command: CommandObject, req
                              language=message.from_user.language_code))
     await message.answer(f"Текущая модель: {current_model}\n"
                          f"Отправьте сообщение, чтобы начать диалог\n\n"
+                         f"/clear - Очистить историю диалога\n"
                          f"/ref - Реферальная ссылка\n"
                          f"/switch - Сменить модель\n"
                          f"/models - Список доступных моделей", reply_markup=btn_my_profile)
@@ -51,6 +52,7 @@ async def command_back_start(call: types.CallbackQuery, request: Database):
     current_model = await request.get_user_chat_type(user_id=user_id)
     await call.message.edit_text(f"Текущая модель: {current_model}\n"
                                  f"Отправьте сообщение, чтобы начать диалог\n\n"
+                                 f"/clear - Очистить историю диалога\n"
                                  f"/ref - Реферальная ссылка\n"
                                  f"/switch - Сменить модель\n"
                                  f"/models - Список доступных моделей", reply_markup=btn_my_profile)

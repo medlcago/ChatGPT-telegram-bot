@@ -1,5 +1,8 @@
 import logging
+
 import openai
+
+from exceptions import RequestProcessingError
 
 
 class ImageGenerator:
@@ -15,7 +18,7 @@ class ImageGenerator:
             return await self._get_response(content)
         except Exception as e:
             logging.error(f'Error processing request: {e}')
-            return "Ошибка обработки запроса. Пожалуйста, повторите попытку."
+            raise RequestProcessingError("Ошибка обработки запроса. Пожалуйста, повторите попытку.")
 
     async def _get_response(self, content):
         if not self.api_key:

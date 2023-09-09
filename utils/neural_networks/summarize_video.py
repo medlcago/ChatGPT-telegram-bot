@@ -5,6 +5,8 @@ from typing import Optional
 import openai
 from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled
 
+from exceptions import RequestProcessingError
+
 
 class SummarizeVideo:
     def __init__(self, api_key=None, api_base=None, model=None, languages=("ru", "en", "de", "es")):
@@ -20,7 +22,7 @@ class SummarizeVideo:
             return self._get_response(text=text, language=language)
         except Exception as e:
             logging.error(f'Error processing request: {e}')
-            return "Ошибка обработки запроса. Пожалуйста, повторите попытку."
+            raise RequestProcessingError("Ошибка обработки запроса. Пожалуйста, повторите попытку.")
 
     def _get_response(self, text: str, language: str) -> str:
         if not self.api_key:
