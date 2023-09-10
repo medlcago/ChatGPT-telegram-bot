@@ -68,8 +68,8 @@ async def handle_chat(message: types.Message, request: Database, bot: Bot, confi
         old_messages = "\n".join(old_messages)
         gpt_bot = ChatBot(api_key=config.openai.api_key, api_base=config.openai.api_base, model=model)
         sent_message = await message.reply("Обработка запроса, ожидайте")
-        bot_response = await gpt_bot.chat(prompt=prompt, history=old_messages)
         try:
+            bot_response = await gpt_bot.chat(prompt=prompt, history=old_messages)
             await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id,
                                         text=bot_response,
                                         parse_mode="markdown", disable_web_page_preview=True)

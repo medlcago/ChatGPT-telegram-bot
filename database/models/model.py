@@ -11,7 +11,7 @@ Base = declarative_base(metadata=metadata)
 
 
 @dataclass
-class User(Base):
+class Model(Base):
     __tablename__ = 'model'
 
     id: int = Column(BIGINT(unsigned=True), primary_key=True)
