@@ -66,7 +66,7 @@ def routers_registration(dp: Dispatcher):
 
     dp.include_router(users.command_start_help_router)
     dp.include_router(users.command_profile_router)
-    dp.include_router(users.command_ref_router)
+    dp.include_router(users.command_affiliate_program_router)
     dp.include_router(users.command_contact_admin_router)
     dp.include_router(users.command_promocode_router)
     dp.include_router(users.command_summary_router)
