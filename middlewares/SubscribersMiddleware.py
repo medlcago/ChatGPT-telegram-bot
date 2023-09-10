@@ -7,7 +7,7 @@ from aiogram.types import Message, CallbackQuery
 from data.config import SUBSCRIBERS_ONLY
 from data.templates import SUBSCRIBERS_ONLY_MESSAGE
 from database.db import Database
-from keyboards.inline import get_keyboard_activate_subscription
+from keyboards.inline import get_activate_subscription_button
 
 
 class SubscribersMiddleware(BaseMiddleware):
@@ -33,7 +33,7 @@ class SubscribersMiddleware(BaseMiddleware):
 
     @staticmethod
     async def handle_restriction(event: Union[Message, CallbackQuery]) -> None:
-        markup = get_keyboard_activate_subscription().as_markup()
+        markup = get_activate_subscription_button().as_markup()
         if isinstance(event, CallbackQuery):
             await event.answer(SUBSCRIBERS_ONLY_MESSAGE)
             await event.message.answer(SUBSCRIBERS_ONLY_MESSAGE, reply_markup=markup)

@@ -4,13 +4,16 @@ from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-btn_my_profile = InlineKeyboardMarkup(inline_keyboard=[
+my_profile_and_affiliate_program_buttons = InlineKeyboardMarkup(inline_keyboard=[
     [
         InlineKeyboardButton(text="👤 Мой профиль", callback_data="my_profile")
+    ],
+    [
+        InlineKeyboardButton(text="🤝 Партнерская программа", callback_data="affiliate_program")
     ]
 ])
 
-btn_cmd_admin = InlineKeyboardMarkup(inline_keyboard=[
+admin_panel_buttons = InlineKeyboardMarkup(inline_keyboard=[
     [
         InlineKeyboardButton(text="Рассылка", callback_data="send_all"),
         InlineKeyboardButton(text="Статистика", callback_data="statistics")
@@ -47,13 +50,13 @@ btn_cmd_admin = InlineKeyboardMarkup(inline_keyboard=[
     ]
 ])
 
-btn_contact_admin = InlineKeyboardMarkup(inline_keyboard=[
+contact_admin_button = InlineKeyboardMarkup(inline_keyboard=[
     [
         InlineKeyboardButton(text="✉️ Связаться с администратором", callback_data="contact_admin")
     ]
 ])
 
-btn_promocode_activation = InlineKeyboardMarkup(inline_keyboard=[
+promocode_activation_button = InlineKeyboardMarkup(inline_keyboard=[
     [
         InlineKeyboardButton(text="✅ Активировать промокод", callback_data="activate_promocode")
     ]
@@ -64,16 +67,16 @@ class ComeBack(CallbackData, prefix="back"):
     back: str
 
 
-def get_keyboard_back(back: str) -> InlineKeyboardBuilder:
+def get_back_button(back: str) -> InlineKeyboardBuilder:
     builder = InlineKeyboardBuilder()
     builder.button(text="🔙 Назад", callback_data=ComeBack(back=back))
     return builder
 
 
-def get_keyboard_activate_subscription() -> InlineKeyboardBuilder:
+def get_activate_subscription_button() -> InlineKeyboardBuilder:
     builder = InlineKeyboardBuilder()
-    builder.attach(InlineKeyboardBuilder.from_markup(btn_contact_admin))
-    builder.attach(InlineKeyboardBuilder.from_markup(btn_promocode_activation))
+    builder.attach(InlineKeyboardBuilder.from_markup(contact_admin_button))
+    builder.attach(InlineKeyboardBuilder.from_markup(promocode_activation_button))
     builder.adjust(1, 1)
     return builder
 
@@ -88,7 +91,7 @@ class SendMessage(CallbackData, prefix="send"):
     recipients: str
 
 
-def get_keyboard_message(recipients: str) -> InlineKeyboardBuilder:
+def get_confirmation_button(recipients: str) -> InlineKeyboardBuilder:
     if recipients not in ("one", "all", "creator"):
         raise ValueError("recipients must be one of: 'one', 'all', 'creator'")
     builder = InlineKeyboardBuilder()
@@ -111,7 +114,7 @@ class ReplyUser(CallbackData, prefix="reply"):
     message_id: int
 
 
-def get_keyboard_reply_to_user(user_id: int, message_id: int) -> InlineKeyboardBuilder:
+def get_reply_to_user_button(user_id: int, message_id: int) -> InlineKeyboardBuilder:
     builder = InlineKeyboardBuilder()
     builder.button(text="✉️ Ответить", callback_data=ReplyUser(action=ReplyUserAction.reply_to_user, user_id=user_id,
                                                                message_id=message_id))
@@ -126,7 +129,7 @@ class Model(CallbackData, prefix="model"):
     model: str
 
 
-def get_models_list(models: list) -> InlineKeyboardBuilder:
+def get_model_list_button(models: list) -> InlineKeyboardBuilder:
     builder = InlineKeyboardBuilder()
     for model in models:
         builder.button(text=model, callback_data=Model(model=model))

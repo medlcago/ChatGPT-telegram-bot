@@ -7,7 +7,7 @@ from aiogram.fsm.context import FSMContext
 from database.db import Database
 from decorators import MessageLogging
 from filters import IsAdmin, ChatTypeFilter
-from keyboards.inline import get_keyboard_message, SendMessage
+from keyboards.inline import get_confirmation_button, SendMessage
 from states.admins import Administrators
 
 command_send_message_router = Router()
@@ -46,7 +46,7 @@ async def message_to_send(message: types.Message, state: FSMContext, request: Da
     user_exists = await request.get_user(user_id=user_id)
 
     if user_exists:
-        markup = get_keyboard_message("one").as_markup()
+        markup = get_confirmation_button("one").as_markup()
         await message.answer(f"Сообщение:\n{message_to_user}\n\nПолучатель:\n{user_exists.fullname}({user_id})",
                              reply_markup=markup)
         reply_to_message_id = data.get("message").message_id

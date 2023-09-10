@@ -8,7 +8,7 @@ from aiogram.fsm.context import FSMContext
 from database.db import Database
 from decorators import MessageLogging
 from filters import ChatTypeFilter, IsAdmin
-from keyboards.inline import get_keyboard_message, SendMessage
+from keyboards.inline import get_confirmation_button, SendMessage
 from states.admins import Administrators
 
 command_send_all_router = Router()
@@ -32,7 +32,7 @@ async def command_send_all(call: types.CallbackQuery, state: FSMContext):
 @command_send_all_router.message(Administrators.Mailing.message)
 @MessageLogging
 async def message_send_all(message: types.Message, state: FSMContext):
-    markup = get_keyboard_message("all").as_markup()
+    markup = get_confirmation_button("all").as_markup()
 
     await message.answer(f"Сообщение для рассылки:\n{message.text}",
                          reply_markup=markup)

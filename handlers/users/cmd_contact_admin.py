@@ -2,7 +2,7 @@ from aiogram import Router, F, types, flags, Bot
 from aiogram.fsm.context import FSMContext
 
 from data.config import Config
-from keyboards.inline import get_keyboard_message, SendMessage, get_keyboard_reply_to_user
+from keyboards.inline import get_confirmation_button, SendMessage, get_reply_to_user_button
 from states.users import Users
 
 command_contact_admin_router = Router()
@@ -28,7 +28,7 @@ async def message_to_administrator(message: types.Message, state: FSMContext):
     await state.update_data(message=message)
     await message.answer(
         f"Ваше сообщение:\n{message_to_admin}\n\nАдминистратор ответит вам в течение <b><i>24 часов</i></b>",
-        reply_markup=get_keyboard_message("creator").as_markup())
+        reply_markup=get_confirmation_button("creator").as_markup())
     await state.set_state(Users.ContactAdmin.confirmation)
 
 
@@ -42,7 +42,7 @@ async def confirmation_send_message(call: types.CallbackQuery, state: FSMContext
     message_to_admin = f"""🔔 Новое сообщение от пользователя - <b>{user_id}</b>\n
 {message.text}"""
 
-    markup = get_keyboard_reply_to_user(user_id, message_id).as_markup()
+    markup = get_reply_to_user_button(user_id, message_id).as_markup()
 
     await call.message.delete()
     await bot.send_message(chat_id=creator_user_id, text=message_to_admin, reply_markup=markup)

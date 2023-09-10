@@ -7,7 +7,7 @@ from aiogram.utils.markdown import hbold
 
 from data.templates import BLOCKED_MESSAGE
 from database.db import Database
-from keyboards.inline import btn_contact_admin
+from keyboards.inline import contact_admin_button
 
 
 class BlockMiddleware(BaseMiddleware):
@@ -33,6 +33,6 @@ class BlockMiddleware(BaseMiddleware):
     async def handle_restriction(event: Union[Message, CallbackQuery]) -> None:
         if isinstance(event, CallbackQuery):
             await event.answer("Access is denied.", show_alert=True)
-            await event.message.answer(hbold(BLOCKED_MESSAGE), reply_markup=btn_contact_admin)
+            await event.message.answer(hbold(BLOCKED_MESSAGE), reply_markup=contact_admin_button)
         else:
-            await event.answer(hbold(BLOCKED_MESSAGE), reply_markup=btn_contact_admin)
+            await event.answer(hbold(BLOCKED_MESSAGE), reply_markup=contact_admin_button)

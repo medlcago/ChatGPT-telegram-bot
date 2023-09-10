@@ -4,7 +4,7 @@ from aiogram.utils.markdown import hcode
 
 from database.db import Database
 from decorators import MessageLogging
-from keyboards.inline import btn_promocode_activation, get_keyboard_back
+from keyboards.inline import promocode_activation_button, get_back_button
 
 command_profile_router = Router()
 
@@ -27,10 +27,10 @@ async def command_profile(call: types.CallbackQuery, request: Database):
 ├ Подписка: {hcode(status)}
 ├ Кол-во рефералов: {hcode(referral_count)}
 └ Текущая модель: {hcode(current_model)}"""
-    builder = get_keyboard_back(back="start")
+    builder = get_back_button(back="start")
     if is_subscriber:
         await call.message.edit_text(message, reply_markup=builder.as_markup())
     else:
         await call.message.edit_text(message,
                                      reply_markup=builder.attach(InlineKeyboardBuilder.from_markup(
-                                         btn_promocode_activation)).as_markup())
+                                         promocode_activation_button)).as_markup())

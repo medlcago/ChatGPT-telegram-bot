@@ -7,7 +7,7 @@ from database.db import Database
 from decorators import CheckTimeLimits, MessageLogging
 from exceptions import RequestProcessingError
 from filters import ChatTypeFilter, IsAdmin, IsSubscription
-from keyboards.inline import btn_promocode_activation, get_models_list, Model
+from keyboards.inline import promocode_activation_button, get_model_list_button, Model
 from utils.neural_networks import ChatBot
 
 handle_chat_router = Router()
@@ -18,7 +18,7 @@ handle_chat_router = Router()
 @MessageLogging
 async def switch_chat_type(message: types.Message, config: Config):
     available_models = config.models.available_models
-    await message.answer("Выберите модель ниже 👇", reply_markup=get_models_list(available_models).as_markup())
+    await message.answer("Выберите модель ниже 👇", reply_markup=get_model_list_button(available_models).as_markup())
 
 
 @handle_chat_router.callback_query(Model.filter())
@@ -37,11 +37,11 @@ async def switch_chat_type_non_premium(message: types.Message, command: CommandO
     if message.from_user.language_code == "ru":
         await message.reply(
             f"Команда <b><i>{command.prefix + command.command}</i></b> доступна только premium пользователям.",
-            reply_markup=btn_promocode_activation)
+            reply_markup=promocode_activation_button)
     else:
         await message.reply(
             f"The command <b><i>{command.prefix + command.command}</i></b> is only available to premium users.",
-            reply_markup=btn_promocode_activation)
+            reply_markup=promocode_activation_button)
 
 
 @handle_chat_router.message(Command(commands=["clear"]), ChatTypeFilter(is_group=False))

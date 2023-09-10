@@ -6,7 +6,7 @@ from data.templates import START_MESSAGE
 from database.db import Database
 from decorators import MessageLogging
 from filters import ChatTypeFilter
-from keyboards.inline import btn_my_profile, ComeBack
+from keyboards.inline import my_profile_and_affiliate_program_buttons, ComeBack
 from utils.misc import payload_decode
 
 command_start_help_router = Router()
@@ -40,9 +40,8 @@ async def command_start_help(message: types.Message, command: CommandObject, req
     await message.answer(f"Текущая модель: {current_model}\n"
                          f"Отправьте сообщение, чтобы начать диалог\n\n"
                          f"/clear - Очистить историю диалога\n"
-                         f"/ref - Реферальная ссылка\n"
                          f"/switch - Сменить модель\n"
-                         f"/models - Список доступных моделей", reply_markup=btn_my_profile)
+                         f"/models - Список доступных моделей", reply_markup=my_profile_and_affiliate_program_buttons)
 
 
 @command_start_help_router.callback_query(ComeBack.filter(F.back == "start"))
@@ -53,6 +52,6 @@ async def command_back_start(call: types.CallbackQuery, request: Database):
     await call.message.edit_text(f"Текущая модель: {current_model}\n"
                                  f"Отправьте сообщение, чтобы начать диалог\n\n"
                                  f"/clear - Очистить историю диалога\n"
-                                 f"/ref - Реферальная ссылка\n"
                                  f"/switch - Сменить модель\n"
-                                 f"/models - Список доступных моделей", reply_markup=btn_my_profile)
+                                 f"/models - Список доступных моделей",
+                                 reply_markup=my_profile_and_affiliate_program_buttons)

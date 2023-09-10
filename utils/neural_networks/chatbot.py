@@ -39,10 +39,7 @@ class ChatBot:
                     Ты полезный ассистент с ИИ, который готов помочь своему пользователю. Твоим создателем является Студент РТУ МИРЭА @medlcago"""
                 },
                 {
-                    "role": "user", "content": history
-                },
-                {
-                    "role": "user", "content": content
+                    "role": "user", "content": f"Предыдущие сообщения: {history}; Запрос: {content}"
                 }])
         return response.choices[0].message.content.strip()
 

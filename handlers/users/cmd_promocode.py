@@ -7,7 +7,7 @@ from database.db import Database
 from decorators import MessageLogging
 from exceptions import ActivationError
 from filters import ChatTypeFilter
-from keyboards.inline import btn_contact_admin
+from keyboards.inline import contact_admin_button
 from states.users import Users
 
 command_promocode_router = Router()
@@ -52,7 +52,7 @@ async def promocode_activation(message: types.Message, state: FSMContext, reques
         result = await promocode_activation_common(promocode=promocode, user_id=user_id, request=request)
         await message.reply(result)
     except ActivationError as error:
-        await message.reply(str(error), reply_markup=btn_contact_admin)
+        await message.reply(str(error), reply_markup=contact_admin_button)
     await state.clear()
 
 

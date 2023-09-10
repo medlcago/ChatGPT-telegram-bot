@@ -7,7 +7,7 @@ from aiogram.filters.command import Command
 
 from decorators import MessageLogging
 from filters import IsAdmin, ChatTypeFilter
-from keyboards.inline import get_keyboard_back
+from keyboards.inline import get_back_button
 
 command_server_router = Router()
 
@@ -48,5 +48,5 @@ async def command_server(message: types.Message):
 @MessageLogging
 async def command_server(call: types.CallbackQuery):
     result = await get_server_system_info()
-    await call.message.edit_text(result, reply_markup=get_keyboard_back(back="admin_panel").as_markup())
+    await call.message.edit_text(result, reply_markup=get_back_button(back="admin_panel").as_markup())
     await call.answer("Успех!")

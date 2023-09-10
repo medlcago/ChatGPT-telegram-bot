@@ -6,7 +6,7 @@ from aiogram.types import Message, CallbackQuery
 from data.config import DEBUG
 from data.templates import DEBUG_MESSAGE
 from database.db import Database
-from keyboards.inline import btn_contact_admin
+from keyboards.inline import contact_admin_button
 
 
 class DebugMiddleware(BaseMiddleware):
@@ -33,6 +33,6 @@ class DebugMiddleware(BaseMiddleware):
     async def handle_restriction(event: Union[Message, CallbackQuery]) -> None:
         if isinstance(event, CallbackQuery):
             await event.answer(DEBUG_MESSAGE)
-            await event.message.answer(DEBUG_MESSAGE, reply_markup=btn_contact_admin)
+            await event.message.answer(DEBUG_MESSAGE, reply_markup=contact_admin_button)
         else:
-            await event.answer(DEBUG_MESSAGE, reply_markup=btn_contact_admin)
+            await event.answer(DEBUG_MESSAGE, reply_markup=contact_admin_button)

@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from typing import Optional, Sequence, Union
 
 import pytz
 from sqlalchemy import update, select, delete, func
@@ -10,135 +11,124 @@ from .models import User, Member, Promocode, UserDialogues
 
 class Database:
     def __init__(self, session: AsyncSession):
-        self.session = session
+        self.__session = session
 
-    async def get_session(self):
+    @property
+    def session(self):
         """
         Returns the database session.
         """
-        return self.session
+        return self.__session
 
-    async def add_user(self, user_id, fullname, referrer=None):
+    async def add_user(self, user_id: int, fullname: str, referrer: Union[int, None] = None) -> None:
         """
         Adds a new user to the database.
         """
         try:
-            session = await self.get_session()
             user = User(user_id=user_id, fullname=fullname, referrer=referrer)
-            session.add(user)
-            await session.commit()
+            self.session.add(user)
+            await self.session.commit()
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def update_admin_rights_status(self, user_id, is_admin):
+    async def update_admin_rights_status(self, user_id: int, is_admin: bool) -> Optional[bool]:
         """
         Updates the admin rights status of a user in the database.
         """
         try:
-            session = await self.get_session()
-            await session.execute(update(User).filter_by(user_id=user_id).values(is_admin=is_admin))
-            await session.commit()
+            await self.session.execute(update(User).filter_by(user_id=user_id).values(is_admin=is_admin))
+            await self.session.commit()
             return True
         except Exception as e:
             logging.error(f"Database error: {e}")
-            return False
 
-    async def get_user(self, user_id):
+    async def get_user(self, user_id: int) -> Optional[User]:
         """
         Checks if a user exists in the database and return their data as a User object.
         """
         try:
-            session = await self.get_session()
-            user = await session.scalar(select(User).filter_by(user_id=user_id))
+            user = await self.session.scalar(select(User).filter_by(user_id=user_id))
             return user
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def get_all_users(self):
+    async def get_all_users(self) -> Optional[Sequence[User]]:
         """
         Retrieves all users from the database and return them as a generator of User objects.
         """
         try:
-            session = await self.get_session()
-            users = (await session.scalars(select(User))).all()
+            users = (await self.session.scalars(select(User))).all()
             return users
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def update_user_block_status(self, user_id, is_blocked):
+    async def update_user_block_status(self, user_id: int, is_blocked: bool) -> Optional[bool]:
         """
         Updates the user's block status in the database.
         """
         try:
-            session = await self.get_session()
-            await session.execute(update(User).filter_by(user_id=user_id).values(is_blocked=is_blocked))
-            await session.commit()
+            await self.session.execute(update(User).filter_by(user_id=user_id).values(is_blocked=is_blocked))
+            await self.session.commit()
             return True
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def check_user_blocked(self, user_id):
+    async def check_user_blocked(self, user_id: int) -> Optional[bool]:
         """
         Checks the user's lockout status
         """
         try:
-            session = await self.get_session()
-            is_blocked = await session.scalar(select(User.is_blocked).filter_by(user_id=user_id))
+            is_blocked = await self.session.scalar(select(User.is_blocked).filter_by(user_id=user_id))
             return is_blocked
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def get_all_blocked(self):
+    async def get_all_blocked(self) -> Optional[Sequence[User]]:
         """
         Retrieves all blocked users from the database and returns them as a generator of User objects.
         """
         try:
-            session = await self.get_session()
-            blocked_users = (await session.scalars(select(User).filter_by(is_blocked=1))).all()
+            blocked_users = (await self.session.scalars(select(User).filter_by(is_blocked=1))).all()
             return blocked_users
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def get_admins(self):
+    async def get_admins(self) -> Optional[Sequence[User]]:
         """
         Retrieves all admins from the database and return them as a generator of User objects.
         """
         try:
-            session = await self.get_session()
-            admins = (await session.scalars(select(User).filter_by(is_admin=1))).all()
+            admins = (await self.session.scalars(select(User).filter_by(is_admin=1))).all()
             return admins
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def check_admin_permissions(self, user_id):
+    async def check_admin_permissions(self, user_id: int) -> Optional[bool]:
         """
         Checks if the user has administrator rights.
         """
         try:
-            session = await self.get_session()
-            is_admin = await session.scalar(select(User.is_admin).filter_by(user_id=user_id))
+            is_admin = await self.session.scalar(select(User.is_admin).filter_by(user_id=user_id))
             return is_admin
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def get_user_command_count(self, user_id):
+    async def get_user_command_count(self, user_id: int) -> Optional[int]:
         """
         Retrieves the command count for a specific user in the database.
         """
         try:
-            session = await self.get_session()
-            command_count = await session.scalar(select(User.command_count).filter_by(user_id=user_id))
+            command_count = await self.session.scalar(select(User.command_count).filter_by(user_id=user_id))
             return command_count
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def get_user_last_command_time(self, user_id):
+    async def get_user_last_command_time(self, user_id: int) -> Optional[datetime]:
         """
         Retrieves the last command time for a specific user in the database.
         """
         try:
-            session = await self.get_session()
-            last_command_time = await session.scalar(select(User.last_command_time).filter_by(user_id=user_id))
+            last_command_time = await self.session.scalar(select(User.last_command_time).filter_by(user_id=user_id))
             if last_command_time:
                 date_format = '%Y-%m-%d %H:%M:%S'
                 moscow_tz = pytz.timezone('Europe/Moscow')
@@ -147,208 +137,188 @@ class Database:
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def reset_user_command_count(self, user_id):
+    async def reset_user_command_count(self, user_id: int) -> None:
         """
         Resets the command count for a specific user in the database.
         """
         try:
-            session = await self.get_session()
-            await session.execute(update(User).filter_by(user_id=user_id).values(command_count=0))
-            await session.commit()
+            await self.session.execute(update(User).filter_by(user_id=user_id).values(command_count=0))
+            await self.session.commit()
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def increment_user_command_count(self, user_id):
+    async def increment_user_command_count(self, user_id: int) -> None:
         """
         Increments the command count for a user in the database.
         """
         try:
-            session = await self.get_session()
-            await session.execute(update(User).filter_by(user_id=user_id).values(command_count=User.command_count + 1))
-            await session.commit()
+            await self.session.execute(
+                update(User).filter_by(user_id=user_id).values(command_count=User.command_count + 1))
+            await self.session.commit()
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def update_user_last_command_time(self, user_id, time):
+    async def update_user_last_command_time(self, user_id: int, time: str) -> None:
         """
         Updates the last command time for a user in the database.
         """
         try:
-            session = await self.get_session()
-            await session.execute(update(User).filter_by(user_id=user_id).values(last_command_time=time))
-            await session.commit()
+            await self.session.execute(update(User).filter_by(user_id=user_id).values(last_command_time=time))
+            await self.session.commit()
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def get_members(self):
+    async def get_members(self) -> Optional[Sequence[Member]]:
         """
         Gets all members from members table.
         """
         try:
-            session = await self.get_session()
-            members = await session.scalars(select(Member))
+            members = await self.session.scalars(select(Member))
             return members.all()
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def get_user_chat_type(self, user_id):
+    async def get_user_chat_type(self, user_id: int) -> Optional[str]:
         """
         Gets user's chat type by its user id.
         """
         try:
-            session = await self.get_session()
-            chat_type = await session.scalar(select(User.chat_type).filter_by(user_id=user_id))
+            chat_type = await self.session.scalar(select(User.chat_type).filter_by(user_id=user_id))
             return chat_type
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def update_user_chat_type(self, user_id, chat_type):
+    async def update_user_chat_type(self, user_id: int, chat_type: str) -> Optional[str]:
         """
         Updates the chat type associated with a given user ID in the database.
         """
         try:
-            session = await self.get_session()
-            await session.execute(update(User).filter_by(user_id=user_id).values(chat_type=chat_type))
-            await session.commit()
+            await self.session.execute(update(User).filter_by(user_id=user_id).values(chat_type=chat_type))
+            await self.session.commit()
             return chat_type
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def check_user_subscription(self, user_id):
+    async def check_user_subscription(self, user_id: int) -> Optional[bool]:
         """
         Check if the user with the given user ID is a subscriber.
         """
         try:
-            session = await self.get_session()
-            is_subscriber = await session.scalar(select(User.is_subscriber).filter_by(user_id=user_id))
+            is_subscriber = await self.session.scalar(select(User.is_subscriber).filter_by(user_id=user_id))
             return is_subscriber
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def update_user_subscription_status(self, user_id, is_subscriber):
+    async def update_user_subscription_status(self, user_id: int, is_subscriber: bool) -> Optional[bool]:
         """
         Updates the user's subscription status in the database.
         """
         try:
-            session = await self.get_session()
-            await session.execute(update(User).filter_by(user_id=user_id).values(is_subscriber=is_subscriber))
-            await session.commit()
+            await self.session.execute(update(User).filter_by(user_id=user_id).values(is_subscriber=is_subscriber))
+            await self.session.commit()
             return True
         except Exception as e:
             logging.error(f"Database error: {e}")
-            return False
 
-    async def get_user_limit(self, user_id):
+    async def get_user_limit(self, user_id: int) -> Optional[int]:
         """
         Gets the user's request limit.
         """
         try:
-            session = await self.get_session()
-            request_limit = await session.scalar(select(User.limit).filter_by(user_id=user_id))
+            request_limit = await self.session.scalar(select(User.limit).filter_by(user_id=user_id))
             return request_limit
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def check_promocode(self, promocode):
+    async def check_promocode(self, promocode: str) -> Optional[bool]:
         """
         Checks the promo code for validity and increases the number of its activations.
         """
         try:
-            session = await self.get_session()
-            is_valid_promo = await session.scalar(select(Promocode).filter_by(promocode=promocode))
-            if is_valid_promo:
-                if is_valid_promo.individual_activations_count < is_valid_promo.activations_count:
-                    is_valid_promo.individual_activations_count += 1
-                    await session.commit()
-                    return True
+            is_valid_promo = await self.session.scalar(select(Promocode).filter_by(promocode=promocode))
+            if is_valid_promo and is_valid_promo.individual_activations_count < is_valid_promo.activations_count:
+                is_valid_promo.individual_activations_count += 1
+                await self.session.commit()
+                return True
+            return False
         except Exception as e:
             logging.error(f"Database error: {e}")
-            return False
 
-    async def promocode_exists(self, promocode):
+    async def promocode_exists(self, promocode: str) -> Optional[Promocode]:
         """
         Checks if a promo code exists.
         """
         try:
-            session = await self.get_session()
-            promocode_exists = await session.scalar(select(Promocode).filter_by(promocode=promocode))
+            promocode_exists = await self.session.scalar(select(Promocode).filter_by(promocode=promocode))
             return promocode_exists
         except Exception as e:
             logging.error(f"Database error: {e}")
-            return False
 
-    async def add_promocode(self, promocode, activations_count=1):
+    async def add_promocode(self, promocode: str, activations_count: int = 1) -> Optional[bool]:
         """
         Adds a new promo code to the database.
         """
         try:
-            session = await self.get_session()
             promocode = Promocode(promocode=promocode, activations_count=activations_count)
-            session.add(promocode)
-            await session.commit()
+            self.session.add(promocode)
+            await self.session.commit()
             return True
         except Exception as e:
             logging.error(f"Database error: {e}")
-            return False
 
-    async def delete_promocode(self, promocode):
+    async def delete_promocode(self, promocode: str) -> Optional[bool]:
         """
         Deletes the promo code in the database.
         """
         try:
-            session = await self.get_session()
-            await session.execute(delete(Promocode).filter_by(promocode=promocode))
-            await session.commit()
+            await self.session.execute(delete(Promocode).filter_by(promocode=promocode))
+            await self.session.commit()
             return True
         except Exception as e:
             logging.error(f"Database error: {e}")
             return False
 
-    async def get_user_referral_count(self, user_id):
+    async def get_user_referral_count(self, user_id: int) -> Optional[int]:
         """
         Gets the number of user referrals.
         """
         try:
-            session = await self.get_session()
-            referral_count = await session.scalar(
+            referral_count = await self.session.scalar(
                 select(func.count()).where(User.referrer == user_id).select_from(User))
             return referral_count
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def add_message_to_dialog(self, user_id, messages):
+    async def add_message_to_dialog(self, user_id: int, messages: Union[list, tuple]) -> None:
         """
         Adds a new messages to the user's dialog
         """
         try:
-            session = await self.get_session()
             for m in messages:
                 message = UserDialogues(user_id=user_id, message=m)
-                session.add(message)
-            await session.commit()
+                self.session.add(message)
+            await self.session.commit()
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def get_user_dialog(self, user_id, limit=40):
+    async def get_user_dialog(self, user_id: int, limit: int = 40) -> Optional[Sequence[str]]:
         """
         Gets the user's dialog.
         """
         try:
-            session = await self.get_session()
-            dialog = (await session.scalars(
+            dialog = (await self.session.scalars(
                 select(UserDialogues.message).filter_by(user_id=user_id).order_by(UserDialogues.id).limit(
                     limit))).all()
             return dialog
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def clear_user_dialog_history(self, user_id):
+    async def clear_user_dialog_history(self, user_id: int) -> None:
         """
         Clears the user's dialog history
         """
         try:
-            session = await self.get_session()
-            await session.execute(delete(UserDialogues).filter_by(user_id=user_id))
-            await session.commit()
+            await self.session.execute(delete(UserDialogues).filter_by(user_id=user_id))
+            await self.session.commit()
         except Exception as e:
             logging.error(f"Database error: {e}")
