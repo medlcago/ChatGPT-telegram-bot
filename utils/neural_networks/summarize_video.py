@@ -22,7 +22,7 @@ class SummarizeVideo:
             return self._get_response(text=text, language=language)
         except Exception as e:
             logging.error(f'Error processing request: {e}')
-            raise RequestProcessingError("Ошибка обработки запроса. Пожалуйста, повторите попытку.")
+            raise RequestProcessingError("Error processing request. Please, try again.")
 
     def _get_response(self, text: str, language: str) -> str:
         if not self.api_key:

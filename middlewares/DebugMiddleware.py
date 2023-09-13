@@ -1,12 +1,13 @@
 from typing import Callable, Dict, Any, Awaitable, Union
 
 from aiogram import BaseMiddleware
+from aiogram.dispatcher.flags import get_flag
 from aiogram.types import Message, CallbackQuery
 
 from data.config import DEBUG
-from data.templates import DEBUG_MESSAGE
 from database.db import Database
 from keyboards.inline import contact_admin_button
+from language.translator import LocalizedTranslator
 
 
 class DebugMiddleware(BaseMiddleware):
@@ -18,10 +19,12 @@ class DebugMiddleware(BaseMiddleware):
     ) -> Any:
         user_id = event.from_user.id
         request: Database = data["request"]
+        translator: LocalizedTranslator = data["translator"]
+        skip = get_flag(data, "skip")
 
-        if await self.is_allowed(user_id, request):
+        if skip or await self.is_allowed(user_id, request):
             return await handler(event, data)
-        await self.handle_restriction(event)
+        await self.handle_restriction(event, translator)
 
     @staticmethod
     async def is_allowed(user_id: int, request: Database) -> bool:
@@ -30,9 +33,9 @@ class DebugMiddleware(BaseMiddleware):
         return await request.check_admin_permissions(user_id)
 
     @staticmethod
-    async def handle_restriction(event: Union[Message, CallbackQuery]) -> None:
+    async def handle_restriction(event: Union[Message, CallbackQuery], translator: LocalizedTranslator) -> None:
         if isinstance(event, CallbackQuery):
-            await event.answer(DEBUG_MESSAGE)
-            await event.message.answer(DEBUG_MESSAGE, reply_markup=contact_admin_button)
+            await event.answer(translator.get("debug-message"))
+            await event.message.answer(translator.get("debug-message"), reply_markup=contact_admin_button)
         else:
-            await event.answer(DEBUG_MESSAGE, reply_markup=contact_admin_button)
+            await event.answer(translator.get("debug-message"), reply_markup=contact_admin_button)

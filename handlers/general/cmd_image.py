@@ -6,6 +6,7 @@ from aiogram.types import URLInputFile
 from data.config import Config
 from decorators import MessageLogging, check_command_args
 from exceptions import RequestProcessingError
+from language.translator import LocalizedTranslator
 from utils.neural_networks import ImageGenerator
 
 command_image_router = Router()
@@ -15,10 +16,10 @@ command_image_router = Router()
 @MessageLogging
 @check_command_args
 @flags.rate_limit(limit=30, key="image")
-async def command_image(message: types.Message, command: CommandObject, config: Config, bot: Bot):
+async def command_image(message: types.Message, command: CommandObject, config: Config, bot: Bot, translator: LocalizedTranslator):
     prompt = html.quote(command.args)
     image_generator = ImageGenerator(api_key=config.openai.api_key, api_base=config.openai.api_base, model="sdxl")
-    sent_message = await message.reply("Обработка запроса, ожидайте")
+    sent_message = await message.reply(translator.get("processing-request-message"))
     try:
         image_response = await image_generator.generate_image(prompt=prompt)
         image = URLInputFile(

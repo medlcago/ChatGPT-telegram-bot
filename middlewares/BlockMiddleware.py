@@ -3,11 +3,10 @@ from typing import Callable, Dict, Any, Awaitable, Union
 from aiogram import BaseMiddleware
 from aiogram.dispatcher.flags import get_flag
 from aiogram.types import Message, CallbackQuery
-from aiogram.utils.markdown import hbold
 
-from data.templates import BLOCKED_MESSAGE
 from database.db import Database
 from keyboards.inline import contact_admin_button
+from language.translator import LocalizedTranslator
 
 
 class BlockMiddleware(BaseMiddleware):
@@ -19,20 +18,21 @@ class BlockMiddleware(BaseMiddleware):
     ) -> Any:
         user_id = event.from_user.id
         request: Database = data["request"]
+        translator: LocalizedTranslator = data["translator"]
         skip = get_flag(data, "skip")
 
         if skip or await self.is_allowed(user_id, request):
             return await handler(event, data)
-        await self.handle_restriction(event)
+        await self.handle_restriction(event, translator)
 
     @staticmethod
     async def is_allowed(user_id: int, request: Database) -> bool:
         return not await request.check_user_blocked(user_id)
 
     @staticmethod
-    async def handle_restriction(event: Union[Message, CallbackQuery]) -> None:
+    async def handle_restriction(event: Union[Message, CallbackQuery], translator: LocalizedTranslator) -> None:
         if isinstance(event, CallbackQuery):
             await event.answer("Access is denied.", show_alert=True)
-            await event.message.answer(hbold(BLOCKED_MESSAGE), reply_markup=contact_admin_button)
+            await event.message.answer(translator.get("blocked-message"), reply_markup=contact_admin_button)
         else:
-            await event.answer(hbold(BLOCKED_MESSAGE), reply_markup=contact_admin_button)
+            await event.answer(translator.get("blocked-message"), reply_markup=contact_admin_button)

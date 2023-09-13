@@ -18,7 +18,7 @@ class ImageGenerator:
             return await self._get_response(content)
         except Exception as e:
             logging.error(f'Error processing request: {e}')
-            raise RequestProcessingError("Ошибка обработки запроса. Пожалуйста, повторите попытку.")
+            raise RequestProcessingError("Error processing request. Please, try again.")
 
     async def _get_response(self, content):
         if not self.api_key:

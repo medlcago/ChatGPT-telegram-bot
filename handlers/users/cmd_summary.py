@@ -2,14 +2,15 @@ import asyncio
 
 from aiogram import Bot, flags
 from aiogram import Router
-from aiogram import types
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters.command import Command, CommandObject
+from aiogram.types import Message
 
 from data.config import Config
 from decorators import MessageLogging, check_command_args
 from exceptions import RequestProcessingError
 from filters import ChatTypeFilter
+from language.translator import LocalizedTranslator
 from utils.neural_networks import SummarizeVideo
 
 command_summary_router = Router()
@@ -19,10 +20,10 @@ command_summary_router = Router()
 @MessageLogging
 @check_command_args
 @flags.rate_limit(rate=60, limit=1, key="summary")
-async def command_summarize(message: types.Message, command: CommandObject, bot: Bot, config: Config):
+async def command_summarize(message: Message, command: CommandObject, bot: Bot, config: Config, translator: LocalizedTranslator):
     url = command.args
     loop = asyncio.get_event_loop()
-    sent_message = await message.reply("Обработка запроса, ожидайте")
+    sent_message = await message.reply(translator.get("processing-request-message"))
     summarize_video = SummarizeVideo(api_key=config.openai.api_key, api_base=config.openai.api_base,
                                      model="gpt-3.5-turbo-16k")
     try:

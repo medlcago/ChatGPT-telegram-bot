@@ -6,6 +6,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 
 from data.config import load_config
 from handlers import admins, general, groups, users
+from language.translator import Translator
 from middlewares import (
     DatabaseMiddleware,
     BlockMiddleware,
@@ -13,7 +14,8 @@ from middlewares import (
     SubscribersMiddleware,
     ConfigMiddleware,
     RedisMiddleware,
-    RateLimitMiddleware)
+    RateLimitMiddleware,
+    TranslatorMiddleware)
 from settings.database.setup import create_db_session
 from settings.redis.setup import create_redis_session
 from utils.misc import get_bot_commands
@@ -29,11 +31,14 @@ def middlewares_registration(dp: Dispatcher, config, session_pool, redis):
     dp.message.outer_middleware(ConfigMiddleware(config))
     dp.callback_query.outer_middleware(ConfigMiddleware(config))
 
+    dp.message.outer_middleware(TranslatorMiddleware())
+    dp.callback_query.outer_middleware(TranslatorMiddleware())
+
     dp.message.middleware(BlockMiddleware())
     dp.callback_query.middleware(BlockMiddleware())
 
-    dp.message.outer_middleware(DebugMiddleware())
-    dp.callback_query.outer_middleware(DebugMiddleware())
+    dp.message.middleware(DebugMiddleware())
+    dp.callback_query.middleware(DebugMiddleware())
 
     dp.message.middleware(SubscribersMiddleware())
     dp.callback_query.middleware(SubscribersMiddleware())
@@ -96,7 +101,7 @@ async def main():
     logging.info(f"Bot running in {'DEBUG' if debug else 'RELEASE'} mode!")
 
     try:
-        await dp.start_polling(bot)
+        await dp.start_polling(bot, translator=Translator())
     except Exception as ex:
         logging.error(f"[!!! Exception] - {ex}", exc_info=True)
     finally:

@@ -4,6 +4,7 @@ from aiogram.fsm.context import FSMContext
 
 from decorators import MessageLogging
 from filters import ChatTypeFilter
+from language.translator import LocalizedTranslator
 
 command_cancel_router = Router()
 
@@ -11,6 +12,6 @@ command_cancel_router = Router()
 @command_cancel_router.message(Command(commands=["cancel"], prefix="/"), ChatTypeFilter(is_group=False))
 @MessageLogging
 @flags.skip
-async def command_cancel(message: types.Message, state: FSMContext):
+async def command_cancel(message: types.Message, state: FSMContext, translator: LocalizedTranslator):
     await state.clear()
-    await message.reply("Действие было отменено.")
+    await message.reply(translator.get("cancel-message"))
