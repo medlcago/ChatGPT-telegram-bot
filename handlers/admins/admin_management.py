@@ -6,36 +6,9 @@ from database.db import Database
 from decorators import MessageLogging, check_command_args
 from filters import IsAdmin, ChatTypeFilter
 from states.admins import Administrators
+from utils.misc import assign_admin_rights, revoke_admin_rights
 
 admin_management_router = Router()
-
-
-async def add_admin_common(*, user_id: str, request: Database):
-    if user_id and user_id.isnumeric():
-        user = await request.get_user(user_id=user_id)
-        if user:
-            if user.is_admin:
-                return f"<b>{user.fullname}({user.user_id})</b> уже является администратором."
-            if await request.update_admin_rights_status(user_id=user_id, is_admin=True):
-                return f"<b>{user.fullname}({user.user_id})</b> назначен администратором."
-            return f"<b>{user.fullname}({user.user_id})</b> не назначен администратором."
-        return f"user_id <i>{user_id}</i> не найден в базе данных."
-    return "Аргумент не является идентификатором пользователя."
-
-
-async def remove_admin_common(*, user_id: str, from_user_id: int, request: Database):
-    if user_id and user_id.isnumeric():
-        user = await request.get_user(user_id=user_id)
-        if user:
-            if user.is_admin:
-                if user.user_id != from_user_id:
-                    if await request.update_admin_rights_status(user_id=user_id, is_admin=False):
-                        return f"<b>{user.fullname}({user.user_id})</b> удален из администраторов."
-                    return f"<b>{user.fullname}({user.user_id})</b> не удален из администраторов."
-                return "Нельзя удалить самого себя!"
-            return f"<b>{user.fullname}({user.user_id})</b> не является администратором."
-        return f"user_id <i>{user_id}</i> не найден в базе данных."
-    return "Аргумент не является идентификатором пользователя."
 
 
 # Добавление администратора
@@ -44,7 +17,7 @@ async def remove_admin_common(*, user_id: str, from_user_id: int, request: Datab
 @check_command_args
 async def command_add_admin(message: types.Message, command: CommandObject, request: Database):
     user_id = command.args
-    result = await add_admin_common(user_id=user_id, request=request)
+    result = await assign_admin_rights(user_id=user_id, request=request)
     await message.reply(result)
 
 
@@ -62,7 +35,7 @@ async def command_add_admin(call: types.CallbackQuery, state: FSMContext):
 async def add_admin(message: types.Message, state: FSMContext, request: Database):
     user_id = message.text
     sent_message = (await state.get_data()).get("sent_message")
-    result = await add_admin_common(user_id=user_id, request=request)
+    result = await assign_admin_rights(user_id=user_id, request=request)
     await message.reply(result)
 
     await sent_message.delete()
@@ -76,7 +49,7 @@ async def add_admin(message: types.Message, state: FSMContext, request: Database
 async def command_remove_admin(message: types.Message, command: CommandObject, request: Database):
     user_id = command.args
     from_user_id = message.from_user.id
-    result = await remove_admin_common(user_id=user_id, from_user_id=from_user_id, request=request)
+    result = await revoke_admin_rights(user_id=user_id, from_user_id=from_user_id, request=request)
     await message.reply(result)
 
 
@@ -95,7 +68,7 @@ async def remove_admin(message: types.Message, state: FSMContext, request: Datab
     user_id = message.text
     from_user_id = message.from_user.id
     sent_message = (await state.get_data()).get("sent_message")
-    result = await remove_admin_common(user_id=user_id, from_user_id=from_user_id, request=request)
+    result = await revoke_admin_rights(user_id=user_id, from_user_id=from_user_id, request=request)
     await message.reply(result)
 
     await sent_message.delete()

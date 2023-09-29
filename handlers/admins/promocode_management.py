@@ -5,26 +5,9 @@ from database.db import Database
 from decorators import MessageLogging
 from filters import IsAdmin
 from states.admins import Administrators
-from utils.misc import generate_promocode
+from utils.misc import validate_and_add_promocode, deactivate_promocode
 
 promocode_management_router = Router()
-
-
-async def add_promocode_common(*, activations_count: str, request: Database):
-    if activations_count.isnumeric() and int(activations_count) > 0:
-        promocode = await generate_promocode()
-        if await request.add_promocode(promocode=promocode, activations_count=activations_count):
-            return f"Сгенерированный промокод: <code>{promocode}</code>\nКол-во активаций: {activations_count}"
-        return "Произошла ошибка при создании промокода."
-    return "Аргумент не является целым числом > 0"
-
-
-async def delete_promocode_common(*, promocode: str, request: Database):
-    if await request.promocode_exists(promocode=promocode):
-        if await request.delete_promocode(promocode=promocode):
-            return f"Промокод <code>{promocode}</code> был деактивирован."
-        return f"Промокод <code>{promocode}</code> не был деактивирован."
-    return f"Промокод <code>{promocode}</code> не существует."
 
 
 # Создание промокода
@@ -42,7 +25,7 @@ async def command_add_promocode(call: types.CallbackQuery, state: FSMContext):
 async def add_promocode(message: types.Message, state: FSMContext, request: Database):
     activations_count = message.text
     sent_message = (await state.get_data()).get("sent_message")
-    result = await add_promocode_common(activations_count=activations_count, request=request)
+    result = await validate_and_add_promocode(activations_count=activations_count, request=request)
     await message.reply(result)
 
     await sent_message.delete()
@@ -64,7 +47,7 @@ async def command_delete_promocode(call: types.CallbackQuery, state: FSMContext)
 async def delete_promocode(message: types.Message, state: FSMContext, request: Database):
     promocode = message.text
     sent_message = (await state.get_data()).get("sent_message")
-    result = await delete_promocode_common(promocode=promocode, request=request)
+    result = await deactivate_promocode(promocode=promocode, request=request)
     await message.reply(result)
 
     await sent_message.delete()

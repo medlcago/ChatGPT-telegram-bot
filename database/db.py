@@ -73,7 +73,7 @@ class Database:
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def check_user_blocked(self, user_id: int) -> Optional[bool]:
+    async def check_user_block_status(self, user_id: int) -> Optional[bool]:
         """
         Checks the user's lockout status
         """
@@ -199,7 +199,7 @@ class Database:
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def check_user_subscription(self, user_id: int) -> Optional[bool]:
+    async def check_user_subscription_status(self, user_id: int) -> Optional[bool]:
         """
         Check if the user with the given user ID is a subscriber.
         """

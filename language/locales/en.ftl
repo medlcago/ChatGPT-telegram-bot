@@ -78,6 +78,8 @@ non-premium-message = The command <b><i>{$command}</i></b> is only available to 
 
 model-not-found = Error: Model not found
 
+empty-command-message = The command <b><i>{$command}</i></b> was empty, the request could not be completed."
+
 non-text-message = The bot can only work with text. Please, repeat your request in text form.
 
 contact-admin-message =

@@ -1,8 +1,9 @@
-from aiogram.types import BotCommand
+from aiogram import Bot
+from aiogram.types import BotCommand, BotCommandScopeAllPrivateChats
 
 
-async def get_bot_commands():
-    commands = [
+async def set_bot_commands(bot: Bot):
+    ru_commands = [
         BotCommand(
             command="start",
             description="Запуск бота"
@@ -16,4 +17,21 @@ async def get_bot_commands():
             description="Список моделей"
         )
     ]
-    return commands
+
+    en_commands = [
+        BotCommand(
+            command="start",
+            description="Start bot"
+        ),
+        BotCommand(
+            command="help",
+            description="Help"
+        ),
+        BotCommand(
+            command="models",
+            description="List of models"
+        )
+    ]
+
+    await bot.set_my_commands(ru_commands, language_code="ru", scope=BotCommandScopeAllPrivateChats())
+    await bot.set_my_commands(en_commands, language_code="en", scope=BotCommandScopeAllPrivateChats())

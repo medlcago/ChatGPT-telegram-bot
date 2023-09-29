@@ -1,5 +1,5 @@
 python-dotenv==1.0.0
-openai==0.28.0
+openai==0.28.1
 aiomysql==0.2.0
 pytz==2023.3
 aiogram==3.0.0

@@ -8,4 +8,4 @@ from database.db import Database
 
 class IsSubscription(Filter):
     async def __call__(self, event: Union[Message, CallbackQuery], request: Database) -> bool:
-        return await request.check_user_subscription(event.from_user.id)
+        return await request.check_user_subscription_status(event.from_user.id)

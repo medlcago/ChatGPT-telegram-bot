@@ -18,7 +18,7 @@ from middlewares import (
     TranslatorMiddleware)
 from settings.database.setup import create_db_session
 from settings.redis.setup import create_redis_session
-from utils.misc import get_bot_commands
+from utils.misc import set_bot_commands
 
 
 def middlewares_registration(dp: Dispatcher, config, session_pool, redis):
@@ -81,7 +81,7 @@ def routers_registration(dp: Dispatcher):
 
 
 async def on_startup(bot: Bot):
-    await bot.set_my_commands(await get_bot_commands())
+    await set_bot_commands(bot=bot)
 
 
 async def main():

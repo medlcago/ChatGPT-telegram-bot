@@ -27,7 +27,7 @@ class BlockMiddleware(BaseMiddleware):
 
     @staticmethod
     async def is_allowed(user_id: int, request: Database) -> bool:
-        return not await request.check_user_blocked(user_id)
+        return not await request.check_user_block_status(user_id)
 
     @staticmethod
     async def handle_restriction(event: Union[Message, CallbackQuery], translator: LocalizedTranslator) -> None:

@@ -3,20 +3,21 @@ from functools import wraps
 from aiogram.filters import CommandObject
 from aiogram.types import Message
 
+from language.translator import LocalizedTranslator
+
 
 def check_command_args(func):
     @wraps(func)
     async def wrapper(message: Message, *args, **kwargs):
         command: CommandObject = kwargs.get("command", None)
+        translator: LocalizedTranslator = kwargs.get("translator")
         if command is None:
             raise ValueError("Command argument missing.")
+        if translator is None:
+            return await message.answer(
+                f"The command <b><i>{command.prefix + command.command}</i></b> was empty, the request could not be completed.")
         if not command.args:
-            if message.from_user.language_code == "ru":
-                await message.reply(
-                    f"Команда <b><i>{command.prefix + command.command}</i></b> оказалась пустой, запрос не может быть выполнен.")
-            else:
-                await message.reply(
-                    f"The command <b><i>{command.prefix + command.command}</i></b> was empty, the request could not be completed.")
+            await message.reply(translator.get("empty-command-message", command=command.prefix + command.command))
         else:
             await func(message, *args, **kwargs)
 

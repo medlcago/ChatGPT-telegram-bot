@@ -30,7 +30,7 @@ class SubscribersMiddleware(BaseMiddleware):
     async def is_allowed(user_id: int, request: Database) -> bool:
         if not SUBSCRIBERS_ONLY:
             return True
-        return await request.check_user_subscription(user_id) or await request.check_admin_permissions(user_id)
+        return await request.check_user_subscription_status(user_id) or await request.check_admin_permissions(user_id)
 
     @staticmethod
     async def handle_restriction(event: Union[Message, CallbackQuery], translator: LocalizedTranslator) -> None:

@@ -6,34 +6,9 @@ from database.db import Database
 from decorators import MessageLogging, check_command_args
 from filters import IsAdmin, ChatTypeFilter
 from states.admins import Administrators
+from utils.misc import activate_subscription, deactivate_subscription
 
 subscription_management_router = Router()
-
-
-async def grant_subscription_common(*, user_id: str, request: Database):
-    if user_id and user_id.isnumeric():
-        user = await request.get_user(user_id=user_id)
-        if user:
-            if user.is_subscriber:
-                return f"<b>{user.fullname}({user.user_id})</b> уже является подписчиком."
-            if await request.update_user_subscription_status(user_id=user_id, is_subscriber=True):
-                return f"<b>{user.fullname}({user.user_id})</b> получил подписку."
-            return f"Произошла ошибка. <b>{user.fullname}({user.user_id})</b> не получил подписку."
-        return f"user_id <i>{user_id}</i> не найден в базе данных."
-    return "Аргумент не является идентификатором пользователя."
-
-
-async def remove_subscription_common(*, user_id: str, request: Database):
-    if user_id and user_id.isnumeric():
-        user = await request.get_user(user_id=user_id)
-        if user:
-            if user.is_subscriber:
-                if await request.update_user_subscription_status(user_id=user_id, is_subscriber=False):
-                    return f"<b>{user.fullname}({user.user_id})</b> лишился подписки."
-                return f"Произошла ошибка. <b>{user.fullname}({user.user_id})</b> не лишился подписки."
-            return f"<b>{user.fullname}({user.user_id})</b> не является подписчиком."
-        return f"user_id <i>{user_id}</i> не найден в базе данных."
-    return "Аргумент не является идентификатором пользователя."
 
 
 # Выдача подписки
@@ -42,7 +17,7 @@ async def remove_subscription_common(*, user_id: str, request: Database):
 @check_command_args
 async def command_grant_subscription(message: types.Message, command: CommandObject, request: Database):
     user_id = command.args
-    result = await grant_subscription_common(user_id=user_id, request=request)
+    result = await activate_subscription(user_id=user_id, request=request)
     await message.reply(result)
 
 
@@ -60,7 +35,7 @@ async def command_grant_subscription(call: types.CallbackQuery, state: FSMContex
 async def grant_subscription(message: types.Message, state: FSMContext, request: Database):
     user_id = message.text
     sent_message = (await state.get_data()).get("sent_message")
-    result = await grant_subscription_common(user_id=user_id, request=request)
+    result = await activate_subscription(user_id=user_id, request=request)
     await message.reply(result)
 
     await sent_message.delete()
@@ -73,7 +48,7 @@ async def grant_subscription(message: types.Message, state: FSMContext, request:
 @check_command_args
 async def command_remove_subscription(message: types.Message, command: CommandObject, request: Database):
     user_id = command.args
-    result = await remove_subscription_common(user_id=user_id, request=request)
+    result = await deactivate_subscription(user_id=user_id, request=request)
     await message.reply(result)
 
 
@@ -91,7 +66,7 @@ async def command_remove_subscription(call: types.CallbackQuery, state: FSMConte
 async def remove_subscription(message: types.Message, state: FSMContext, request: Database):
     user_id = message.text
     sent_message = (await state.get_data()).get("sent_message")
-    result = await remove_subscription_common(user_id=user_id, request=request)
+    result = await deactivate_subscription(user_id=user_id, request=request)
     await message.reply(result)
 
     await sent_message.delete()

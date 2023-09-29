@@ -9,18 +9,9 @@ from exceptions import ActivationError
 from filters import ChatTypeFilter
 from keyboards.inline import contact_admin_button
 from states.users import Users
+from utils.misc import activate_promocode
 
 command_promocode_router = Router()
-
-
-async def promocode_activation_common(*, promocode, user_id, request: Database):
-    if await request.check_user_subscription(user_id=user_id):
-        return "Промокод не был активирован, т.к вы уже являетесь подписчиком."
-    if await request.check_promocode(promocode):
-        if await request.update_user_subscription_status(user_id=user_id, is_subscriber=True):
-            return f"Промокод {hcode(promocode)} был успешно активирован ✅"
-        raise ActivationError("Произошла ошибка при активации промокода. Пожалуйста, свяжитесь с администратором.")
-    return f"Промокод {hcode(promocode)} не является действительным."
 
 
 @command_promocode_router.message(Command(commands=["promocode"]), ChatTypeFilter(is_group=False))
@@ -49,7 +40,7 @@ async def promocode_activation(message: types.Message, state: FSMContext, reques
     promocode = message.text
     user_id = message.from_user.id
     try:
-        result = await promocode_activation_common(promocode=promocode, user_id=user_id, request=request)
+        result = await activate_promocode(promocode=promocode, user_id=user_id, request=request)
         await message.reply(result)
     except ActivationError as error:
         await message.reply(str(error), reply_markup=contact_admin_button)
