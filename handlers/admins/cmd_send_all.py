@@ -34,9 +34,9 @@ async def command_send_all(call: types.CallbackQuery, state: FSMContext):
 async def message_send_all(message: types.Message, state: FSMContext):
     markup = get_confirmation_button("all").as_markup()
 
-    await message.answer(f"Сообщение для рассылки:\n{message.text}",
-                         reply_markup=markup)
-    await state.update_data(message=message.text)
+    await message.copy_to(chat_id=message.chat.id, caption=f"{message.text}\n\nПолучатель:\nВсе пользователи бота.",
+                          reply_markup=markup)
+    await state.update_data(message=message)
     await state.set_state(Administrators.Mailing.confirmation)
 
 
@@ -48,8 +48,12 @@ async def confirmation_send_all(call: types.CallbackQuery, state: FSMContext, re
     data = await state.get_data()
 
     message_to_user = data.get("message")
+    from_chat_id = message_to_user.chat.id
+    message_id = message_to_user.message_id
+
     await call.answer("Рассылка была запущена.")
-    sent_message = await call.message.edit_text("Рассылка была запущена.\n\n/cancel - Остановить рассылку")
+    await call.message.delete()
+    sent_message = await call.message.answer("Рассылка была запущена.\n\n/cancel - Остановить рассылку", reply_to_message_id=message_id)
 
     count = 0
     users = await request.get_all_users()
@@ -57,7 +61,7 @@ async def confirmation_send_all(call: types.CallbackQuery, state: FSMContext, re
         if (await state.get_state()) != "Mailing.confirmation":
             break
         try:
-            await bot.send_message(chat_id=user.user_id, text=message_to_user)
+            await bot.copy_message(chat_id=user.user_id, from_chat_id=from_chat_id, message_id=message_id)
             count += 1
         except Exception as e:
             logging.error(f"Error sending message: {e}")

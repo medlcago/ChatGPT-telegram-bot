@@ -41,18 +41,17 @@ async def get_recipient_user_id(message: types.Message, state: FSMContext):
 async def message_to_send(message: types.Message, state: FSMContext, request: Database):
     data = await state.get_data()
 
-    message_to_user = data.get("message").text
+    message_to_user = data.get("message")
     user_id = message.text
     user_exists = await request.get_user(user_id=user_id)
 
     if user_exists:
         markup = get_confirmation_button("one").as_markup()
-        await message.answer(f"Сообщение:\n{message_to_user}\n\nПолучатель:\n{user_exists.fullname}({user_id})",
-                             reply_markup=markup)
-        reply_to_message_id = data.get("message").message_id
+        await message_to_user.copy_to(chat_id=message.chat.id,
+                                      caption=f"{message_to_user.text or message_to_user.caption}\n\nПолучатель:\n{user_exists.fullname}({user_id})",
+                                      reply_markup=markup)
 
         await state.update_data(user_id=user_id)
-        await state.update_data(reply_to_message_id=reply_to_message_id)
         await state.update_data(recipient=f"{user_exists.fullname}({user_id})")
         await state.set_state(Administrators.SendMessage.confirmation)
     else:
@@ -67,13 +66,14 @@ async def message_to_send(message: types.Message, state: FSMContext, request: Da
 async def confirmation_send_message(call: types.CallbackQuery, state: FSMContext, bot: Bot):
     data = await state.get_data()
 
-    message_to_user = data.get("message").text
+    message_to_user = data.get("message")
     user_id = data.get("user_id")
-    reply_to_message_id = data.get("reply_to_message_id")
+    reply_to_message_id = message_to_user.message_id
+    from_chat_id = message_to_user.chat.id
     recipient = data.get("recipient")
 
     try:
-        await bot.send_message(chat_id=user_id, text=message_to_user)
+        await bot.copy_message(chat_id=user_id, from_chat_id=from_chat_id, message_id=reply_to_message_id)
         await call.message.delete()
         await call.message.answer(f"Сообщение успешно отправлено пользователю <b>{recipient}</b>",
                                   reply_to_message_id=reply_to_message_id)
@@ -91,5 +91,6 @@ async def confirmation_send_message(call: types.CallbackQuery, state: FSMContext
 @MessageLogging
 async def cancel_send_message(call: types.CallbackQuery, state: FSMContext):
     await state.clear()
-    await call.message.edit_text("Действие было отменено.")
+    await call.message.delete()
+    await call.message.answer("Действие было отменено.")
     await call.answer("Отменено")
