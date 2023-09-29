@@ -83,7 +83,7 @@ empty-command-message = The command <b><i>{$command}</i></b> was empty, the requ
 non-text-message = The bot can only work with text. Please, repeat your request in text form.
 
 contact-admin-message =
-    You have chosen to contact the administrator.
+    Contact the administrator.
 
     Enter your message and wait for a response from the administrator.
 

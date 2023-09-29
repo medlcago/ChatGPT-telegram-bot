@@ -1,12 +1,21 @@
 from aiogram import Router, F, types, flags, Bot
 from aiogram.fsm.context import FSMContext
+from aiogram.filters.command import Command
 
 from data.config import Config
+from filters import ChatTypeFilter
 from keyboards.inline import get_confirmation_button, SendMessage, get_reply_to_user_button
 from language.translator import LocalizedTranslator
 from states.users import Users
 
 command_contact_admin_router = Router()
+
+
+@command_contact_admin_router.message(Command(commands="support"), ChatTypeFilter(is_group=False))
+@flags.skip
+async def command_contact_admin(message: types.Message, state: FSMContext, translator: LocalizedTranslator):
+    await message.reply(translator.get("contact-admin-message"))
+    await state.set_state(Users.ContactAdmin.message)
 
 
 @command_contact_admin_router.callback_query(F.data == "contact_admin")
@@ -27,7 +36,8 @@ async def message_to_administrator(message: types.Message, state: FSMContext, tr
     await state.set_state(Users.ContactAdmin.confirmation)
 
 
-@command_contact_admin_router.callback_query(Users.ContactAdmin.confirmation, SendMessage.filter((F.action == "confirmation") & (F.recipients == "creator")))
+@command_contact_admin_router.callback_query(Users.ContactAdmin.confirmation, SendMessage.filter(
+    (F.action == "confirmation") & (F.recipients == "creator")))
 @flags.skip
 async def confirmation_send_message(call: types.CallbackQuery, state: FSMContext, bot: Bot, config: Config):
     message: types.Message = (await state.get_data()).get("message")
@@ -46,7 +56,8 @@ async def confirmation_send_message(call: types.CallbackQuery, state: FSMContext
     await state.clear()
 
 
-@command_contact_admin_router.callback_query(Users.ContactAdmin.confirmation, SendMessage.filter((F.action == "cancel") & (F.recipients == "creator")))
+@command_contact_admin_router.callback_query(Users.ContactAdmin.confirmation,
+                                             SendMessage.filter((F.action == "cancel") & (F.recipients == "creator")))
 @flags.skip
 async def cancel_send_message(call: types.CallbackQuery, state: FSMContext, translator: LocalizedTranslator):
     await state.clear()

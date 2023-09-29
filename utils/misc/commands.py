@@ -15,6 +15,10 @@ async def set_bot_commands(bot: Bot):
         BotCommand(
             command="models",
             description="Список моделей"
+        ),
+        BotCommand(
+            command="support",
+            description="Связаться с админом"
         )
     ]
 
@@ -30,6 +34,10 @@ async def set_bot_commands(bot: Bot):
         BotCommand(
             command="models",
             description="List of models"
+        ),
+        BotCommand(
+            command="support",
+            description="Contact admin"
         )
     ]
 
