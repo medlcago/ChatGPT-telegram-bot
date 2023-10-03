@@ -3,7 +3,7 @@ from aiogram.filters.command import Command
 
 from decorators import MessageLogging
 from filters import IsAdmin, ChatTypeFilter
-from keyboards.inline import get_back_button
+from keyboards.inline_main import get_back_button
 from utils.misc import get_server_system_info
 
 command_server_router = Router()

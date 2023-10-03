@@ -4,7 +4,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from database.db import Database
 from decorators import MessageLogging
-from keyboards.inline import promocode_activation_button, get_back_button
+from keyboards.inline_main import promocode_activation_button, get_back_button
 from language.translator import LocalizedTranslator
 
 command_profile_router = Router()
@@ -28,8 +28,9 @@ async def command_profile(call: CallbackQuery, request: Database, translator: Lo
 
     builder = get_back_button(back="start")
     if is_subscriber:
-        await call.message.edit_text(message, reply_markup=builder.as_markup())
+        await call.message.edit_text(text=message, reply_markup=builder.as_markup())
     else:
-        await call.message.edit_text(message,
-                                     reply_markup=builder.attach(InlineKeyboardBuilder.from_markup(
-                                         promocode_activation_button)).as_markup())
+        await call.message.edit_text(
+            text=message,
+            reply_markup=builder.attach(InlineKeyboardBuilder.from_markup(promocode_activation_button)).as_markup()
+        )

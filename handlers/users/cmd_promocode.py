@@ -7,7 +7,7 @@ from database.db import Database
 from decorators import MessageLogging
 from exceptions import ActivationError
 from filters import ChatTypeFilter
-from keyboards.inline import contact_admin_button
+from keyboards.inline_main import contact_admin_button
 from states.users import Users
 from utils.misc import activate_promocode
 

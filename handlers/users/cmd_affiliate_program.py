@@ -3,7 +3,7 @@ from aiogram.utils.deep_linking import create_start_link
 
 from database.db import Database
 from decorators import MessageLogging
-from keyboards.inline import get_back_button
+from keyboards.inline_main import get_back_button
 
 command_affiliate_program_router = Router()
 

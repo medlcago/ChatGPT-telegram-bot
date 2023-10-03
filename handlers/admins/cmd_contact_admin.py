@@ -5,7 +5,7 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 
 from filters import IsAdmin
-from keyboards.inline import ReplyUser
+from keyboards.callbacks import ReplyUser
 from states.admins import Administrators
 
 command_contact_admin_router = Router()

@@ -3,7 +3,7 @@ from aiogram import Router, types, F
 from database.db import Database
 from decorators import MessageLogging
 from filters import IsAdmin
-from keyboards.inline import get_back_button
+from keyboards.inline_main import get_back_button
 
 command_statistics_router = Router()
 

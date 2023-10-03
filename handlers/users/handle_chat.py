@@ -8,7 +8,8 @@ from database.db import Database
 from decorators import CheckTimeLimits, MessageLogging
 from exceptions import RequestProcessingError
 from filters import ChatTypeFilter, IsAdmin, IsSubscription
-from keyboards.inline import promocode_activation_button, get_model_list_button, Model
+from keyboards.callbacks import Model
+from keyboards.inline_main import promocode_activation_button, get_model_list_button
 from language.translator import LocalizedTranslator
 from utils.neural_networks import ChatBot
 
@@ -20,7 +21,8 @@ handle_chat_router = Router()
 @MessageLogging
 async def switch_chat_type(message: Message, config: Config, translator: LocalizedTranslator):
     available_models = config.models.available_models
-    await message.answer(translator.get("model-selection-message"), reply_markup=get_model_list_button(available_models).as_markup())
+    list_of_models = get_model_list_button(available_models, add_close_button=True)
+    await message.answer(translator.get("model-selection-message"), reply_markup=list_of_models.as_markup())
 
 
 @handle_chat_router.callback_query(Model.filter())

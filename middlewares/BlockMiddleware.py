@@ -5,7 +5,7 @@ from aiogram.dispatcher.flags import get_flag
 from aiogram.types import Message, CallbackQuery
 
 from database.db import Database
-from keyboards.inline import contact_admin_button
+from keyboards.inline_main import contact_admin_button
 from language.translator import LocalizedTranslator
 
 

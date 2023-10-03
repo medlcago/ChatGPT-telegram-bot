@@ -18,6 +18,7 @@ from middlewares import (
     TranslatorMiddleware)
 from settings.database.setup import create_db_session
 from settings.redis.setup import create_redis_session
+from utils import universal_events_router
 from utils.misc import set_bot_commands
 
 
@@ -48,7 +49,7 @@ def middlewares_registration(dp: Dispatcher, config, session_pool, redis):
 
 
 def routers_registration(dp: Dispatcher):
-    dp.include_router(general.command_cancel_router)
+    dp.include_router(universal_events_router)
     dp.include_router(general.command_image_router)
 
     dp.include_router(admins.command_admin_router)

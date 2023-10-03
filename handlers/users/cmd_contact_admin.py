@@ -1,10 +1,11 @@
 from aiogram import Router, F, types, flags, Bot
-from aiogram.fsm.context import FSMContext
 from aiogram.filters.command import Command
+from aiogram.fsm.context import FSMContext
 
 from data.config import Config
 from filters import ChatTypeFilter
-from keyboards.inline import get_confirmation_button, SendMessage, get_reply_to_user_button
+from keyboards.callbacks import SendMessage
+from keyboards.inline_main import get_confirmation_button, get_reply_to_user_button
 from language.translator import LocalizedTranslator
 from states.users import Users
 

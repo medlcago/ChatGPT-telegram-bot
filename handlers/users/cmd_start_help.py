@@ -6,7 +6,8 @@ from aiogram.types import Message, CallbackQuery
 from database.db import Database
 from decorators import MessageLogging
 from filters import ChatTypeFilter
-from keyboards.inline import my_profile_and_affiliate_program_buttons, ComeBack
+from keyboards.callbacks import ComeBack
+from keyboards.inline_main import my_profile_and_affiliate_program_buttons
 from language.translator import LocalizedTranslator
 from utils.misc import payload_decode
 

@@ -8,7 +8,8 @@ from aiogram.fsm.context import FSMContext
 from database.db import Database
 from decorators import MessageLogging
 from filters import ChatTypeFilter, IsAdmin
-from keyboards.inline import get_confirmation_button, SendMessage
+from keyboards.callbacks import SendMessage
+from keyboards.inline_main import get_confirmation_button
 from states.admins import Administrators
 
 command_send_all_router = Router()
@@ -34,7 +35,7 @@ async def command_send_all(call: types.CallbackQuery, state: FSMContext):
 async def message_send_all(message: types.Message, state: FSMContext):
     markup = get_confirmation_button("all").as_markup()
 
-    await message.copy_to(chat_id=message.chat.id, caption=f"{message.text}\n\nПолучатель:\nВсе пользователи бота.",
+    await message.copy_to(chat_id=message.chat.id, caption=f"{message.text or message.caption}\n\nПолучатель:\nВсе пользователи бота.",
                           reply_markup=markup)
     await state.update_data(message=message)
     await state.set_state(Administrators.Mailing.confirmation)

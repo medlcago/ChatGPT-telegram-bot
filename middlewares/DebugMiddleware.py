@@ -6,7 +6,7 @@ from aiogram.types import Message, CallbackQuery
 
 from data.config import DEBUG
 from database.db import Database
-from keyboards.inline import contact_admin_button
+from keyboards.inline_main import contact_admin_button
 from language.translator import LocalizedTranslator
 
 

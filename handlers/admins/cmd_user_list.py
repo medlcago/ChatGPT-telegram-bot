@@ -4,7 +4,7 @@ from aiogram.filters.command import Command
 from database.db import Database
 from decorators import MessageLogging
 from filters import IsAdmin, ChatTypeFilter
-from keyboards.inline import get_back_button
+from keyboards.inline_main import get_back_button
 from utils.misc import get_user_list
 
 command_user_list_router = Router()

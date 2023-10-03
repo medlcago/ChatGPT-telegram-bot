@@ -6,7 +6,7 @@ from aiogram.types import Message, CallbackQuery
 
 from data.config import SUBSCRIBERS_ONLY
 from database.db import Database
-from keyboards.inline import get_activate_subscription_button
+from keyboards.inline_main import get_activate_subscription_button
 from language.translator import LocalizedTranslator
 
 

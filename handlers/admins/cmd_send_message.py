@@ -7,7 +7,8 @@ from aiogram.fsm.context import FSMContext
 from database.db import Database
 from decorators import MessageLogging
 from filters import IsAdmin, ChatTypeFilter
-from keyboards.inline import get_confirmation_button, SendMessage
+from keyboards.callbacks import SendMessage
+from keyboards.inline_main import get_confirmation_button
 from states.admins import Administrators
 
 command_send_message_router = Router()
