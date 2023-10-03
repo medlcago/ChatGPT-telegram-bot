@@ -2,6 +2,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from keyboards.callbacks import ComeBack, SendMessageAction, SendMessage, ReplyUserAction, ReplyUser, Model
+from keyboards.inline_utils import create_inline_keyboard
 
 my_profile_and_affiliate_program_buttons = InlineKeyboardMarkup(inline_keyboard=[
     [
@@ -103,7 +104,7 @@ def get_model_list_button(models: list, add_close_button: bool = False) -> Inlin
     builder = InlineKeyboardBuilder()
     for model in models:
         builder.button(text=model, callback_data=Model(model=model))
-    if add_close_button:
-        builder.button(text="❌ Закрыть", callback_data="close")
     builder.adjust(2, 2)
+    if add_close_button:
+        builder.row(InlineKeyboardButton(text="❌ Закрыть", callback_data="close"))
     return builder
