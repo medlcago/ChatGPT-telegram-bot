@@ -7,9 +7,9 @@ from data.config import Config
 from database.db import Database
 from decorators import CheckTimeLimits, MessageLogging
 from exceptions import RequestProcessingError
-from filters import ChatTypeFilter, IsAdmin, IsSubscription
+from filters import ChatTypeFilter
 from keyboards.callbacks import Model
-from keyboards.inline_main import promocode_activation_button, get_model_list_button
+from keyboards.inline_main import get_model_list_button, get_activate_subscription_button
 from language.translator import LocalizedTranslator
 from utils.neural_networks import ChatBot
 
@@ -39,7 +39,7 @@ async def switch_chat_type(call: CallbackQuery, callback_data: Model, request: D
 async def switch_chat_type_non_premium(message: Message, command: CommandObject, translator: LocalizedTranslator):
     await message.reply(
         translator.get("non-premium-message", command=command.prefix + command.command),
-        reply_markup=promocode_activation_button)
+        reply_markup=get_activate_subscription_button(add_close_button=True).as_markup())
 
 
 @handle_chat_router.message(Command(commands=["clear"]), ChatTypeFilter(is_group=False))

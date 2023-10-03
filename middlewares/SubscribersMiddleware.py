@@ -34,7 +34,7 @@ class SubscribersMiddleware(BaseMiddleware):
 
     @staticmethod
     async def handle_restriction(event: Union[Message, CallbackQuery], translator: LocalizedTranslator) -> None:
-        markup = get_activate_subscription_button().as_markup()
+        markup = get_activate_subscription_button(add_close_button=True).as_markup()
         if isinstance(event, CallbackQuery):
             await event.answer("Access limited due to lack of subscription.")
             await event.message.answer(translator.get("subscribers-only-message"), reply_markup=markup)

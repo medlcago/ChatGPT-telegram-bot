@@ -2,7 +2,6 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from keyboards.callbacks import ComeBack, SendMessageAction, SendMessage, ReplyUserAction, ReplyUser, Model
-from keyboards.inline_utils import create_inline_keyboard
 
 my_profile_and_affiliate_program_buttons = InlineKeyboardMarkup(inline_keyboard=[
     [
@@ -69,11 +68,13 @@ def get_back_button(back: str) -> InlineKeyboardBuilder:
     return builder
 
 
-def get_activate_subscription_button() -> InlineKeyboardBuilder:
+def get_activate_subscription_button(add_close_button: bool = False) -> InlineKeyboardBuilder:
     builder = InlineKeyboardBuilder()
     builder.attach(InlineKeyboardBuilder.from_markup(contact_admin_button))
     builder.attach(InlineKeyboardBuilder.from_markup(promocode_activation_button))
     builder.adjust(1, 1)
+    if add_close_button:
+        builder.row(InlineKeyboardButton(text="❌ Закрыть", callback_data="close"))
     return builder
 
 
