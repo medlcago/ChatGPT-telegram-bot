@@ -16,8 +16,7 @@ from utils.neural_networks import ChatBot
 handle_chat_router = Router()
 
 
-@handle_chat_router.message(Command(commands=["switch"]), ChatTypeFilter(is_group=False), IsSubscription())
-@handle_chat_router.message(Command(commands=["switch"]), ChatTypeFilter(is_group=False), IsAdmin())
+@handle_chat_router.message(Command(commands=["switch"]), ChatTypeFilter(is_group=False))
 @MessageLogging
 async def switch_chat_type(message: Message, config: Config, translator: LocalizedTranslator):
     available_models = config.models.available_models

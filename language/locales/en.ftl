@@ -51,7 +51,7 @@ help-message =
 
     <b>⚙️ Other bot commands</b>
     <b>/clear</b> - Start a new dialogue without taking into account the context (By default, the bot remembers the context)
-    <b>/switch</b> - Change model (Available only with subscription)
+    <b>/switch</b> - Change model (Temporarily available to all)
     <b>/models</b> - List of models available for work
 
 my-profile-message =
