@@ -57,7 +57,7 @@ async def confirmation_send_all(call: types.CallbackQuery, state: FSMContext, re
     sent_message = await call.message.answer("Рассылка была запущена.\n\n/cancel - Остановить рассылку", reply_to_message_id=message_id)
 
     count = 0
-    users = await request.get_all_users()
+    users = await request.get_all_users(is_active=True)
     for user in users:
         if (await state.get_state()) != "Mailing.confirmation":
             break

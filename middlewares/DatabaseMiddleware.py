@@ -1,7 +1,7 @@
-from typing import Callable, Any, Awaitable, Dict
+from typing import Callable, Any, Awaitable, Dict, Union
 
 from aiogram import BaseMiddleware
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery, ChatMemberUpdated
 
 from database.db import Database
 
@@ -13,7 +13,7 @@ class DatabaseMiddleware(BaseMiddleware):
     async def __call__(
             self,
             handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
-            event: Message,
+            event: Union[Message, CallbackQuery, ChatMemberUpdated],
             data: Dict[str, Any]) -> Any:
         async with self.session_pool() as session:
             data['session'] = session

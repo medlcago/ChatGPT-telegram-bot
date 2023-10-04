@@ -21,6 +21,7 @@ class User(Base):
     is_blocked: bool = Column(BOOLEAN, default=False)
     is_admin: bool = Column(BOOLEAN, default=False)
     is_subscriber: bool = Column(BOOLEAN, default=False)
+    is_active: bool = Column(BOOLEAN, default=True)
     last_command_time: str = Column(Text)
     command_count: int = Column(SMALLINT(unsigned=True), default=0)
     chat_type: str = Column(String(255), nullable=False, default="gpt-3.5-turbo")

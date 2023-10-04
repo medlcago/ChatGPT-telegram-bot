@@ -42,22 +42,28 @@ class Database:
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def get_user(self, user_id: int) -> Optional[User]:
+    async def get_user(self, user_id: int, is_active: bool = None) -> Optional[User]:
         """
         Checks if a user exists in the database and return their data as a User object.
         """
         try:
-            user = await self.session.scalar(select(User).filter_by(user_id=user_id))
+            if is_active is None:
+                user = await self.session.scalar(select(User).filter_by(user_id=user_id))
+            else:
+                user = await self.session.scalar(select(User).filter_by(user_id=user_id, is_active=is_active))
             return user
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def get_all_users(self) -> Optional[Sequence[User]]:
+    async def get_all_users(self, is_active: bool = None) -> Optional[Sequence[User]]:
         """
         Retrieves all users from the database and return them as a generator of User objects.
         """
         try:
-            users = (await self.session.scalars(select(User))).all()
+            if is_active is None:
+                users = (await self.session.scalars(select(User))).all()
+            else:
+                users = (await self.session.scalars(select(User).filter_by(is_active=is_active))).all()
             return users
         except Exception as e:
             logging.error(f"Database error: {e}")
@@ -291,7 +297,7 @@ class Database:
 
     async def add_message_to_dialog(self, user_id: int, messages: Union[list, tuple]) -> None:
         """
-        Adds a new messages to the user's dialog
+        Adds a new messages to the user's dialog.
         """
         try:
             for m in messages:
@@ -315,10 +321,20 @@ class Database:
 
     async def clear_user_dialog_history(self, user_id: int) -> None:
         """
-        Clears the user's dialog history
+        Clears the user's dialog history.
         """
         try:
             await self.session.execute(delete(UserDialogues).filter_by(user_id=user_id))
+            await self.session.commit()
+        except Exception as e:
+            logging.error(f"Database error: {e}")
+
+    async def update_user_active_status(self, user_id: int, is_active: bool) -> None:
+        """
+        Updates the user's activity status.
+        """
+        try:
+            await self.session.execute(update(User).filter_by(user_id=user_id).values(is_active=is_active))
             await self.session.commit()
         except Exception as e:
             logging.error(f"Database error: {e}")

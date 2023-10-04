@@ -25,6 +25,7 @@ from utils.misc import set_bot_commands
 def middlewares_registration(dp: Dispatcher, config, session_pool, redis):
     dp.message.outer_middleware(DatabaseMiddleware(session_pool))
     dp.callback_query.outer_middleware(DatabaseMiddleware(session_pool))
+    dp.my_chat_member.outer_middleware(DatabaseMiddleware(session_pool))
 
     dp.message.outer_middleware(RedisMiddleware(redis))
     dp.callback_query.outer_middleware(RedisMiddleware(redis))
@@ -70,6 +71,7 @@ def routers_registration(dp: Dispatcher):
     dp.include_router(groups.moderate_chat_router)
     dp.include_router(groups.edit_chat_router)
 
+    dp.include_router(users.user_activity_status_router)
     dp.include_router(users.command_start_help_router)
     dp.include_router(users.command_profile_router)
     dp.include_router(users.command_affiliate_program_router)
