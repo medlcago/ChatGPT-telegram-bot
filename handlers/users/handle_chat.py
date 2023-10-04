@@ -79,7 +79,7 @@ async def handle_chat(message: Message, request: Database, bot: Bot, config: Con
             await bot.edit_message_text(chat_id=sent_message.chat.id, message_id=sent_message.message_id,
                                         text=str(error))
     else:
-        await message.reply(translator.get("model-not-found"))
+        await message.reply(translator.get("model-not-found", model=model))
 
 
 @handle_chat_router.message(ChatTypeFilter(is_group=False))

@@ -76,7 +76,7 @@ clear-dialog-history-message = История сообщений была очи
 
 non-premium-message = Команда <b><i>{$command}</i></b> доступна только premium пользователям.
 
-model-not-found = Ошибка: модель не найдена
+model-not-found = Ошибка: модель <b><i>{$model}</i></b> не найдена
 
 empty-command-message = Команда <b><i>{$command}</i></b> оказалась пустой, запрос не может быть выполнен.
 

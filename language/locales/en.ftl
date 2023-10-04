@@ -76,7 +76,7 @@ clear-dialog-history-message = The message history has been cleared.
 
 non-premium-message = The command <b><i>{$command}</i></b> is only available to premium users.
 
-model-not-found = Error: Model not found
+model-not-found = Error: Model <b><i>{$model}</i></b> not found
 
 empty-command-message = The command <b><i>{$command}</i></b> was empty, the request could not be completed."
 
