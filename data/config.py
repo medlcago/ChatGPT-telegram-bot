@@ -76,7 +76,7 @@ def load_config(debug: bool = False, path: str | None = None) -> Config:
         openai=OpenAIConfig(
             api_key=env.str("OpenAI_API_KEY"),
             api_base=env.str("OpenAI_API_BASE"),
-            context_limit=40
+            context_limit=10
         ),
         models=ModelsConfig(
             available_models=[

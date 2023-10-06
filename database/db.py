@@ -307,7 +307,7 @@ class Database:
         except Exception as e:
             logging.error(f"Database error: {e}")
 
-    async def get_user_dialog(self, user_id: int, limit: int = 40) -> Optional[Sequence[str]]:
+    async def get_user_dialog(self, user_id: int, limit: int = 5) -> Optional[Sequence[str]]:
         """
         Gets the user's dialog.
         """
