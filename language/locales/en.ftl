@@ -89,7 +89,7 @@ contact-admin-message =
 
     You can cancel this action with the command <b><i>/cancel</i></b>
 
-    <b>We will try to respond to you within <i>24 hours</i></b>
+    <b>A response will be received within <i>24 hours</i></b>
 
     ❗If you delete your message, there will be no response to it.
 

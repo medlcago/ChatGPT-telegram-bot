@@ -9,7 +9,9 @@ from exceptions import RequestProcessingError
 
 
 class SummarizeVideo:
-    def __init__(self, api_key=None, api_base=None, model=None, languages=("ru", "en", "de", "es")):
+    __slots__ = ("api_key", "api_base", "model", "languages")
+
+    def __init__(self, api_key: str, api_base: str, model: str, languages=("ru", "en", "de", "es")):
         self.api_key = api_key
         self.api_base = api_base
         self.model = model

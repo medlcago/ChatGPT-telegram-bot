@@ -1,10 +1,9 @@
 import random
 import string
 
-from aiogram.utils.markdown import hcode
-
 from database.db import Database
 from exceptions import ActivationError
+from utils import is_number
 
 
 def generate_promocode():
@@ -23,15 +22,15 @@ def generate_promocode():
     return promocode
 
 
-async def validate_and_add_promocode(*, activations_count: str, request: Database):
+async def validate_and_add_promocode(*, activations_count: str | int, request: Database):
     """
     Проверяет промокод на валидность, после чего добавляет его в базу данных.
     """
-    if activations_count.isnumeric() and int(activations_count) > 0:
+    activations_count = is_number(activations_count)
+    if activations_count and activations_count > 0:
         promocode = generate_promocode()
-        activations_count = int(activations_count)
         if await request.add_promocode(promocode=promocode, activations_count=activations_count):
-            return f"Сгенерированный промокод: <code>{promocode}</code>\nКол-во активаций: {activations_count}"
+            return f"Сгенерированный промокод: <code>{promocode}</code>\n\nКол-во активаций: <b>{activations_count}</b>"
         return "Произошла ошибка при создании промокода."
     return "Аргумент должен быть целым положительным числом."
 
@@ -47,7 +46,7 @@ async def deactivate_promocode(*, promocode: str, request: Database):
     return f"Промокод <code>{promocode}</code> не существует."
 
 
-async def activate_promocode(*, promocode, user_id, request: Database):
+async def activate_promocode(*, promocode: str, user_id: str | int, request: Database):
     """
     Проверяет промокод на валидность, после чего происходит его активация.
     """
@@ -55,6 +54,6 @@ async def activate_promocode(*, promocode, user_id, request: Database):
         return "Промокод не был активирован, т.к вы уже являетесь подписчиком."
     if await request.check_promocode(promocode):
         if await request.update_user_subscription_status(user_id=user_id, is_subscriber=True):
-            return f"Промокод {hcode(promocode)} был успешно активирован ✅"
+            return f"Промокод <code>{promocode}</code> был успешно активирован ✅"
         raise ActivationError("Произошла ошибка при активации промокода. Пожалуйста, свяжитесь с администратором.")
-    return f"Промокод {hcode(promocode)} не является действительным."
+    return f"Промокод <code>{promocode}</code> не является действительным."

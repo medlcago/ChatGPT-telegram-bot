@@ -6,6 +6,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 
 from data.config import load_config
 from handlers import admins, general, groups, users
+from handlers import universal_handler_router
 from language.translator import Translator
 from middlewares import (
     DatabaseMiddleware,
@@ -18,7 +19,6 @@ from middlewares import (
     TranslatorMiddleware)
 from settings.database.setup import create_db_session
 from settings.redis.setup import create_redis_session
-from utils import universal_events_router
 from utils.misc import set_bot_commands
 
 
@@ -50,7 +50,7 @@ def middlewares_registration(dp: Dispatcher, config, session_pool, redis):
 
 
 def routers_registration(dp: Dispatcher):
-    dp.include_router(universal_events_router)
+    dp.include_router(universal_handler_router)
     dp.include_router(general.command_image_router)
 
     dp.include_router(admins.command_admin_router)
@@ -104,6 +104,7 @@ async def main():
     logging.info(f"Bot running in {'DEBUG' if debug else 'RELEASE'} mode!")
 
     try:
+        await bot.delete_webhook(drop_pending_updates=True)
         await dp.start_polling(bot, translator=Translator())
     except Exception as ex:
         logging.error(f"[!!! Exception] - {ex}", exc_info=True)

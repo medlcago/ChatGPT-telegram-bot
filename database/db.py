@@ -2,10 +2,10 @@ import logging
 from datetime import datetime
 from typing import Optional, Sequence, Union
 
-import pytz
 from sqlalchemy import update, select, delete, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from utils import localize_time
 from .models import User, Member, Promocode, UserDialogues
 
 
@@ -135,11 +135,7 @@ class Database:
         """
         try:
             last_command_time = await self.session.scalar(select(User.last_command_time).filter_by(user_id=user_id))
-            if last_command_time:
-                date_format = '%Y-%m-%d %H:%M:%S'
-                moscow_tz = pytz.timezone('Europe/Moscow')
-                last_command_time = datetime.strptime(last_command_time, date_format)
-                return moscow_tz.localize(last_command_time)
+            return localize_time(time_string=last_command_time)
         except Exception as e:
             logging.error(f"Database error: {e}")
 
