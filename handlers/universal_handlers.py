@@ -6,10 +6,10 @@ from decorators import MessageLogging
 from filters import ChatTypeFilter
 from language.translator import LocalizedTranslator
 
-universal_events_router = Router()
+universal_handler_router = Router()
 
 
-@universal_events_router.callback_query(F.data.in_({"close", "delete"}))
+@universal_handler_router.callback_query(F.data.in_({"close", "delete"}))
 @MessageLogging
 @flags.skip
 async def delete_message(call: types.CallbackQuery):
@@ -17,7 +17,7 @@ async def delete_message(call: types.CallbackQuery):
     await call.message.delete()
 
 
-@universal_events_router.message(Command(commands=["cancel"], prefix="/"), ChatTypeFilter(is_group=False))
+@universal_handler_router.message(Command(commands=["cancel"], prefix="/"), ChatTypeFilter(is_group=False))
 @MessageLogging
 @flags.skip
 async def cancel_action(message: types.Message, state: FSMContext, translator: LocalizedTranslator):

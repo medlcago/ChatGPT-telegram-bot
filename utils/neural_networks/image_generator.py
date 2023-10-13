@@ -6,12 +6,14 @@ from exceptions import RequestProcessingError
 
 
 class ImageGenerator:
-    def __init__(self, api_key=None, api_base=None, model=None):
+    __slots__ = ("api_key", "api_base", "model")
+
+    def __init__(self, api_key: str, api_base: str, model: str):
         self.api_key = api_key
         self.api_base = api_base
         self.model = model
 
-    async def get_response(self, content):
+    async def get_response(self, content: str):
         if not self.model:
             raise ValueError("Model is not specified.")
         try:
@@ -20,7 +22,7 @@ class ImageGenerator:
             logging.error(f'Error processing request: {e}')
             raise RequestProcessingError("Error processing request. Please, try again.")
 
-    async def _get_response(self, content):
+    async def _get_response(self, content: str):
         if not self.api_key:
             raise ValueError("API Key is not specified.")
         if not self.api_base:
@@ -36,5 +38,5 @@ class ImageGenerator:
         )
         return response['data'][0]['url']
 
-    async def generate_image(self, prompt):
+    async def generate_image(self, prompt: str):
         return await self.get_response(prompt)

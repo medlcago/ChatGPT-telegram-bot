@@ -9,7 +9,7 @@ from filters import ChatTypeFilter
 from keyboards.callbacks import ComeBack
 from keyboards.inline_main import my_profile_and_affiliate_program_buttons
 from language.translator import LocalizedTranslator
-from utils.misc import payload_decode
+from utils import deeplink_decode
 
 command_start_help_router = Router()
 
@@ -17,17 +17,18 @@ command_start_help_router = Router()
 @command_start_help_router.message(Command(commands="start"), ChatTypeFilter(is_group=False))
 @MessageLogging
 @flags.rate_limit(rate=120, limit=1, key="start")
-async def command_start(message: Message, command: CommandObject, request: Database, bot: Bot, translator: LocalizedTranslator):
-    referrer_id = payload_decode(payload=command.args)
+async def command_start(message: Message, command: CommandObject, request: Database, bot: Bot,
+                        translator: LocalizedTranslator):
+    referrer_id = deeplink_decode(payload=command.args)
     user_id = message.from_user.id
     fullname = message.from_user.full_name
     current_model = await request.get_user_chat_type(user_id=user_id)
 
     if await request.get_user(user_id=user_id) is None:
-        if referrer_id and referrer_id.isdigit() and user_id != int(referrer_id) and await request.get_user(
-                user_id=referrer_id):
+        if referrer_id and user_id != referrer_id and await request.get_user(user_id=referrer_id):
             await request.add_user(user_id=user_id, fullname=fullname, referrer=referrer_id)
-            await bot.send_message(chat_id=referrer_id, text=f"<b>Новый реферал — <code>{user_id}</code>!</b>")
+            await bot.send_message(chat_id=referrer_id,
+                                   text=f"<b>Новый реферал — <code>{fullname}[{user_id}]</code>!</b>")
         else:
             await request.add_user(user_id=user_id, fullname=fullname)
 

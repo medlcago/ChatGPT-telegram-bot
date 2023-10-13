@@ -10,6 +10,7 @@ from filters import IsAdmin, ChatTypeFilter
 from keyboards.callbacks import SendMessage
 from keyboards.inline_main import get_confirmation_button
 from states.admins import Administrators
+from utils import is_number
 
 command_send_message_router = Router()
 
@@ -43,13 +44,17 @@ async def message_to_send(message: types.Message, state: FSMContext, request: Da
     data = await state.get_data()
 
     message_to_user = data.get("message")
-    user_id = message.text
-    user_exists = await request.get_user(user_id=user_id)
+    user_id = is_number(message.text)
+    if not user_id:
+        await message.reply(f"<i>{message.text}</i> не является идентификатором пользователя.")
+        return
 
+    user_exists = await request.get_user(user_id=user_id)
     if user_exists:
         markup = get_confirmation_button("one").as_markup()
+        caption = f"{message_to_user.text or message_to_user.caption}\n\nПолучатель:\n{user_exists.fullname}({user_id})"
         await message_to_user.copy_to(chat_id=message.chat.id,
-                                      caption=f"{message_to_user.text or message_to_user.caption}\n\nПолучатель:\n{user_exists.fullname}({user_id})",
+                                      caption=caption,
                                       reply_markup=markup)
 
         await state.update_data(user_id=user_id)

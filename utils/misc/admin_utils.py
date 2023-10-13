@@ -1,11 +1,11 @@
 from database.db import Database
+from utils import is_number
 
 
-async def assign_admin_rights(*, user_id: str, request: Database):
-    if not user_id or not user_id.isnumeric():
+async def assign_admin_rights(*, user_id: str | int, request: Database):
+    user_id = is_number(user_id)
+    if not user_id:
         return "Аргумент не является идентификатором пользователя."
-
-    user_id = int(user_id)
 
     user = await request.get_user(user_id=user_id)
     if user is None:
@@ -20,11 +20,10 @@ async def assign_admin_rights(*, user_id: str, request: Database):
     return f"<b>{user.fullname}({user.user_id})</b> не назначен администратором."
 
 
-async def revoke_admin_rights(*, user_id: str, from_user_id: int, request: Database):
-    if not user_id or not user_id.isnumeric():
+async def revoke_admin_rights(*, user_id: str | int, from_user_id: str | int, request: Database):
+    user_id = is_number(user_id)
+    if not user_id:
         return "Аргумент не является идентификатором пользователя."
-
-    user_id = int(user_id)
 
     user = await request.get_user(user_id=user_id)
     if user is None:
