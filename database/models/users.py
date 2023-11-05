@@ -1,31 +1,28 @@
 from dataclasses import dataclass
 
-from sqlalchemy import Column, String, Text, BOOLEAN
-from sqlalchemy import MetaData
+from sqlalchemy import String, Text
 from sqlalchemy.dialects.mysql import BIGINT, SMALLINT
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import Mapped, mapped_column
 
-metadata = MetaData()
-
-Base = declarative_base(metadata=metadata)
+from database.models import Base
 
 
 @dataclass
 class User(Base):
     __tablename__ = 'users'
 
-    id: int = Column(BIGINT(unsigned=True), primary_key=True)
-    user_id: int = Column(BIGINT(unsigned=True), unique=True)
-    fullname: str = Column(Text)
-    referrer: int = Column(BIGINT(unsigned=True))
-    is_blocked: bool = Column(BOOLEAN, default=False)
-    is_admin: bool = Column(BOOLEAN, default=False)
-    is_subscriber: bool = Column(BOOLEAN, default=False)
-    is_active: bool = Column(BOOLEAN, default=True)
-    last_command_time: str = Column(Text)
-    command_count: int = Column(SMALLINT(unsigned=True), default=0)
-    chat_type: str = Column(String(255), nullable=False, default="gpt-3.5-turbo")
-    limit: int = Column(SMALLINT(unsigned=True), nullable=False, default=20)
+    id: Mapped[int] = mapped_column(BIGINT(unsigned=True), primary_key=True)
+    user_id: Mapped[int] = mapped_column(BIGINT(unsigned=True), unique=True)
+    fullname: Mapped[str] = mapped_column(Text)
+    referrer: Mapped[int] = mapped_column(BIGINT(unsigned=True))
+    is_blocked: Mapped[bool] = mapped_column(default=False)
+    is_admin: Mapped[bool] = mapped_column(default=False)
+    is_subscriber: Mapped[bool] = mapped_column(default=False)
+    is_active: Mapped[bool] = mapped_column(default=True)
+    last_command_time: Mapped[str] = mapped_column(Text)
+    command_count: Mapped[int] = mapped_column(SMALLINT(unsigned=True), default=0)
+    chat_type: Mapped[str] = mapped_column(String(255), default="gpt-3.5-turbo")
+    limit: Mapped[int] = mapped_column(SMALLINT(unsigned=True), default=20)
 
 
 update_limit_trigger = """

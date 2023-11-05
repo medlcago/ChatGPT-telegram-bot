@@ -18,7 +18,7 @@ command_image_router = Router()
 @flags.rate_limit(limit=30, key="image")
 async def command_image(message: types.Message, command: CommandObject, config: Config, bot: Bot, translator: LocalizedTranslator):
     prompt = html.quote(command.args)
-    image_generator = ImageGenerator(api_key=config.openai.api_key, api_base=config.openai.api_base, model="sdxl")
+    image_generator = ImageGenerator(api_key=config.openai.api_key, api_base=config.openai.api_base, model="kandinsky-2.2")
     sent_message = await message.reply(translator.get("processing-request-message"))
     try:
         image_response = await image_generator.generate_image(prompt=prompt)

@@ -13,7 +13,6 @@ from middlewares import (
     BlockMiddleware,
     DebugMiddleware,
     SubscribersMiddleware,
-    ConfigMiddleware,
     RedisMiddleware,
     RateLimitMiddleware,
     TranslatorMiddleware)
@@ -22,16 +21,13 @@ from settings.redis.setup import create_redis_session
 from utils.misc import set_bot_commands
 
 
-def middlewares_registration(dp: Dispatcher, config, session_pool, redis):
+def middlewares_registration(dp: Dispatcher, session_pool, redis):
     dp.message.outer_middleware(DatabaseMiddleware(session_pool))
     dp.callback_query.outer_middleware(DatabaseMiddleware(session_pool))
     dp.my_chat_member.outer_middleware(DatabaseMiddleware(session_pool))
 
     dp.message.outer_middleware(RedisMiddleware(redis))
     dp.callback_query.outer_middleware(RedisMiddleware(redis))
-
-    dp.message.outer_middleware(ConfigMiddleware(config))
-    dp.callback_query.outer_middleware(ConfigMiddleware(config))
 
     dp.message.outer_middleware(TranslatorMiddleware())
     dp.callback_query.outer_middleware(TranslatorMiddleware())
@@ -97,15 +93,21 @@ async def main():
     redis = await create_redis_session(url=config.redis.redis_url)
 
     routers_registration(dp=dp)
-    middlewares_registration(dp=dp, config=config, session_pool=session_pool, redis=redis)
+    middlewares_registration(dp=dp, session_pool=session_pool, redis=redis)
 
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s: %(message)s',
-                        datefmt='%d.%m.%Y %H:%M:%S')
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s: %(message)s',
+        datefmt='%d.%m.%Y %H:%M:%S'
+    )
     logging.info(f"Bot running in {'DEBUG' if debug else 'RELEASE'} mode!")
 
     try:
         await bot.delete_webhook(drop_pending_updates=True)
-        await dp.start_polling(bot, translator=Translator())
+        await dp.start_polling(bot,
+                               translator=Translator(),
+                               config=config
+                               )
     except Exception as ex:
         logging.error(f"[!!! Exception] - {ex}", exc_info=True)
     finally:

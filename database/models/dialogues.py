@@ -1,18 +1,16 @@
 from dataclasses import dataclass
 
-from sqlalchemy import Column, Text, MetaData
+from sqlalchemy import Text
 from sqlalchemy.dialects.mysql import BIGINT
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import Mapped, mapped_column
 
-metadata = MetaData()
-
-Base = declarative_base(metadata=metadata)
+from database.models import Base
 
 
 @dataclass
 class UserDialogues(Base):
     __tablename__ = 'user_dialogues'
 
-    id: int = Column(BIGINT(unsigned=True), primary_key=True)
-    user_id: int = Column(BIGINT(unsigned=True))
-    message: str = Column(Text)
+    id: Mapped[int] = mapped_column(BIGINT(unsigned=True), primary_key=True)
+    user_id: Mapped[int] = mapped_column(BIGINT(unsigned=True))
+    message: Mapped[str] = mapped_column(Text)

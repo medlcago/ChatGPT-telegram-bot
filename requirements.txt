@@ -9,7 +9,7 @@ cryptography==41.0.1
 psutil==5.9.5
 urllib3==1.26.6
 alembic==1.11.3
-sqlalchemy==2.0.20
+sqlalchemy==2.0.23
 aioredis==2.0.1
 redis==5.0.0
 environs==9.5.0

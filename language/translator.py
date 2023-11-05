@@ -7,20 +7,26 @@ from fluentogram import TranslatorHub, FluentTranslator, TranslatorRunner
 class Translator:
     def __init__(self):
         self.locales_path = os.path.join(os.path.dirname(__file__), 'locales')
-        self.t_hub = TranslatorHub(locales_map={
-            "en": ("en", "ru"),
-            "ru": ("ru",)
-        },
+        self.t_hub = TranslatorHub(
+            locales_map={
+                "en": ("en", "ru"),
+                "ru": ("ru",)
+            },
             translators=[
                 FluentTranslator(
                     locale="en",
-                    translator=FluentBundle.from_files(locale="en-US",
-                                                       filenames=[os.path.join(self.locales_path, 'en.ftl')],
-                                                       use_isolating=False)),
+                    translator=FluentBundle.from_files(
+                        locale="en-US",
+                        filenames=[os.path.join(self.locales_path, 'en.ftl')],
+                        use_isolating=False)
+                ),
                 FluentTranslator(locale="ru",
-                                 translator=FluentBundle.from_files(locale="ru-RU",
-                                                                    filenames=[os.path.join(self.locales_path, 'ru.ftl')],
-                                                                    use_isolating=False))],
+                                 translator=FluentBundle.from_files(
+                                     locale="ru-RU",
+                                     filenames=[os.path.join(self.locales_path, 'ru.ftl')],
+                                     use_isolating=False
+                                 )
+                                 )],
             root_locale="ru")
 
     def __call__(self, language: str):

@@ -66,12 +66,12 @@ def load_config(debug: bool = False, path: str | None = None) -> Config:
             redis_url=env.str("REDIS_URL")
         ),
         db=DbConfig(
-            user=env.str("user"),
-            password=env.str("password"),
-            host=env.str("host"),
-            port=env.str("port"),
-            database=env.str("db"),
-            connection_db_string=f'mysql+aiomysql://{env.str("user")}:{env.str("password")}@{env.str("host")}:{env.str("port")}/{env.str("db")}'
+            user=env.str("USER"),
+            password=env.str("PASSWORD"),
+            host=env.str("HOST"),
+            port=env.str("PORT"),
+            database=env.str("DB_NAME"),
+            connection_db_string=f'mysql+aiomysql://{env.str("USER")}:{env.str("PASSWORD")}@{env.str("HOST")}:{env.str("PORT")}/{env.str("DB_NAME")}'
         ),
         openai=OpenAIConfig(
             api_key=env.str("OpenAI_API_KEY"),

@@ -1,19 +1,17 @@
 from dataclasses import dataclass
 
-from sqlalchemy import Column, String, MetaData
+from sqlalchemy import String
 from sqlalchemy.dialects.mysql import TINYINT, BIGINT
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import Mapped, mapped_column
 
-metadata = MetaData()
-
-Base = declarative_base(metadata=metadata)
+from database.models import Base
 
 
 @dataclass
 class Promocode(Base):
     __tablename__ = 'promocodes'
 
-    id: int = Column(BIGINT(unsigned=True), primary_key=True)
-    promocode: str = Column(String(255), unique=True)
-    activations_count: int = Column(TINYINT(unsigned=True), default=1)
-    individual_activations_count: int = Column(TINYINT(unsigned=True), default=0)
+    id: Mapped[int] = mapped_column(BIGINT(unsigned=True), primary_key=True)
+    promocode: Mapped[str] = mapped_column(String(255), unique=True)
+    activations_count: Mapped[int] = mapped_column(TINYINT(unsigned=True), default=1)
+    individual_activations_count: Mapped[int] = mapped_column(TINYINT(unsigned=True), default=0)

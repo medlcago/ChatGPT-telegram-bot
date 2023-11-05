@@ -5,10 +5,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from data.config import load_config
-from database.models.dialogues import metadata as dialogues_metadata
-from database.models.members import metadata as members_metadata
-from database.models.promocodes import metadata as promocodes_metadata
-from database.models.users import metadata as users_metadata
+from database.models import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -17,11 +14,11 @@ config = context.config
 cfg = load_config()
 
 section = config.config_ini_section
-config.set_section_option(section, "user", cfg.db.user)
-config.set_section_option(section, "password", cfg.db.password)
-config.set_section_option(section, "host", cfg.db.host)
-config.set_section_option(section, "port", cfg.db.port)
-config.set_section_option(section, "db", cfg.db.database)
+config.set_section_option(section, "USER", cfg.db.user)
+config.set_section_option(section, "PASSWORD", cfg.db.password)
+config.set_section_option(section, "HOST", cfg.db.host)
+config.set_section_option(section, "PORT", cfg.db.port)
+config.set_section_option(section, "DB_NAME", cfg.db.database)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -32,7 +29,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = [members_metadata, promocodes_metadata, users_metadata, dialogues_metadata]
+target_metadata = Base.metadata
 
 
 # other values from the config, defined by the needs of env.py,
