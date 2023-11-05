@@ -309,7 +309,7 @@ class Database:
         """
         try:
             dialog = (await self.session.scalars(
-                select(UserDialogues.message).filter_by(user_id=user_id).order_by(UserDialogues.id).limit(
+                select(UserDialogues.message).filter_by(user_id=user_id).order_by(UserDialogues.id.desc()).limit(
                     limit))).all()
             return dialog
         except Exception as e:
