@@ -84,7 +84,7 @@ async def on_startup(bot: Bot):
 
 
 async def main():
-    config = load_config(debug := False)
+    config = load_config(debug := True)
     bot = Bot(token=config.tg.token, parse_mode="html")
     dp = Dispatcher(storage=MemoryStorage())
     dp.startup.register(on_startup)

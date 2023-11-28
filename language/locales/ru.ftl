@@ -3,8 +3,8 @@ debug-message =
     Бот временно недоступен.
 
 blocked-message =
-    <b>В доступе отказано.
-    Скорее всего, вас заблокировали за нарушение правил бота.</b>
+    <b>Access denied.
+    The request has not been fulfilled.</b>
 
 subscribers-only-message = <b>Для использования бота необходимо приобрести подписку.</b>
 

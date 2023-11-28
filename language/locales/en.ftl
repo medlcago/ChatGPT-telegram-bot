@@ -3,8 +3,8 @@ debug-message =
     The bot is temporarily unavailable.
 
 blocked-message =
-    Access is denied.
-    Most likely, you have been banned for violating the rules of the bot.
+    <b>Access is denied.
+    Most likely, you have been banned for violating the rules of the bot.</b>
 
 subscribers-only-message = <b>To use the bot, you must purchase a subscription.</b>
 

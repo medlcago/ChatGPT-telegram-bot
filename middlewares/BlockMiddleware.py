@@ -32,7 +32,6 @@ class BlockMiddleware(BaseMiddleware):
     @staticmethod
     async def handle_restriction(event: Union[Message, CallbackQuery], translator: LocalizedTranslator) -> None:
         if isinstance(event, CallbackQuery):
-            await event.answer("Access is denied.", show_alert=True)
-            await event.message.answer(translator.get("blocked-message"), reply_markup=contact_admin_button)
+            await event.answer("ACCESS_DENIED")
         else:
-            await event.answer(translator.get("blocked-message"), reply_markup=contact_admin_button)
+            await event.answer(translator.get("blocked-message"))
