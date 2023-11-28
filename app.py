@@ -4,7 +4,7 @@ import logging
 from aiogram import Dispatcher, Bot
 from aiogram.fsm.storage.memory import MemoryStorage
 
-from data.config import load_config
+from data.config import config
 from handlers import admins, general, groups, users
 from handlers import universal_handler_router
 from language.translator import Translator
@@ -84,7 +84,6 @@ async def on_startup(bot: Bot):
 
 
 async def main():
-    config = load_config(debug := True)
     bot = Bot(token=config.tg.token, parse_mode="html")
     dp = Dispatcher(storage=MemoryStorage())
     dp.startup.register(on_startup)
@@ -100,7 +99,7 @@ async def main():
         format='%(asctime)s - %(name)s - %(levelname)s: %(message)s',
         datefmt='%d.%m.%Y %H:%M:%S'
     )
-    logging.info(f"Bot running in {'DEBUG' if debug else 'RELEASE'} mode!")
+    logging.info(f"Bot running in {'DEBUG' if config.debug else 'RELEASE'} mode!")
 
     try:
         await bot.delete_webhook(drop_pending_updates=True)

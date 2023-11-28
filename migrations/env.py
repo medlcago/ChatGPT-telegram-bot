@@ -4,14 +4,13 @@ from alembic import context
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
-from data.config import load_config
+from data.config import config
 from database.models import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
+cfg = config
 config = context.config
-
-cfg = load_config()
 
 section = config.config_ini_section
 config.set_section_option(section, "USER", cfg.db.user)

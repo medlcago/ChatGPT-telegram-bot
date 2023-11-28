@@ -52,6 +52,7 @@ class Config:
     models: ModelsConfig
     creator_user_id: int
     refresh_time: int  # время (в часах) следующего обновления данных
+    debug: bool
 
 
 def load_config(debug: bool = False, path: str | None = None) -> Config:
@@ -91,10 +92,14 @@ def load_config(debug: bool = False, path: str | None = None) -> Config:
             default_model="gpt-3.5-turbo"
         ),
         creator_user_id=env.int("CREATOR_USER_ID"),
-        refresh_time=12)
+        refresh_time=12,
+        debug=debug
+    )
 
 
 main_chat_ids = (-1001633082765, -1001525007729)
 
 SUBSCRIBERS_ONLY = False
 DEBUG = False
+
+config = load_config(debug=False)
