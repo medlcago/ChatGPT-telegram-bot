@@ -98,3 +98,9 @@ message-to-administrator-message =
     {$message}
 
     Администратор ответит вам в течение <b><i>24 часов</i></b>
+
+new-user-message =
+    <b>Новый пользователь!</b>
+
+    <b>username:</b> {$username}
+    <b>user_id:</b> <code>{$user_id}</code>
