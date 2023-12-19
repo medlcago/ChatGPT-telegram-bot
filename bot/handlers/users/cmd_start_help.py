@@ -21,7 +21,6 @@ async def command_start(message: Message, command: CommandObject, request: Datab
     referrer_id = deeplink_decode(payload=command.args)
     user_id = message.from_user.id
     fullname = message.from_user.full_name
-    current_model = await request.get_user_chat_type(user_id=user_id)
     username = message.from_user.username
 
     if await request.get_user(user_id=user_id) is None:
@@ -43,6 +42,7 @@ async def command_start(message: Message, command: CommandObject, request: Datab
 
     await message.answer(translator.get("start-message", full_name=html.quote(message.from_user.full_name)))
 
+    current_model = await request.get_user_chat_type(user_id=user_id)
     await message.answer(
         text=translator.get("sub-start-message", current_model=current_model),
         reply_markup=my_profile_and_affiliate_program_buttons

@@ -68,12 +68,19 @@ def load_config(debug: bool = False, path: str | None = None) -> Config:
             redis_url=env.str("REDIS_URL")
         ),
         db=DbConfig(
-            user=env.str("USER"),
-            password=env.str("PASSWORD"),
-            host=env.str("HOST"),
-            port=env.str("PORT"),
+            user=env.str("DB_USER_TEST"),
+            password=env.str("DB_PASSWORD_TEST"),
+            host=env.str("DB_HOST_TEST"),
+            port=env.str("DB_PORT_TEST"),
+            database=env.str("DB_DB_NAME_TEST"),
+            connection_db_string=f'mysql+aiomysql://{env.str("DB_USER_TEST")}:{env.str("DB_PASSWORD_TEST")}@{env.str("DB_HOST_TEST")}:{env.str("DB_PORT_TEST")}/{env.str("DB_DB_NAME_TEST")}'
+        ) if debug else DbConfig(
+            user=env.str("DB_USER"),
+            password=env.str("DB_PASSWORD"),
+            host=env.str("DB_HOST"),
+            port=env.str("DB_PORT"),
             database=env.str("DB_NAME"),
-            connection_db_string=f'mysql+aiomysql://{env.str("USER")}:{env.str("PASSWORD")}@{env.str("HOST")}:{env.str("PORT")}/{env.str("DB_NAME")}'
+            connection_db_string=f'mysql+aiomysql://{env.str("DB_USER")}:{env.str("DB_PASSWORD")}@{env.str("DB_HOST")}:{env.str("DB_PORT")}/{env.str("DB_NAME")}'
         ),
         openai=OpenAIConfig(
             api_key=env.str("OpenAI_API_KEY"),
@@ -104,4 +111,4 @@ main_chat_ids = (-1001633082765, -1001525007729)
 SUBSCRIBERS_ONLY = False
 DEBUG = False
 
-config = load_config(debug=False)
+config = load_config(debug=True)
