@@ -75,6 +75,13 @@ class ReplyUser(StatesGroup):
     message = State()
 
 
+class UserInfo(StatesGroup):
+    """
+    Класс состояний для получения информации о пользователе
+    """
+    user_id = State()
+
+
 class Administrators:
     """
     Класс, объединяющий состояния для работы администраторов.
@@ -89,3 +96,4 @@ class Administrators:
     UnblockUser = UnblockUser
     CreatePromocode = CreatePromocode
     ReplyUser = ReplyUser
+    UserInfo = UserInfo

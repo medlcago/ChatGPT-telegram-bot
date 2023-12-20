@@ -9,6 +9,10 @@ async def set_bot_commands(bot: Bot):
             description="Запуск бота"
         ),
         BotCommand(
+            command="profile",
+            description="Мой профиль"
+        ),
+        BotCommand(
             command="help",
             description="Помощь"
         ),
@@ -26,6 +30,10 @@ async def set_bot_commands(bot: Bot):
         BotCommand(
             command="start",
             description="Start bot"
+        ),
+        BotCommand(
+            command="profile",
+            description="My profile"
         ),
         BotCommand(
             command="help",

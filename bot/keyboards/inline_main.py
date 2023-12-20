@@ -50,6 +50,9 @@ admin_panel_buttons = InlineKeyboardMarkup(inline_keyboard=[
         InlineKeyboardButton(text="Информация о сервере", callback_data="server_info")
     ],
     [
+        InlineKeyboardButton(text="Информация о пользователе", callback_data="get_user_by_id")
+    ],
+    [
 
         InlineKeyboardButton(text="❌ Закрыть панель", callback_data="close")
     ]

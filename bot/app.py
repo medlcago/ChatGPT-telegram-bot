@@ -4,9 +4,16 @@ import logging
 from aiogram import Dispatcher, Bot
 from aiogram.fsm.storage.memory import MemoryStorage
 
-from bot.handlers import users
-from bot.language.translator import Translator
-from bot.middlewares import (
+from config import config
+from handlers import (
+    users,
+    admins,
+    general,
+    groups,
+    universal_handler_router
+)
+from language.translator import Translator
+from middlewares import (
     DatabaseMiddleware,
     BlockMiddleware,
     DebugMiddleware,
@@ -14,12 +21,9 @@ from bot.middlewares import (
     RateLimitMiddleware,
     TranslatorMiddleware
 )
-from bot.settings.redis.setup import create_redis_session
-from bot.utils.misc import set_bot_commands
-from config import config
-from handlers import admins, general, groups
-from handlers import universal_handler_router
 from settings.database.setup import async_session_maker
+from settings.redis.setup import create_redis_session
+from utils.misc import set_bot_commands
 
 
 def middlewares_registration(dp: Dispatcher, session_pool):
@@ -59,6 +63,7 @@ def routers_registration(dp: Dispatcher):
     dp.include_router(admins.subscription_management_router)
     dp.include_router(admins.command_statistics_router)
     dp.include_router(admins.user_management_router)
+    dp.include_router(admins.get_user_by_id_router)
 
     dp.include_router(groups.command_gpt_groups_router)
     dp.include_router(groups.command_all_mention_router)

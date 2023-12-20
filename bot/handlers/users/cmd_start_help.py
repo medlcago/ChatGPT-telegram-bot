@@ -40,13 +40,13 @@ async def command_start(message: Message, command: CommandObject, request: Datab
             reply_markup=close_button
         )
 
-        await message.answer(translator.get("start-message", full_name=html.quote(message.from_user.full_name)))
+    await message.answer(translator.get("start-message", full_name=html.quote(message.from_user.full_name)))
 
-        current_model = await request.get_user_chat_type(user_id=user_id)
-        await message.answer(
-            text=translator.get("sub-start-message", current_model=current_model),
-            reply_markup=my_profile_and_affiliate_program_buttons
-        )
+    current_model = await request.get_user_chat_type(user_id=user_id)
+    await message.answer(
+        text=translator.get("sub-start-message", current_model=current_model),
+        reply_markup=my_profile_and_affiliate_program_buttons
+    )
 
 
 @command_start_help_router.message(Command(commands="help"), ChatTypeFilter(is_group=False))
