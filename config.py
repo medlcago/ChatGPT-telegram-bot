@@ -72,8 +72,8 @@ def load_config(debug: bool = False, path: str | None = None) -> Config:
             password=env.str("DB_PASSWORD_TEST"),
             host=env.str("DB_HOST_TEST"),
             port=env.str("DB_PORT_TEST"),
-            database=env.str("DB_DB_NAME_TEST"),
-            connection_db_string=f'mysql+aiomysql://{env.str("DB_USER_TEST")}:{env.str("DB_PASSWORD_TEST")}@{env.str("DB_HOST_TEST")}:{env.str("DB_PORT_TEST")}/{env.str("DB_DB_NAME_TEST")}'
+            database=env.str("DB_NAME_TEST"),
+            connection_db_string=f'mysql+aiomysql://{env.str("DB_USER_TEST")}:{env.str("DB_PASSWORD_TEST")}@{env.str("DB_HOST_TEST")}:{env.str("DB_PORT_TEST")}/{env.str("DB_NAME_TEST")}'
         ) if debug else DbConfig(
             user=env.str("DB_USER"),
             password=env.str("DB_PASSWORD"),
