@@ -111,4 +111,4 @@ main_chat_ids = (-1001633082765, -1001525007729)
 SUBSCRIBERS_ONLY = False
 DEBUG = False
 
-config = load_config(debug=True)
+config = load_config(debug=False)
