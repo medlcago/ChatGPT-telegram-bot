@@ -19,7 +19,8 @@ from middlewares import (
     DebugMiddleware,
     SubscribersMiddleware,
     RateLimitMiddleware,
-    TranslatorMiddleware
+    TranslatorMiddleware,
+    UserRegistrationMiddleware
 )
 from settings.database.setup import async_session_maker
 from settings.redis.setup import create_redis_session
@@ -30,6 +31,8 @@ def middlewares_registration(dp: Dispatcher, session_pool):
     dp.message.outer_middleware(DatabaseMiddleware(session_pool))
     dp.callback_query.outer_middleware(DatabaseMiddleware(session_pool))
     dp.my_chat_member.outer_middleware(DatabaseMiddleware(session_pool))
+
+    dp.message.middleware(UserRegistrationMiddleware())
 
     dp.message.outer_middleware(TranslatorMiddleware())
     dp.callback_query.outer_middleware(TranslatorMiddleware())
