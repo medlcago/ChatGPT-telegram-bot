@@ -64,7 +64,7 @@ async def confirmation_send_all(call: types.CallbackQuery, state: FSMContext, re
     count = 0
     users = await request.get_all_users(is_active=True)
     for user in users:
-        if (await state.get_state()) != "Mailing.confirmation":
+        if (await state.get_state()) != "Mailing:confirmation":
             break
         try:
             await bot.copy_message(chat_id=user.user_id, from_chat_id=from_chat_id, message_id=message_id)
